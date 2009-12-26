@@ -8,17 +8,18 @@ MainWindow::MainWindow(QWidget *parent)
     ui.setupUi(this);
 
     scene = new QGraphicsScene(this);
-    scene->setSceneRect(0,0,100,100);
     ui.view->setScene(scene);
 
 //    QPixmap p("vedado.jpg");
 //    qDebug() << p.width();
 //    qDebug() << p.height();
-//    QGraphicsPixmapItem *i = scene->addPixmap(QPixmap("vedado.jpg"));
+    QGraphicsPixmapItem *i = scene->addPixmap(QPixmap("vedado.jpg"));
 //    qDebug() << i->isVisible();
 //    ui.view->centerOn(i);
-    QGraphicsItem *e = scene->addEllipse(0,0,80,80);
-    ui.view->fitInView(e);
+    QGraphicsItem *e = scene->addEllipse(0,0,80,80,QPen(QBrush(Qt::black),2));
+//    e->setVisible(true);
+//    ui.view->fitInView(e);
+    scene->setSceneRect(QRectF());
     qDebug() << ui.view->sceneRect();
 
 }

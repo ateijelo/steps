@@ -10,10 +10,5 @@ MapView::MapView(QWidget *parent)
 
 bool MapView::viewportEvent(QEvent *event)
 {
-    if (event->type() == QEvent::Wheel)
-    {
-        QWheelEvent *e = (QWheelEvent*)(event);
-        //qDebug() << e->orientation() << e->delta();
-    }
-    return false;
+    return QGraphicsView::viewportEvent(event);
 }
