@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QGraphicsScene>
+#include <QGraphicsPixmapItem>
+#include <QList>
 
 #include "ui_mainwindow.h"
 
@@ -15,6 +17,10 @@ class MainWindow : public QMainWindow
     private:
         Ui::MainWindow ui;
         QGraphicsScene *scene;
+        QList<QGraphicsPixmapItem*> tiles;
+
+private slots:
+    void on_pushButton_clicked();
 };
 
 #endif
