@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::mapViewHadToPaint()
 {
-    qDebug() << ui.mapView->mapToScene(ui.mapView->viewport()->rect()).boundingRect();
+    //qDebug() << ui.mapView->mapToScene(ui.mapView->viewport()->rect()).boundingRect();
 }
 
 void MainWindow::on_pushButton_clicked()
