@@ -6,6 +6,7 @@
 
 class MapView : public QGraphicsView
 {
+    Q_OBJECT
     public:
         MapView(QWidget *parent=NULL);
 

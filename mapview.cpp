@@ -10,4 +10,5 @@ MapView::MapView(QWidget *parent)
 bool MapView::viewportEvent(QEvent *event)
 {
     qDebug() << event->type();
+    return false;
 }
