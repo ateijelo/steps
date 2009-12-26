@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QGraphicsScene>
 
 #include "ui_mainwindow.h"
 
@@ -13,6 +14,7 @@ class MainWindow : public QMainWindow
 
     private:
         Ui::MainWindow ui;
+        QGraphicsScene *scene;
 };
 
 #endif
