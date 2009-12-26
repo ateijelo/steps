@@ -1,4 +1,5 @@
 #include <QtDebug>
+#include <QWheelEvent>
 
 #include "mapview.h"
 
@@ -9,6 +10,10 @@ MapView::MapView(QWidget *parent)
 
 bool MapView::viewportEvent(QEvent *event)
 {
-    qDebug() << event->type();
+    if (event->type() == QEvent::Wheel)
+    {
+        QWheelEvent *e = (QWheelEvent*)(event);
+        qDebug() << e->orientation() << e->delta();
+    }
     return false;
 }
