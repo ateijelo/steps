@@ -8,24 +8,21 @@ MainWindow::MainWindow(QWidget *parent)
     ui.setupUi(this);
 
     scene = new QGraphicsScene(this);
-    ui.view->setScene(scene);
+    ui.mapView->setScene(scene);
 
-//    QPixmap p("vedado.jpg");
-//    qDebug() << p.width();
-//    qDebug() << p.height();
-    for (int i=0; i<10; i++)
+    for (int i=0; i<3; i++)
     {
         tiles.append(scene->addPixmap(QPixmap("vedado.jpg")));
         tiles.last()->setPos(4096*i,0);
     }
-//    qDebug() << i->isVisible();
-//    ui.view->centerOn(i);
-    QGraphicsItem *e = scene->addEllipse(0,0,80,80,QPen(QBrush(Qt::black),2));
-//    e->setVisible(true);
-//    ui.view->fitInView(e);
     scene->setSceneRect(QRectF());
-    qDebug() << ui.view->sceneRect();
+    qDebug() << ui.mapView->sceneRect();
+    connect(ui.mapView,SIGNAL(hadToPaint()),this,SLOT(mapViewHadToPaint()));
+}
 
+void MainWindow::mapViewHadToPaint()
+{
+    qDebug() << ui.mapView->mapToScene(ui.mapView->viewport()->rect()).boundingRect();
 }
 
 void MainWindow::on_pushButton_clicked()

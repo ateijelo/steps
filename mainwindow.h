@@ -19,8 +19,9 @@ class MainWindow : public QMainWindow
         QGraphicsScene *scene;
         QList<QGraphicsPixmapItem*> tiles;
 
-private slots:
-    void on_pushButton_clicked();
+    private slots:
+        void on_pushButton_clicked();
+        void mapViewHadToPaint();
 };
 
 #endif

@@ -11,6 +11,8 @@ class MapView : public QGraphicsView
         MapView(QWidget *parent=NULL);
 
         bool viewportEvent(QEvent *event);
+    signals:
+        void hadToPaint();
 };
 
 #endif
