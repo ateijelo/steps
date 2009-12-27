@@ -20,7 +20,6 @@ class MainWindow : public QMainWindow
         QList<QGraphicsPixmapItem*> tiles;
 
     private slots:
-        void on_pushButton_clicked();
         void mapViewHadToPaint();
 };
 
