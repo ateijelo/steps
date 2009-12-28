@@ -9,9 +9,11 @@ INCLUDEPATH += .
 # Input
 HEADERS += mainwindow.h \
     mapview.h \
-    testthread.h
+    mgmreader.h \
+    geotools.h
 FORMS += mainwindow.ui
 SOURCES += main.cpp \
     mainwindow.cpp \
     mapview.cpp \
-    testthread.cpp
+    mgmreader.cpp \
+    geotools.cpp
