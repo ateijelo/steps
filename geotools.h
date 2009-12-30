@@ -1,6 +1,9 @@
 #ifndef GEOTOOLS_H
 #define GEOTOOLS_H
 
+// Utility functions for Qt GMaps
+// Copyright (C) 2009 Andy Teijelo <andy@teijelo.net>
+//
 // This class defines several functions to work with the WGS84
 // ellipsoid, with the Mercator projection used by GoogleMap,
 // with its tiling system, etc.
@@ -47,7 +50,13 @@ class GeoTools
     public:
         GeoTools(int tileSize=256);
 
-        void LatLon2Meters(double lat, double lon, double &mx, double &my);
+        void LatLon2Meters(double lat, double lon, double *mx, double *my);
+        void Meters2TMSTile(double mx, double my, int zoom, int *tx, int *ty);
+        void Meters2Pixels(double mx, double my, int zoom, double *px, double *py);
+        void Pixels2TMSTile(double px, double py, int *tx, int *ty);
+        void Pixels2GoogleTile(double px, double py, int zoom, int *gx, int *gy);
+        void TMS2Google(int tx, int ty, int zoom, int *gx, int *gy);
+        double resolution(int zoom);
 
     private:
         int tileSize;

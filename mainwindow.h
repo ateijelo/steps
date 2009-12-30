@@ -3,10 +3,12 @@
 
 #include <QMainWindow>
 #include <QGraphicsScene>
-#include <QGraphicsPixmapItem>
-#include <QList>
+#include <QLinkedList>
+#include <QPoint>
 
 #include "ui_mainwindow.h"
+#include "geotools.h"
+#include "tile.h"
 
 class MainWindow : public QMainWindow
 {
@@ -17,10 +19,14 @@ class MainWindow : public QMainWindow
     private:
         Ui::MainWindow ui;
         QGraphicsScene *scene;
-        QList<QGraphicsPixmapItem*> tiles;
+        QLinkedList<Tile*> tiles;
+        GeoTools gt;
+        QPointF center;
+        int zoom;
 
     private slots:
         void mapViewHadToPaint();
+        void test();
 };
 
 #endif

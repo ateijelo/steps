@@ -10,10 +10,12 @@ INCLUDEPATH += .
 HEADERS += mainwindow.h \
     mapview.h \
     mgmreader.h \
-    geotools.h
+    geotools.h \
+    tile.h
 FORMS += mainwindow.ui
 SOURCES += main.cpp \
     mainwindow.cpp \
     mapview.cpp \
     mgmreader.cpp \
-    geotools.cpp
+    geotools.cpp \
+    tile.cpp
