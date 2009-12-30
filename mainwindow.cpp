@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     Tile *t = new Tile();
     t->setPixmap(QPixmap("00-0_0.mgm.00x00.png"));
 #if QT_VERSION >= 0x040600
-    t->setScale(res,res);
+    t->setScale(res);
 #else
     t->scale(res,res);
 #endif
