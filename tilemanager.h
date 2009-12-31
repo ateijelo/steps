@@ -20,7 +20,7 @@ class TileManager : public QObject
 
     private:
         ColumnPointer adjustBeforeIntersection(const QRect& n, int zoom);
-        void adjustColumn(Column* col, const QRect& n, int zoom);
+        void adjustColumn(Column* col, const QRect& n, int x, int zoom);
         void deleteColumn(Column* col);
 
         QLinkedList<Column*> columns;

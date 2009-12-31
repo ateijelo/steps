@@ -29,7 +29,7 @@ TileManager::ColumnPointer TileManager::adjustBeforeIntersection(const QRect& n,
     int check1 = 0; // Only one of the following cycles should enter
     int check2 = 0;
 
-    // Columns to be deleted
+    // Columns to be deleted from front
     for (int i=o.left(); i<=qMin(o.right(),n.left()-1); i++)
     {
         check1 = 1;
@@ -56,9 +56,21 @@ TileManager::ColumnPointer TileManager::adjustBeforeIntersection(const QRect& n,
     return p;
 }
 
-void TileManager::adjustColumn(Column* col, const QRect& n, int zoom)
+void TileManager::adjustColumn(Column* col, const QRect& n, int x, int zoom)
 {
-
+    QRect& o = region; // n => new, o => old
+    // Tiles to be deleted from the top of the column
+    for (int i=o.top(); i<=qMin(o.bottom(),n.top()-1); i++)
+    {
+        Tile *t = col->takeFirst();
+        delete t;
+    }
+    // Tiles to be prepended in the top of the column
+    TilePointer p = col->begin();
+    for (int i=n.top(); i<=qMin(n.bottom(),o.top()-1); i++)
+    {
+        col->insert(p,new Tile(x,i,zoom));
+    }
 }
 
 void TileManager::setRegion(const QRect& n, int zoom)
@@ -73,20 +85,15 @@ void TileManager::setRegion(const QRect& n, int zoom)
     {
         for (int i=qMax(n.left(),o.left()); i<=qMin(n.right(),o.right()); i++)
         {
+            adjustColumn(*p,n,i,zoom);
+            p++;
         }
     }
     // We're now in the intersection
     // The analysis is similar, but instead of
     // adding or removing whole columns, it'll
     // be individual tiles within one column.
-    for (int i=n.top(); i<=qMin(n.bottom(),o.top()-1); i++)
-    {
-        // tiles to prepend
-    }
-    for (int i=o.top(); i<=qMin(o.bottom(),n.top()-1); i++)
-    {
-        // tiles to delete
-    }
+
     // Here the iterator must be moved to the end of the column
     // And a similar process happens
     for (int i=qMax(n.left(),o.right()+1); i<=n.right(); i++)

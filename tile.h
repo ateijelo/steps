@@ -7,6 +7,7 @@ class Tile : public QGraphicsPixmapItem
 {
     public:
         Tile(int x, int y, int zoom);
+        ~Tile();
     private:
         int x,y,zoom;
 };
