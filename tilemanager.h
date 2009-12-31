@@ -19,8 +19,9 @@ class TileManager : public QObject
         void setRegion(const QRect& r, int zoom);
 
     private:
-        ColumnPointer adjustBeforeIntersection(const QRect& n, int zoom);
+        ColumnPointer adjustBeforeIntersection(const QRect& n, int zoom);        
         void adjustColumn(Column* col, const QRect& n, int x, int zoom);
+        void adjustAfterIntersection(const QRect& n, int zoom);
         void deleteColumn(Column* col);
 
         QLinkedList<Column*> columns;

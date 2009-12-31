@@ -39,16 +39,16 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::mapViewHadToPaint()
 {
-    QRectF drawArea = ui.mapView->mapToScene(ui.mapView->viewport()->rect()).boundingRect();
-    qDebug() << drawArea;
-    qDebug() << "tile boundaries: "
-             << gt.Meters2GoogleTile(drawArea.topLeft(),zoom)
-             << gt.Meters2GoogleTile(drawArea.bottomRight(),zoom);
+//    QRectF drawArea = ui.mapView->mapToScene(ui.mapView->viewport()->rect()).boundingRect();
+//    qDebug() << drawArea;
+//    qDebug() << "tile boundaries: "
+//             << gt.Meters2GoogleTile(drawArea.topLeft(),zoom)
+//             << gt.Meters2GoogleTile(drawArea.bottomRight(),zoom);
 }
 
 void MainWindow::mapViewMouseMoved(const QPoint& p)
 {
-    qDebug() << "mouse moved:" << gt.Meters2LatLon(ui.mapView->mapToScene(p));
+//    qDebug() << "mouse moved:" << gt.Meters2LatLon(ui.mapView->mapToScene(p));
 }
 
 void MainWindow::test()
