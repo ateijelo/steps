@@ -110,7 +110,7 @@ void TileManager::adjustAfterIntersection(const QRect& n, int zoom)
 
 void TileManager::setRegion(const QRect& n, int zoom)
 {
-    qDebug() << "setRegion: " << n;
+    //qDebug() << "setRegion: " << n;
     QRect& o = region; // n => new, o => old
 
     ColumnPointer p = adjustBeforeIntersection(n,zoom);
