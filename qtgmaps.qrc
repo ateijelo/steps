@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="/img" >
+    <file alias="zoom-in.png" >img/zoom-in.png</file>
+    <file alias="zoom-out.png" >img/zoom-out.png</file>
+    <file alias="rotate-left.png" >img/rotate-left.png</file>
+    <file alias="rotate-right.png" >img/rotate-right.png</file>
+  </qresource>
+</RCC>
