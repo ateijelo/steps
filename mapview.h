@@ -11,8 +11,10 @@ class MapView : public QGraphicsView
         MapView(QWidget *parent=NULL);
 
         bool viewportEvent(QEvent *event);
+        void mouseMoveEvent(QMouseEvent *event);
     signals:
         void hadToPaint();
+        void mouseMoved(const QPoint&);
 };
 
 #endif

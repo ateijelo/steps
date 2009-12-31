@@ -40,23 +40,26 @@
 // found in:
 //  http://www.movable-type.co.uk/scripts/latlong-vincenty.html
 //
-// The code is offerede there under the LGPL license
+// The code is offered there under the LGPL license
 // (http://creativecommons.org/licenses/LGPL/2.1/)
 // and includes the following notice:
 //  Copyright © 2002-2009 Chris Veness
+
+#include <QPoint>
+#include <QPointF>
 
 class GeoTools
 {
     public:
         GeoTools(int tileSize=256);
 
-        void LatLon2Meters(double lat, double lon, double *mx, double *my);
-        void Meters2TMSTile(double mx, double my, int zoom, int *tx, int *ty);
-        void Meters2Pixels(double mx, double my, int zoom, double *px, double *py);
-        void Pixels2TMSTile(double px, double py, int *tx, int *ty);
-        void Pixels2GoogleTile(double px, double py, int zoom, int *gx, int *gy);
-        void TMS2Google(int tx, int ty, int zoom, int *gx, int *gy);
         double resolution(int zoom);
+        QPointF LatLon2Meters(const QPointF& l);
+        QPointF Meters2LatLon(const QPointF& m);
+        QPointF Meters2Pixels(const QPointF& m, int zoom);
+        QPointF Pixels2Meters(const QPointF& p, int zoom);
+        QPoint Pixels2GoogleTile(const QPointF& p);
+        QPoint Meters2GoogleTile(const QPointF& m, int zoom);
 
     private:
         int tileSize;

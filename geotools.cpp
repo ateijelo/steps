@@ -56,57 +56,56 @@ GeoTools::GeoTools(int tileSize)
 
 // This function converts lat/lon to meter coordinates
 // in the Spherical Mercator EPSG:900913
-void GeoTools::LatLon2Meters(double lat, double lon, double *_mx, double *_my)
+// It's modified to make meter coordinates grow right and down
+// like screen coordinates.
+QPointF GeoTools::LatLon2Meters(const QPointF& l)
 {
     double mx,my;
-    mx = lon * originShift / 180.0;
-    my = log(tan((90.0 + lat) * M_PI / 360.0)) / (M_PI / 180.0);
-    my = my * originShift / 180.0;
-    (*_mx) = mx;
-    (*_my) = my;
+    mx = l.y() * originShift / 180.0;
+    my = log(tan((90.0 + l.x()) * M_PI / 360.0)) / (M_PI / 180.0);
+    my = - my * originShift / 180.0;
+    return QPointF(mx,my);
 }
 
+// Converts XY point from Spherical Mercator EPSG:900913 to lat/lon in WGS84 Datum
+QPointF GeoTools::Meters2LatLon(const QPointF& m)
+{
+    double lat,lon;
+    lon =  (m.x() / originShift) * 180.0;
+    lat = -(m.y() / originShift) * 180.0;
+    lat = 180 / M_PI * (2 * atan( exp( lat * M_PI / 180.0)) - M_PI / 2.0);
+    return QPointF(lat,lon);
+}
+
+// Gives how many projection meters 1 pixel represents at given zoom leven
 double GeoTools::resolution(int zoom)
 {
     return initialResolution / (1 << zoom);
 }
 
 // Converts EPSG:900913 to pyramid pixel coordinates in given zoom level
-void GeoTools::Meters2Pixels(double mx, double my, int zoom, double *_px, double *_py)
+QPointF GeoTools::Meters2Pixels(const QPointF& m, int zoom)
 {
-    double px,py;
     double res = resolution(zoom);
-    px = (mx + originShift) / res;
-    py = (my + originShift) / res;
-    (*_px) = px;
-    (*_py) = py;
+    return QPointF((m.x() + originShift) / res,(m.y() + originShift) / res);
 }
 
-// Returns the TMS tile that contains the given pixel coordinates
-void GeoTools::Pixels2TMSTile(double px, double py, int *_tx, int *_ty)
+// Converts pixel coordinates to projection meters
+QPointF GeoTools::Pixels2Meters(const QPointF& p, int zoom)
 {
-    (*_tx) = int(ceil(px/tileSize) - 1);
-    (*_ty) = int(ceil(py/tileSize) - 1);
+    double res = resolution(zoom);
+    return QPointF(p.x()*res - originShift, p.y()*res - originShift);
 }
 
 // Returns the Google Tile coordinates that contain the given pixel
-void GeoTools::Pixels2GoogleTile(double px, double py, int zoom, int *_gx, int *_gy)
+QPoint GeoTools::Pixels2GoogleTile(const QPointF &p)
 {
-    (*_gx) = int(ceil(px/tileSize) - 1);
-    (*_gy) = (1 << zoom) - 1 - int(ceil(py/tileSize) - 1);
+    return QPoint(int(ceil(p.x()/tileSize) - 1),int(ceil(p.y()/tileSize) - 1));
 }
 
-// Returns TMS tile for given mercator coordinates
-void GeoTools::Meters2TMSTile(double mx, double my, int zoom, int *_tx, int *_ty)
+// Returns the Google Tile that contains the given
+// projection point at the given zoom level
+QPoint GeoTools::Meters2GoogleTile(const QPointF& m, int zoom)
 {
-    double px,py;
-    Meters2Pixels(mx,my,zoom,&px,&py);
-    Pixels2TMSTile(px,py,_tx,_ty);
-}
-
-// Converts TMS tile coordinates to Google Tile coordinates
-void GeoTools::TMS2Google(int tx, int ty, int zoom, int *_gx, int *_gy)
-{
-    (*_gx) = tx;
-    (*_gy) = (1 << zoom) - 1 - ty;
+    return Pixels2GoogleTile(Meters2Pixels(m,zoom));
 }

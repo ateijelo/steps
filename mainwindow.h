@@ -19,6 +19,7 @@ class MainWindow : public QMainWindow
     private:
         Ui::MainWindow ui;
         QGraphicsScene *scene;
+        QLinkedList<QLinkedList<Tile*>*> columns;
         QLinkedList<Tile*> tiles;
         GeoTools gt;
         QPointF center;
@@ -26,6 +27,7 @@ class MainWindow : public QMainWindow
 
     private slots:
         void mapViewHadToPaint();
+        void mapViewMouseMoved(const QPoint&);
         void test();
 };
 

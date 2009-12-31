@@ -14,3 +14,9 @@ bool MapView::viewportEvent(QEvent *event)
         emit hadToPaint();
     return QGraphicsView::viewportEvent(event);
 }
+
+void MapView::mouseMoveEvent(QMouseEvent *event)
+{
+    emit mouseMoved(event->pos());
+    QGraphicsView::mouseMoveEvent(event);
+}

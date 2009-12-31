@@ -11,11 +11,14 @@ HEADERS += mainwindow.h \
     mapview.h \
     mgmreader.h \
     geotools.h \
-    tile.h
+    tile.h \
+    tilemanager.h
 FORMS += mainwindow.ui
 SOURCES += main.cpp \
     mainwindow.cpp \
     mapview.cpp \
     mgmreader.cpp \
     geotools.cpp \
-    tile.cpp
+    tile.cpp \
+    tilemanager.cpp
+RESOURCES += qtgmaps.qrc

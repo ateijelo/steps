@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>564</width>
-    <height>529</height>
+    <width>562</width>
+    <height>527</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,124 +31,61 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QDoubleSpinBox" name="lat">
-          <property name="decimals">
-           <number>5</number>
-          </property>
-          <property name="minimum">
-           <double>-89.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>89.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.000001000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QDoubleSpinBox" name="mx">
-          <property name="decimals">
-           <number>5</number>
-          </property>
-          <property name="minimum">
-           <double>-99999999.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>99999999.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QDoubleSpinBox" name="px">
-          <property name="decimals">
-           <number>5</number>
-          </property>
-          <property name="minimum">
-           <double>-99999999.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>99999999.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSpinBox" name="tx">
-          <property name="maximum">
-           <number>16777216</number>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSpinBox" name="gx">
-          <property name="maximum">
-           <number>16777216</number>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <widget class="QDoubleSpinBox" name="lon">
-          <property name="decimals">
-           <number>5</number>
-          </property>
-          <property name="minimum">
-           <double>-179.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>179.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.000001000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QDoubleSpinBox" name="my">
-          <property name="decimals">
-           <number>5</number>
-          </property>
-          <property name="minimum">
-           <double>-99999999.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>99999999.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QDoubleSpinBox" name="py">
-          <property name="decimals">
-           <number>5</number>
-          </property>
-          <property name="minimum">
-           <double>-99999999.000000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>99999999.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSpinBox" name="ty">
-          <property name="maximum">
-           <number>16777216</number>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSpinBox" name="gy">
-          <property name="maximum">
-           <number>16777216</number>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QToolButton" name="rotLeft">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="qtgmaps.qrc">
+          <normaloff>:/img/rotate-left.png</normaloff>:/img/rotate-left.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="rotRight">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="qtgmaps.qrc">
+          <normaloff>:/img/rotate-right.png</normaloff>:/img/rotate-right.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="zoomIn">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="qtgmaps.qrc">
+          <normaloff>:/img/zoom-in.png</normaloff>:/img/zoom-in.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="zoomOut">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="qtgmaps.qrc">
+          <normaloff>:/img/zoom-out.png</normaloff>:/img/zoom-out.png</iconset>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QSpinBox" name="zoom"/>
@@ -162,7 +99,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>564</width>
+     <width>562</width>
      <height>22</height>
     </rect>
    </property>
@@ -176,6 +113,8 @@
    <header>mapview.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="qtgmaps.qrc"/>
+ </resources>
  <connections/>
 </ui>
