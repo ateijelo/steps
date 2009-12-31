@@ -18,12 +18,12 @@ MainWindow::MainWindow(QWidget *parent)
     zoom = 0;
     if (zoom == 0)
         ui.zoomOut->setEnabled(false);
-    if (zoom == 19)
+    if (zoom == 18)
         ui.zoomIn->setEnabled(false);
 
     double res = gt.resolution(zoom);
 
-    ui.mapView->scale(1/res/2, 1/res/2);
+    ui.mapView->scale(1/res, 1/res);
 
 //    Tile *t = new Tile(0,0,zoom);
 //    //t->setPixmap(QPixmap("00-0_0.mgm.00x00.png"));
@@ -50,7 +50,7 @@ void MainWindow::zoomIn()
 {
     tm->clear();
     zoom++;
-    if (zoom == 19)
+    if (zoom == 18)
         ui.zoomIn->setEnabled(false);
     ui.zoomOut->setEnabled(true);
     ui.mapView->scale(2.0,2.0);
@@ -76,7 +76,7 @@ void MainWindow::displayNewTile(Tile *t, int x, int y, int zoom)
 
 void MainWindow::mapViewHadToPaint()
 {
-    QRectF drawArea = ui.mapView->mapToScene(ui.mapView->viewport()->rect().adjusted(64,64,-64,-64)).boundingRect();
+    QRectF drawArea = ui.mapView->mapToScene(ui.mapView->viewport()->rect().adjusted(-20,-20,20,20)).boundingRect();
     QPoint tl = gt.Meters2GoogleTile(drawArea.topLeft(),zoom);
     QPoint br = gt.Meters2GoogleTile(drawArea.bottomRight(),zoom);
     tm->setRegion(QRect(tl,br),zoom);
