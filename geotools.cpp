@@ -109,3 +109,23 @@ QPoint GeoTools::Meters2GoogleTile(const QPointF& m, int zoom)
 {
     return Pixels2GoogleTile(Meters2Pixels(m,zoom));
 }
+
+QPointF GeoTools::GoogleTile2Pixels(int x, int y)
+{
+    return QPointF(x*tileSize,y*tileSize);
+}
+
+QPointF GeoTools::GoogleTile2Pixels(const QPoint &g)
+{
+    return GoogleTile2Pixels(g.x(),g.y());
+}
+
+QPointF GeoTools::GoogleTile2Meters(int x, int y, int zoom)
+{
+    return Pixels2Meters(GoogleTile2Pixels(x,y),zoom);
+}
+
+QPointF GeoTools::GoogleTile2Meters(const QPoint &g, int zoom)
+{
+    return GoogleTile2Meters(g.x(),g.y(),zoom);
+}

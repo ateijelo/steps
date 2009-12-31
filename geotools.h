@@ -59,7 +59,11 @@ class GeoTools
         QPointF Meters2Pixels(const QPointF& m, int zoom);
         QPointF Pixels2Meters(const QPointF& p, int zoom);
         QPoint Pixels2GoogleTile(const QPointF& p);
+        QPointF GoogleTile2Pixels(int x, int y);
+        QPointF GoogleTile2Pixels(const QPoint& g);
         QPoint Meters2GoogleTile(const QPointF& m, int zoom);
+        QPointF GoogleTile2Meters(int x, int y, int zoom);
+        QPointF GoogleTile2Meters(const QPoint& g, int zoom);
 
     private:
         int tileSize;

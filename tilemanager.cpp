@@ -7,10 +7,17 @@ TileManager::TileManager()
     // This class considers the boundaries
     // of the rectangle to be inclusive.
     // So, 0,0,0,0 is a region with one tile.
-    region.setCoords(0,0,0,0);
-    Column *c = new Column();
-    c->append(new Tile(0,0,0));
-    columns.append(c);
+    region.setCoords(0,0,-1,-1);
+//    Column *c = new Column();
+//    c->append(newTile(0,0,0));
+//    columns.append(c);
+}
+
+Tile* TileManager::newTile(int x, int y, int zoom)
+{
+    Tile *t = new Tile(x,y,zoom);
+    emit tileCreated(t,x,y,zoom);
+    return t;
 }
 
 void TileManager::deleteColumn(Column *c)
@@ -42,7 +49,7 @@ TileManager::ColumnPointer TileManager::adjustBeforeIntersection(const QRect& n,
         Column *c = new Column();
         for (int j=n.top(); j<=n.bottom(); j++)
         {
-            c->append(new Tile(i,j,zoom));
+            c->append(newTile(i,j,zoom));
         }
         columns.insert(p,c);
     }
@@ -65,7 +72,7 @@ void TileManager::adjustColumn(Column* col, const QRect& n, int x, int zoom)
     p = col->begin();
     for (int i=n.top(); i<=qMin(n.bottom(),o.top()-1); i++)
     {
-        col->insert(p,new Tile(x,i,zoom));
+        col->insert(p,newTile(x,i,zoom));
     }
 
     // Tiles to be deleted from the end of the column
@@ -78,7 +85,7 @@ void TileManager::adjustColumn(Column* col, const QRect& n, int x, int zoom)
     p = col->end();
     for (int i=qMax(o.bottom()+1,n.top()); i<=n.bottom(); i++)
     {
-        col->insert(p,new Tile(x,i,zoom));
+        col->insert(p,newTile(x,i,zoom));
     }
 }
 
@@ -95,7 +102,7 @@ void TileManager::adjustAfterIntersection(const QRect& n, int zoom)
         Column *c = new Column();
         for (int j=n.top(); j<=n.bottom(); j++)
         {
-            c->append(new Tile(i,j,zoom));
+            c->append(newTile(i,j,zoom));
         }
         columns.append(c);
     }
@@ -122,4 +129,9 @@ void TileManager::setRegion(const QRect& n, int zoom)
     adjustAfterIntersection(n,zoom);
 
     region = n;
+}
+
+void TileManager::clear()
+{
+    setRegion(QRect(0,0,0,0),0);
 }

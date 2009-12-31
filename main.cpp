@@ -7,15 +7,13 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-    //MainWindow m;
-    //m.show();
+    MainWindow m;
+    m.show();
 
-    TileManager tm;
-
-    tm.setRegion(QRect(0,0,2,2),0);
-    tm.setRegion(QRect(1,4,2,3),0);
-    tm.setRegion(QRect(4,4,3,3),0);
-    tm.setRegion(QRect(2,3,4,3),0);
-
-    //return app.exec();
+    return app.exec();
+//    TileManager tm;
+//
+//    tm.setRegion(QRect(1,4,2,3),0);
+//    tm.clear();
+//    tm.setRegion(QRect(2,3,3,3),0);
 }

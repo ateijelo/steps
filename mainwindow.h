@@ -8,6 +8,7 @@
 
 #include "ui_mainwindow.h"
 #include "geotools.h"
+#include "tilemanager.h"
 #include "tile.h"
 
 class MainWindow : public QMainWindow
@@ -22,13 +23,17 @@ class MainWindow : public QMainWindow
         QLinkedList<QLinkedList<Tile*>*> columns;
         QLinkedList<Tile*> tiles;
         GeoTools gt;
+        TileManager *tm;
         QPointF center;
         int zoom;
 
     private slots:
         void mapViewHadToPaint();
         void mapViewMouseMoved(const QPoint&);
+        void displayNewTile(Tile *t, int x, int y, int zoom);
         void test();
+        void zoomIn();
+        void zoomOut();
 };
 
 #endif
