@@ -58,11 +58,13 @@ GeoTools::GeoTools(int tileSize)
 // in the Spherical Mercator EPSG:900913
 // It's modified to make meter coordinates grow right and down
 // like screen coordinates.
+// l.x() is longitude
+// l.y() is latitude
 QPointF GeoTools::LatLon2Meters(const QPointF& l)
 {
     double mx,my;
-    mx = l.y() * originShift / 180.0;
-    my = log(tan((90.0 + l.x()) * M_PI / 360.0)) / (M_PI / 180.0);
+    mx = l.x() * originShift / 180.0;
+    my = log(tan((90.0 + l.y()) * M_PI / 360.0)) / (M_PI / 180.0);
     my = - my * originShift / 180.0;
     return QPointF(mx,my);
 }

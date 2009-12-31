@@ -13,6 +13,7 @@ Tile::Tile(int x, int y, int zoom)
     //r->setParentItem(this);
     //QGraphicsTextItem *t = new QGraphicsTextItem(QString("(%1,%2,%3)").arg(x).arg(y).arg(zoom));
     //t->setParentItem(this);
+    setTransformationMode(Qt::SmoothTransformation);
     int mgm_x = x >> 3;
     int mgm_y = y >> 3;
     int in_x = x & 7;
@@ -71,6 +72,7 @@ Tile::Tile(int x, int y, int zoom)
                 p.loadFromData((uchar*)data,(uint)tile_size,0);
                 setPixmap(p);
             }
+            delete data;
         }
     }
 }

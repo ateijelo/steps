@@ -5,7 +5,7 @@
 #include "mgmreader.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+    : QMainWindow(parent), angle(0)
 {
     ui.setupUi(this);
 
@@ -15,15 +15,10 @@ MainWindow::MainWindow(QWidget *parent)
                                     gt.Pixels2Meters(QPointF(256,256),0)) );
 
     center = QPointF(-82.38,23.13);
-    zoom = 0;
-    if (zoom == 0)
-        ui.zoomOut->setEnabled(false);
-    if (zoom == 18)
-        ui.zoomIn->setEnabled(false);
 
-    double res = gt.resolution(zoom);
+    //double res = gt.resolution(zoom);
 
-    ui.mapView->scale(1/res, 1/res);
+    //ui.mapView->scale(1/res, 1/res);
 
 //    Tile *t = new Tile(0,0,zoom);
 //    //t->setPixmap(QPixmap("00-0_0.mgm.00x00.png"));
@@ -36,34 +31,61 @@ MainWindow::MainWindow(QWidget *parent)
 //    tiles.append(t);
 //    scene->addItem(t);
 
-    tm = new TileManager();
-
-    connect(tm,SIGNAL(tileCreated(Tile*,int,int,int)),this,SLOT(displayNewTile(Tile*,int,int,int)));
+    connect(&tm,SIGNAL(tileCreated(Tile*,int,int,int)),this,SLOT(displayNewTile(Tile*,int,int,int)));
     connect(ui.mapView,SIGNAL(hadToPaint()),this,SLOT(mapViewHadToPaint()));
     connect(ui.mapView,SIGNAL(mouseMoved(QPoint)),this,SLOT(mapViewMouseMoved(QPoint)));
     connect(ui.zoom,SIGNAL(valueChanged(int)),this,SLOT(test()));
     connect(ui.zoomIn,SIGNAL(clicked()),this,SLOT(zoomIn()));
     connect(ui.zoomOut,SIGNAL(clicked()),this,SLOT(zoomOut()));
+    connect(ui.rotRight,SIGNAL(clicked()),this,SLOT(rotRight()));
+    connect(ui.rotLeft,SIGNAL(clicked()),this,SLOT(rotLeft()));
+
+    setZoomLevel(12);
+    qDebug() << gt.LatLon2Meters(center);
+    ui.mapView->centerOn(gt.LatLon2Meters(center));
+}
+
+void MainWindow::setZoomLevel(int zoom)
+{
+    if (zoom < 0)
+        zoom = 0;
+    if (zoom > 18)
+        zoom = 18;
+    if (zoom == 0)
+        ui.zoomOut->setEnabled(false);
+    else
+        ui.zoomOut->setEnabled(true);
+    if (zoom == 18)
+        ui.zoomIn->setEnabled(false);
+    else
+        ui.zoomIn->setEnabled(true);
+    ui.mapView->resetTransform();
+    ui.mapView->rotate(angle);
+    tm.clear();
+    ui.mapView->scale(1/gt.resolution(zoom),1/gt.resolution(zoom));
+    this->zoom = zoom;
 }
 
 void MainWindow::zoomIn()
 {
-    tm->clear();
-    zoom++;
-    if (zoom == 18)
-        ui.zoomIn->setEnabled(false);
-    ui.zoomOut->setEnabled(true);
-    ui.mapView->scale(2.0,2.0);
+    setZoomLevel(zoom + 1);
 }
 
 void MainWindow::zoomOut()
 {
-    tm->clear();
-    zoom--;
-    if (zoom == 0)
-        ui.zoomOut->setEnabled(false);
-    ui.zoomIn->setEnabled(true);
-    ui.mapView->scale(0.5,0.5);
+    setZoomLevel(zoom - 1);
+}
+
+void MainWindow::rotRight()
+{
+    ui.mapView->rotate(15);
+    angle = (angle+15 > 360)? angle - 345 : angle + 15;
+}
+
+void MainWindow::rotLeft()
+{
+    ui.mapView->rotate(-15);
+    angle = (angle-15 < 0)? angle + 345 : angle - 15;
 }
 
 void MainWindow::displayNewTile(Tile *t, int x, int y, int zoom)
@@ -79,12 +101,12 @@ void MainWindow::mapViewHadToPaint()
     QRectF drawArea = ui.mapView->mapToScene(ui.mapView->viewport()->rect().adjusted(-20,-20,20,20)).boundingRect();
     QPoint tl = gt.Meters2GoogleTile(drawArea.topLeft(),zoom);
     QPoint br = gt.Meters2GoogleTile(drawArea.bottomRight(),zoom);
-    tm->setRegion(QRect(tl,br),zoom);
+    tm.setRegion(QRect(tl,br),zoom);
 }
 
 void MainWindow::mapViewMouseMoved(const QPoint& p)
 {
-//    qDebug() << "mouse moved:" << gt.Meters2LatLon(ui.mapView->mapToScene(p));
+    qDebug() << "mouse moved:" << gt.Meters2LatLon(ui.mapView->mapToScene(p));
 }
 
 void MainWindow::test()

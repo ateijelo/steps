@@ -23,9 +23,10 @@ class MainWindow : public QMainWindow
         QLinkedList<QLinkedList<Tile*>*> columns;
         QLinkedList<Tile*> tiles;
         GeoTools gt;
-        TileManager *tm;
+        TileManager tm;
         QPointF center;
         int zoom;
+        qreal angle;
 
     private slots:
         void mapViewHadToPaint();
@@ -34,6 +35,9 @@ class MainWindow : public QMainWindow
         void test();
         void zoomIn();
         void zoomOut();
+        void rotRight();
+        void rotLeft();
+        void setZoomLevel(int zoom);
 };
 
 #endif
