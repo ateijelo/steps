@@ -34,11 +34,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&tm,SIGNAL(tileCreated(Tile*,int,int,int)),this,SLOT(displayNewTile(Tile*,int,int,int)));
     connect(ui.mapView,SIGNAL(hadToPaint()),this,SLOT(mapViewHadToPaint()));
     connect(ui.mapView,SIGNAL(mouseMoved(QPoint)),this,SLOT(mapViewMouseMoved(QPoint)));
-    connect(ui.zoom,SIGNAL(valueChanged(int)),this,SLOT(test()));
-    connect(ui.zoomIn,SIGNAL(clicked()),this,SLOT(zoomIn()));
-    connect(ui.zoomOut,SIGNAL(clicked()),this,SLOT(zoomOut()));
-    connect(ui.rotRight,SIGNAL(clicked()),this,SLOT(rotRight()));
-    connect(ui.rotLeft,SIGNAL(clicked()),this,SLOT(rotLeft()));
+    connect(ui.zoomInAction,SIGNAL(triggered()),this,SLOT(zoomIn()));
+    connect(ui.zoomOutAction,SIGNAL(triggered()),this,SLOT(zoomOut()));
+    connect(ui.rotRightAction,SIGNAL(triggered()),this,SLOT(rotRight()));
+    connect(ui.rotLeftAction,SIGNAL(triggered()),this,SLOT(rotLeft()));
 
     setZoomLevel(12);
     qDebug() << gt.LatLon2Meters(center);
@@ -52,13 +51,13 @@ void MainWindow::setZoomLevel(int zoom)
     if (zoom > 18)
         zoom = 18;
     if (zoom == 0)
-        ui.zoomOut->setEnabled(false);
+        ui.zoomOutAction->setEnabled(false);
     else
-        ui.zoomOut->setEnabled(true);
+        ui.zoomOutAction->setEnabled(true);
     if (zoom == 18)
-        ui.zoomIn->setEnabled(false);
+        ui.zoomInAction->setEnabled(false);
     else
-        ui.zoomIn->setEnabled(true);
+        ui.zoomInAction->setEnabled(true);
     ui.mapView->resetTransform();
     ui.mapView->rotate(angle);
     tm.clear();
@@ -113,9 +112,4 @@ void MainWindow::mapViewHadToPaint()
 void MainWindow::mapViewMouseMoved(const QPoint& p)
 {
     //qDebug() << "mouse moved:" << gt.Meters2LatLon(ui.mapView->mapToScene(p));
-}
-
-void MainWindow::test()
-{
-
 }
