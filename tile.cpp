@@ -3,6 +3,8 @@
 #include <QGraphicsRectItem>
 #include <QFile>
 
+#include <unistd.h>
+
 #include "tile.h"
 
 Tile::Tile(int x, int y, int zoom)
@@ -18,11 +20,12 @@ Tile::Tile(int x, int y, int zoom)
     int mgm_y = y >> 3;
     int in_x = x & 7;
     int in_y = y & 7;
-    QString filename = QString("/pub/Users/ateijelo/programs/qt4/qtgmaps/MGMapsCache/GoogleSat_%1/%2_%3.mgm")
+    QString filename = QString("/home/andy/programs/qt4/qtgmaps/MGMapsCache/GoogleSat_%1/%2_%3.mgm")
                             .arg(zoom)
                             .arg(mgm_x)
                             .arg(mgm_y);
     QFile mgm(filename);
+    //usleep(100000); // 100ms
     if (mgm.open(QIODevice::ReadOnly))
     {
         quint64 r = 0;
