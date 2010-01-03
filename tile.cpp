@@ -8,17 +8,12 @@
 Tile::Tile(int x, int y, int zoom)
         : x(x), y(y), zoom(zoom)
 {
-    //qDebug() << "new Tile:" << x << y << zoom;
-    //QGraphicsRectItem *r = new QGraphicsRectItem(0,0,256,256);
-    //r->setParentItem(this);
-    //QGraphicsTextItem *t = new QGraphicsTextItem(QString("(%1,%2,%3)").arg(x).arg(y).arg(zoom));
-    //t->setParentItem(this);
-    setTransformationMode(Qt::SmoothTransformation);
+    //setTransformationMode(Qt::SmoothTransformation);
     int mgm_x = x >> 3;
     int mgm_y = y >> 3;
     int in_x = x & 7;
     int in_y = y & 7;
-    QString filename = QString("/pub/Users/ateijelo/programs/qt4/qtgmaps/MGMapsCache/GoogleSat_%1/%2_%3.mgm")
+    QString filename = QString("/pub/Users/ateijelo/programs/qt4/qtgmaps/MGMapsCache/GoogleMap_%1/%2_%3.mgm")
                             .arg(zoom)
                             .arg(mgm_x)
                             .arg(mgm_y);

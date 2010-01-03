@@ -12,6 +12,8 @@ class MapView : public QGraphicsView
 
         bool viewportEvent(QEvent *event);
         void mouseMoveEvent(QMouseEvent *event);
+        void mouseDoubleClickEvent(QMouseEvent *event);
+
     signals:
         void hadToPaint();
         void mouseMoved(const QPoint&);

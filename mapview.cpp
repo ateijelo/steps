@@ -6,6 +6,7 @@
 MapView::MapView(QWidget *parent)
     : QGraphicsView(parent)
 {
+    //setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 }
 
 bool MapView::viewportEvent(QEvent *event)
@@ -19,4 +20,9 @@ void MapView::mouseMoveEvent(QMouseEvent *event)
 {
     emit mouseMoved(event->pos());
     QGraphicsView::mouseMoveEvent(event);
+}
+
+void MapView::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    emit
 }

@@ -32,7 +32,6 @@ class MainWindow : public QMainWindow
         void mapViewHadToPaint();
         void mapViewMouseMoved(const QPoint&);
         void displayNewTile(Tile *t, int x, int y, int zoom);
-        void test();
         void zoomIn();
         void zoomOut();
         void rotRight();
