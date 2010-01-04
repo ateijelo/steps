@@ -61,7 +61,7 @@ void MainWindow::setZoomLevel(int zoom)
     ui.mapView->resetTransform();
     ui.mapView->rotate(angle);
     tm.clear();
-    double res = gt.resolution(zoom) * 2;
+    double res = gt.resolution(zoom);
     ui.mapView->scale(1/res,1/res);
     this->zoom = zoom;
 }
@@ -103,7 +103,8 @@ void MainWindow::displayNewTile(Tile *t, int x, int y, int zoom)
 
 void MainWindow::mapViewHadToPaint()
 {
-    QRectF drawArea = ui.mapView->mapToScene(ui.mapView->viewport()->rect().adjusted(+150,+150,-150,-150)).boundingRect();
+    //QRectF drawArea = ui.mapView->mapToScene(ui.mapView->viewport()->rect().adjusted(+150,+150,-150,-150)).boundingRect();
+    QRectF drawArea = ui.mapView->mapToScene(ui.mapView->viewport()->rect().adjusted(-20,-20,20,20)).boundingRect();
     QPoint tl = gt.Meters2GoogleTile(drawArea.topLeft(),zoom);
     QPoint br = gt.Meters2GoogleTile(drawArea.bottomRight(),zoom);
     tm.setRegion(QRect(tl,br),zoom);
@@ -111,5 +112,5 @@ void MainWindow::mapViewHadToPaint()
 
 void MainWindow::mapViewMouseMoved(const QPoint& p)
 {
-    //qDebug() << "mouse moved:" << gt.Meters2LatLon(ui.mapView->mapToScene(p));
+    qDebug() << "mouse moved:" << gt.Meters2LatLon(ui.mapView->mapToScene(p));
 }
