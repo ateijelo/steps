@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui.mapView->setSceneRect(QRectF(gt.Pixels2Meters(QPointF(  0,  0),0),
                                     gt.Pixels2Meters(QPointF(256,256),0)) );
 
-    center = QPointF(-82.38,23.13);
+    center = QPointF(-82.4003,23.1319);
 
     //double res = gt.resolution(zoom);
 
@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui.rotRightAction,SIGNAL(triggered()),this,SLOT(rotRight()));
     connect(ui.rotLeftAction,SIGNAL(triggered()),this,SLOT(rotLeft()));
 
-    setZoomLevel(12);
+    setZoomLevel(16);
     qDebug() << gt.LatLon2Meters(center);
     ui.mapView->centerOn(gt.LatLon2Meters(center));
 }
@@ -61,7 +61,7 @@ void MainWindow::setZoomLevel(int zoom)
     ui.mapView->resetTransform();
     ui.mapView->rotate(angle);
     tm.clear();
-    double res = gt.resolution(zoom) * 2;
+    double res = gt.resolution(zoom);
     ui.mapView->scale(1/res,1/res);
     this->zoom = zoom;
 }
@@ -103,7 +103,7 @@ void MainWindow::displayNewTile(Tile *t, int x, int y, int zoom)
 
 void MainWindow::mapViewHadToPaint()
 {
-    QRectF drawArea = ui.mapView->mapToScene(ui.mapView->viewport()->rect().adjusted(+150,+150,-150,-150)).boundingRect();
+    QRectF drawArea = ui.mapView->mapToScene(ui.mapView->viewport()->rect().adjusted(-20,-20,20,20)).boundingRect();
     QPoint tl = gt.Meters2GoogleTile(drawArea.topLeft(),zoom);
     QPoint br = gt.Meters2GoogleTile(drawArea.bottomRight(),zoom);
     tm.setRegion(QRect(tl,br),zoom);
