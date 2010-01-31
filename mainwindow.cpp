@@ -103,6 +103,7 @@ void MainWindow::displayNewTile(Tile *t, int x, int y, int zoom)
 
 void MainWindow::mapViewHadToPaint()
 {
+    //QRectF drawArea = ui.mapView->mapToScene(ui.mapView->viewport()->rect().adjusted(+150,+150,-150,-150)).boundingRect();
     QRectF drawArea = ui.mapView->mapToScene(ui.mapView->viewport()->rect().adjusted(-20,-20,20,20)).boundingRect();
     QPoint tl = gt.Meters2GoogleTile(drawArea.topLeft(),zoom);
     QPoint br = gt.Meters2GoogleTile(drawArea.bottomRight(),zoom);
@@ -111,5 +112,5 @@ void MainWindow::mapViewHadToPaint()
 
 void MainWindow::mapViewMouseMoved(const QPoint& p)
 {
-    //qDebug() << "mouse moved:" << gt.Meters2LatLon(ui.mapView->mapToScene(p));
+    qDebug() << "mouse moved:" << gt.Meters2LatLon(ui.mapView->mapToScene(p));
 }
