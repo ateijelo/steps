@@ -2,21 +2,45 @@
 #include <QtEndian>
 #include <QGraphicsRectItem>
 #include <QFile>
+#include <QPainter>
 
 #include "tile.h"
 
-Tile::Tile(int x, int y, int zoom)
+Tile::Tile(int tileStyle, int x, int y, int zoom)
         : x(x), y(y), zoom(zoom)
 {
     //setTransformationMode(Qt::SmoothTransformation);
-    int mgm_x = x >> 3;
-    int mgm_y = y >> 3;
+    QPixmap result;
+    QString filename;
+    switch(tileStyle)
+    {
+        case TILE_STYLE_MAP:
+            filename = getMapTileFileName(x, y, zoom);
+            result = getProperTile(filename, x, y);
+            break;
+        case TILE_STYLE_SAT:
+            filename = getSatTileFileName(x, y, zoom);
+            result = getProperTile(filename, x, y);
+            break;
+        case TILE_STYLE_HYB:
+            filename = getSatTileFileName(x, y, zoom);
+            result = getProperTile(filename, x, y);
+
+            filename = getHybTileFileName(x, y, zoom);
+            QPixmap hyb = getProperTile(filename, x, y);
+            QPainter painter(&result);
+            painter.drawPixmap(0, 0, hyb.width(), hyb.height(), hyb);
+            painter.end();
+            break;
+    }
+
+    setPixmap(result);
+}
+
+QPixmap Tile::getProperTile(QString filename, int x, int y)
+{
     int in_x = x & 7;
     int in_y = y & 7;
-    QString filename = QString("/Users/ateijelo/programs/qt4/qtgmaps/MGMapsCache/GoogleMap_%1/%2_%3.mgm")
-                            .arg(zoom)
-                            .arg(mgm_x)
-                            .arg(mgm_y);
     QFile mgm(filename);
     if (mgm.open(QIODevice::ReadOnly))
     {
@@ -28,7 +52,7 @@ Tile::Tile(int x, int y, int zoom)
         if (r != 2)
         {
             qDebug() << "error reading no_tiles";
-            return;
+            return 0;
         }
         no_tiles = qFromBigEndian(no_tiles);
         bool found = false;
@@ -41,7 +65,7 @@ Tile::Tile(int x, int y, int zoom)
             if (r != 6)
             {
                 qDebug() << "error reading tile entry " << i;
-                return;
+                return 0;
             }
             tile_end = qFromBigEndian(tile_end);
             if (tile_x == in_x && tile_y == in_y)
@@ -65,11 +89,43 @@ Tile::Tile(int x, int y, int zoom)
             {
                 QPixmap p;
                 p.loadFromData((uchar*)data,(uint)tile_size,0);
-                setPixmap(p);
+                delete data;
+
+                return p;
             }
-            delete data;
         }
     }
+    else
+    {
+        qDebug() << "error opening " << filename << " for reading";
+    }
+    return 0;
+}
+
+QString Tile::getTileFileName(QString filenameFormat, int x, int y, int zoom)
+{
+    int mgm_x = x >> 3;
+    int mgm_y = y >> 3;
+    return filenameFormat
+            .arg("../MGMapsCache")
+            .arg(zoom)
+            .arg(mgm_x)
+            .arg(mgm_y);
+}
+
+QString Tile::getMapTileFileName(int x, int y, int zoom)
+{
+    return getTileFileName("%1/GoogleMap_%2/%3_%4.mgm", x, y, zoom);
+}
+
+QString Tile::getSatTileFileName(int x, int y, int zoom)
+{
+    return getTileFileName("%1/GoogleSat_%2/%3_%4.mgm", x, y, zoom);
+}
+
+QString Tile::getHybTileFileName(int x, int y, int zoom)
+{
+    return getTileFileName("%1/GoogleHyb_%2/%3_%4.mgm", x, y, zoom);
 }
 
 Tile::~Tile()

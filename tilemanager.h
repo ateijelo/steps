@@ -19,6 +19,8 @@ class TileManager : public QObject
         TileManager();
         void setRegion(const QRect& r, int zoom);
         void clear();
+        void setTileStyle(int tileStyle);
+        int getTileStyle();
 
     signals:
         void tileCreated(Tile *t,int x, int y, int zoom);
@@ -32,6 +34,7 @@ class TileManager : public QObject
 
         QLinkedList<Column*> columns;
         QRect region;
+        int currentTileStyle;
 };
 
 #endif // TILEMANAGER_H

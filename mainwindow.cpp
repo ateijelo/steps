@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui.mapView->setSceneRect(QRectF(gt.Pixels2Meters(QPointF(  0,  0),0),
                                     gt.Pixels2Meters(QPointF(256,256),0)) );
 
-    center = QPointF(-82.4003,23.1319);
+    center = QPointF(-82.38,23.13);
 
     //double res = gt.resolution(zoom);
 
@@ -31,6 +31,8 @@ MainWindow::MainWindow(QWidget *parent)
 //    tiles.append(t);
 //    scene->addItem(t);
 
+    tm.setTileStyle(0);
+
     connect(&tm,SIGNAL(tileCreated(Tile*,int,int,int)),this,SLOT(displayNewTile(Tile*,int,int,int)));
     connect(ui.mapView,SIGNAL(hadToPaint()),this,SLOT(mapViewHadToPaint()));
     connect(ui.mapView,SIGNAL(mouseMoved(QPoint)),this,SLOT(mapViewMouseMoved(QPoint)));
@@ -39,7 +41,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui.rotRightAction,SIGNAL(triggered()),this,SLOT(rotRight()));
     connect(ui.rotLeftAction,SIGNAL(triggered()),this,SLOT(rotLeft()));
 
-    setZoomLevel(16);
+    connect(ui.mapOption, SIGNAL(clicked()), this, SLOT(setMapStyle()));
+    connect(ui.satOption, SIGNAL(clicked()), this, SLOT(setSatStyle()));
+    connect(ui.hybOption, SIGNAL(clicked()), this, SLOT(setHybStyle()));
+
+    setZoomLevel(12);
     qDebug() << gt.LatLon2Meters(center);
     ui.mapView->centerOn(gt.LatLon2Meters(center));
 }
@@ -64,6 +70,24 @@ void MainWindow::setZoomLevel(int zoom)
     double res = gt.resolution(zoom);
     ui.mapView->scale(1/res,1/res);
     this->zoom = zoom;
+}
+
+void MainWindow::setMapStyle()
+{
+    tm.setTileStyle(TILE_STYLE_MAP);
+    setZoomLevel(zoom);
+}
+
+void MainWindow::setSatStyle()
+{
+    tm.setTileStyle(TILE_STYLE_SAT);
+    setZoomLevel(zoom);
+}
+
+void MainWindow::setHybStyle()
+{
+    tm.setTileStyle(TILE_STYLE_HYB);
+    setZoomLevel(zoom);
 }
 
 void MainWindow::zoomIn()
@@ -112,5 +136,5 @@ void MainWindow::mapViewHadToPaint()
 
 void MainWindow::mapViewMouseMoved(const QPoint& p)
 {
-    qDebug() << "mouse moved:" << gt.Meters2LatLon(ui.mapView->mapToScene(p));
+//    qDebug() << "mouse moved:" << gt.Meters2LatLon(ui.mapView->mapToScene(p));
 }
