@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>560</width>
-    <height>525</height>
+    <width>562</width>
+    <height>527</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,6 +22,34 @@
      <number>0</number>
     </property>
     <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QRadioButton" name="mapOption">
+        <property name="text">
+         <string>Maps</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="satOption">
+        <property name="text">
+         <string>Satelite</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="hybOption">
+        <property name="text">
+         <string>Hybrid</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
      <widget class="MapView" name="mapView">
       <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
@@ -31,9 +59,6 @@
       </property>
       <property name="horizontalScrollBarPolicy">
        <enum>Qt::ScrollBarAlwaysOff</enum>
-      </property>
-      <property name="renderHints">
-       <set>QPainter::Antialiasing|QPainter::HighQualityAntialiasing|QPainter::SmoothPixmapTransform|QPainter::TextAntialiasing</set>
       </property>
       <property name="dragMode">
        <enum>QGraphicsView::ScrollHandDrag</enum>
@@ -47,8 +72,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>560</width>
-     <height>22</height>
+     <width>562</width>
+     <height>25</height>
     </rect>
    </property>
   </widget>

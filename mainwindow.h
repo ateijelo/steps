@@ -37,6 +37,9 @@ class MainWindow : public QMainWindow
         void rotRight();
         void rotLeft();
         void setZoomLevel(int zoom);
+        void setMapStyle();
+        void setSatStyle();
+        void setHybStyle();
 };
 
 #endif
