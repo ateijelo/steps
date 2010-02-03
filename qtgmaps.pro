@@ -12,7 +12,8 @@ HEADERS += mainwindow.h \
     mgmreader.h \
     geotools.h \
     tile.h \
-    tilemanager.h
+    tilemanager.h \
+    mainscene.h
 FORMS += mainwindow.ui
 SOURCES += main.cpp \
     mainwindow.cpp \
@@ -20,5 +21,6 @@ SOURCES += main.cpp \
     mgmreader.cpp \
     geotools.cpp \
     tile.cpp \
-    tilemanager.cpp
+    tilemanager.cpp \
+    mainscene.cpp
 RESOURCES += qtgmaps.qrc

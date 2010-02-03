@@ -17,7 +17,7 @@ class Tile : public QGraphicsPixmapItem
         QString getSatTileFileName(int x, int y, int zoom);
         QString getHybTileFileName(int x, int y, int zoom);
         QString getTileFileName(QString filenameFormat, int x, int y, int zoom);
-        QPixmap getProperTile(QString filename, int x, int y);
+        QPixmap loadTile(QString filename, int x, int y);
 
     private:
         int x,y,zoom;
