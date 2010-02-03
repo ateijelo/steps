@@ -6,6 +6,8 @@
 #include <QLinkedList>
 #include <QPoint>
 #include <QRadioButton>
+#include <QLabel>
+#include <QSlider>
 
 #include "ui_mainwindow.h"
 #include "geotools.h"
@@ -19,6 +21,9 @@ class MainWindow : public QMainWindow
         MainWindow(QWidget *parent = NULL);
 
     private:
+        void updateLatLonLabels(QPointF latLon);
+
+    private:
         Ui::MainWindow ui;
         QGraphicsScene *scene;
         QLinkedList<QLinkedList<Tile*>*> columns;
@@ -28,9 +33,13 @@ class MainWindow : public QMainWindow
         QPointF center;
         int zoom;
         qreal angle;
+        QSlider zoomSlider;
         QRadioButton mapOption;
         QRadioButton satOption;
         QRadioButton hybOption;
+        QPointF lastLatLon;
+        QLabel latLabel;
+        QLabel lonLabel;
 
     private slots:
         void mapViewHadToPaint();

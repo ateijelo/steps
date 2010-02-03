@@ -61,8 +61,8 @@
    </attribute>
    <addaction name="rotLeftAction"/>
    <addaction name="rotRightAction"/>
-   <addaction name="zoomInAction"/>
    <addaction name="zoomOutAction"/>
+   <addaction name="zoomInAction"/>
   </widget>
   <action name="rotRightAction">
    <property name="icon">

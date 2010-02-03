@@ -21,20 +21,37 @@ MainWindow::MainWindow(QWidget *parent)
 
     center = QPointF(-82.38,23.13);
 
+    zoomSlider.setMinimum(0);
+    zoomSlider.setMaximum(18);
+    zoomSlider.setOrientation(Qt::Horizontal);
+    zoomSlider.setFixedWidth(30+18*4);
+
+    ui.toolBar->insertWidget(ui.zoomInAction, &zoomSlider);
+
+    connect(&zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(setZoomLevel(int)));
+
+
     mapOption.setChecked(true);
-    mapOption.setText("Maps");
-    satOption.setText("Satellite");
-    hybOption.setText("Hybrid");
+    mapOption.setText("&Maps");
+    satOption.setText("&Satellite");
+    hybOption.setText("&Hybrid");
 
     ui.toolBar->insertSeparator(0);
     ui.toolBar->insertWidget(0, &mapOption);
     ui.toolBar->insertWidget(0, &satOption);
     ui.toolBar->insertWidget(0, &hybOption);
-    ui.toolBar->insertSeparator(0);
 
     connect(&mapOption, SIGNAL(clicked()), this, SLOT(setMapStyle()));
     connect(&satOption, SIGNAL(clicked()), this, SLOT(setSatStyle()));
     connect(&hybOption, SIGNAL(clicked()), this, SLOT(setHybStyle()));
+
+
+    latLabel.setFixedWidth(90);
+    lonLabel.setFixedWidth(90);
+
+    ui.toolBar->insertSeparator(0);
+    ui.toolBar->insertWidget(0, &latLabel);
+    ui.toolBar->insertWidget(0, &lonLabel);
 
     //double res = gt.resolution(zoom);
 
@@ -61,13 +78,18 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui.rotRightAction,SIGNAL(triggered()),this,SLOT(rotRight()));
     connect(ui.rotLeftAction,SIGNAL(triggered()),this,SLOT(rotLeft()));
 
-    setZoomLevel(12);
-    qDebug() << gt.LatLon2Meters(center);
+
+    //setZoomLevel(12);
+    zoomSlider.setValue(12);
     ui.mapView->centerOn(gt.LatLon2Meters(center));
+
+    updateLatLonLabels(center);
 }
 
 void MainWindow::setZoomLevel(int zoom)
 {
+    QPoint lastCursorPos = ui.mapView->mapFromScene(gt.LatLon2Meters(lastLatLon));
+
     if (zoom < 0)
         zoom = 0;
     if (zoom > 18)
@@ -86,6 +108,8 @@ void MainWindow::setZoomLevel(int zoom)
     double res = gt.resolution(zoom);
     ui.mapView->scale(1/res,1/res);
     this->zoom = zoom;
+
+    updateLatLonLabels(gt.Meters2LatLon(ui.mapView->mapToScene(lastCursorPos)));
 }
 
 void MainWindow::setMapStyle()
@@ -111,12 +135,14 @@ void MainWindow::setHybStyle()
 
 void MainWindow::zoomIn()
 {
-    setZoomLevel(zoom + 1);
+    //setZoomLevel(zoom + 1);
+    zoomSlider.setValue(zoom + 1);
 }
 
 void MainWindow::zoomOut()
 {
-    setZoomLevel(zoom - 1);
+    //setZoomLevel(zoom - 1);
+    zoomSlider.setValue(zoom - 1);
 }
 
 void MainWindow::rotRight()
@@ -153,7 +179,16 @@ void MainWindow::mapViewHadToPaint()
     tm.setRegion(QRect(tl,br),zoom);
 }
 
+void MainWindow::updateLatLonLabels(QPointF latLon)
+{
+    latLabel.setText(QString("Lat: %1").arg(latLon.x()));
+    lonLabel.setText(QString("Lon: %1").arg(latLon.y()));
+
+    lastLatLon = latLon;
+}
+
 void MainWindow::mapViewMouseMoved(const QPoint& p)
 {
-//    qDebug() << "mouse moved:" << gt.Meters2LatLon(ui.mapView->mapToScene(p));
+    QPointF latLon = gt.Meters2LatLon(ui.mapView->mapToScene(p));
+    updateLatLonLabels(latLon);
 }
