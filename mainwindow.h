@@ -5,6 +5,7 @@
 #include <QGraphicsScene>
 #include <QLinkedList>
 #include <QPoint>
+#include <QRadioButton>
 
 #include "ui_mainwindow.h"
 #include "geotools.h"
@@ -27,6 +28,9 @@ class MainWindow : public QMainWindow
         QPointF center;
         int zoom;
         qreal angle;
+        QRadioButton mapOption;
+        QRadioButton satOption;
+        QRadioButton hybOption;
 
     private slots:
         void mapViewHadToPaint();

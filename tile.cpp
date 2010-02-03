@@ -16,28 +16,35 @@ Tile::Tile(int tileStyle, int x, int y, int zoom)
     {
         case TILE_STYLE_MAP:
             filename = getMapTileFileName(x, y, zoom);
-            result = getProperTile(filename, x, y);
+            result = loadTile(filename, x, y);
             break;
         case TILE_STYLE_SAT:
             filename = getSatTileFileName(x, y, zoom);
-            result = getProperTile(filename, x, y);
+            result = loadTile(filename, x, y);
             break;
         case TILE_STYLE_HYB:
             filename = getSatTileFileName(x, y, zoom);
-            result = getProperTile(filename, x, y);
+            result = loadTile(filename, x, y);
 
             filename = getHybTileFileName(x, y, zoom);
-            QPixmap hyb = getProperTile(filename, x, y);
-            QPainter painter(&result);
-            painter.drawPixmap(0, 0, hyb.width(), hyb.height(), hyb);
-            painter.end();
+            QPixmap hyb = loadTile(filename, x, y);
+            if (result.isNull())
+            {
+                result = hyb;
+            }
+            else
+            {
+                QPainter painter(&result);
+                painter.drawPixmap(0, 0, hyb.width(), hyb.height(), hyb);
+                painter.end();
+            }
             break;
     }
 
     setPixmap(result);
 }
 
-QPixmap Tile::getProperTile(QString filename, int x, int y)
+QPixmap Tile::loadTile(QString filename, int x, int y)
 {
     int in_x = x & 7;
     int in_y = y & 7;

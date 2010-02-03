@@ -3,18 +3,38 @@
 
 #include "mainwindow.h"
 #include "mgmreader.h"
+#include "mainscene.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), angle(0)
 {
     ui.setupUi(this);
 
-    scene = new QGraphicsScene(this);
+    //scene = new QGraphicsScene(this);
+    scene = new MainScene();
+    connect(scene,SIGNAL(zoomIn()),this,SLOT(zoomIn()));
+    connect(scene,SIGNAL(zoomOut()),this,SLOT(zoomOut()));
+
     ui.mapView->setScene(scene);
     ui.mapView->setSceneRect(QRectF(gt.Pixels2Meters(QPointF(  0,  0),0),
                                     gt.Pixels2Meters(QPointF(256,256),0)) );
 
     center = QPointF(-82.38,23.13);
+
+    mapOption.setChecked(true);
+    mapOption.setText("Maps");
+    satOption.setText("Satellite");
+    hybOption.setText("Hybrid");
+
+    ui.toolBar->insertSeparator(0);
+    ui.toolBar->insertWidget(0, &mapOption);
+    ui.toolBar->insertWidget(0, &satOption);
+    ui.toolBar->insertWidget(0, &hybOption);
+    ui.toolBar->insertSeparator(0);
+
+    connect(&mapOption, SIGNAL(clicked()), this, SLOT(setMapStyle()));
+    connect(&satOption, SIGNAL(clicked()), this, SLOT(setSatStyle()));
+    connect(&hybOption, SIGNAL(clicked()), this, SLOT(setHybStyle()));
 
     //double res = gt.resolution(zoom);
 
@@ -31,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    tiles.append(t);
 //    scene->addItem(t);
 
-    tm.setTileStyle(0);
+    tm.setTileStyle(TILE_STYLE_MAP);
 
     connect(&tm,SIGNAL(tileCreated(Tile*,int,int,int)),this,SLOT(displayNewTile(Tile*,int,int,int)));
     connect(ui.mapView,SIGNAL(hadToPaint()),this,SLOT(mapViewHadToPaint()));
@@ -40,10 +60,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui.zoomOutAction,SIGNAL(triggered()),this,SLOT(zoomOut()));
     connect(ui.rotRightAction,SIGNAL(triggered()),this,SLOT(rotRight()));
     connect(ui.rotLeftAction,SIGNAL(triggered()),this,SLOT(rotLeft()));
-
-    connect(ui.mapOption, SIGNAL(clicked()), this, SLOT(setMapStyle()));
-    connect(ui.satOption, SIGNAL(clicked()), this, SLOT(setSatStyle()));
-    connect(ui.hybOption, SIGNAL(clicked()), this, SLOT(setHybStyle()));
 
     setZoomLevel(12);
     qDebug() << gt.LatLon2Meters(center);
@@ -75,19 +91,22 @@ void MainWindow::setZoomLevel(int zoom)
 void MainWindow::setMapStyle()
 {
     tm.setTileStyle(TILE_STYLE_MAP);
-    setZoomLevel(zoom);
+    tm.clear();
+    mapViewHadToPaint();
 }
 
 void MainWindow::setSatStyle()
 {
     tm.setTileStyle(TILE_STYLE_SAT);
-    setZoomLevel(zoom);
+    tm.clear();
+    mapViewHadToPaint();
 }
 
 void MainWindow::setHybStyle()
 {
     tm.setTileStyle(TILE_STYLE_HYB);
-    setZoomLevel(zoom);
+    tm.clear();
+    mapViewHadToPaint();
 }
 
 void MainWindow::zoomIn()

@@ -22,34 +22,6 @@
      <number>0</number>
     </property>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QRadioButton" name="mapOption">
-        <property name="text">
-         <string>Maps</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="satOption">
-        <property name="text">
-         <string>Satelite</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="hybOption">
-        <property name="text">
-         <string>Hybrid</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
      <widget class="MapView" name="mapView">
       <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
