@@ -43,6 +43,7 @@ Tile::Tile(int tileStyle, int x, int y, int zoom)
     }
 
     setPixmap(result);
+    setZValue(zoom);
 }
 
 QPixmap Tile::loadTile(QString filename, int x, int y)
@@ -116,7 +117,7 @@ QString Tile::getTileFileName(QString filenameFormat, int x, int y, int zoom)
     int mgm_y = y >> 3;
     QSettings settings;
     return filenameFormat
-            .arg(settings.value("CachePath",QString("")).toString())
+            .arg(settings.value("CachePath","").toString())
             .arg(zoom)
             .arg(mgm_x)
             .arg(mgm_y);

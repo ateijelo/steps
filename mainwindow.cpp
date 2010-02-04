@@ -27,6 +27,9 @@ MainWindow::MainWindow(QWidget *parent)
     zoomSlider.setMaximum(18);
     zoomSlider.setOrientation(Qt::Horizontal);
     zoomSlider.setFixedWidth(30+18*4);
+    zoomSlider.setTickInterval(1);
+    zoomSlider.setTickPosition(QSlider::TicksBelow);
+
     ui.toolBar->insertWidget(ui.zoomInAction, &zoomSlider);
     connect(&zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(setZoomLevel(int)));
 
@@ -84,8 +87,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui.zoomInAction->setShortcut(QKeySequence::ZoomIn);
     ui.zoomOutAction->setShortcut(QKeySequence::ZoomOut);
 
-    //setZoomLevel(12);
-    zoomSlider.setValue(12);
+    setZoomLevel(12);
     ui.mapView->centerOn(gt.LatLon2Meters(center));
 
     updateLatLonLabels(center);
@@ -124,6 +126,7 @@ void MainWindow::setZoomLevel(int zoom)
     this->zoom = zoom;
 
     updateLatLonLabels(gt.Meters2LatLon(ui.mapView->mapToScene(lastCursorPos)));
+    zoomSlider.setValue(zoom);
 }
 
 void MainWindow::setMapStyle()
@@ -149,14 +152,12 @@ void MainWindow::setHybStyle()
 
 void MainWindow::zoomIn()
 {
-    //setZoomLevel(zoom + 1);
-    zoomSlider.setValue(zoom + 1);
+    setZoomLevel(zoom + 1);
 }
 
 void MainWindow::zoomOut()
 {
-    //setZoomLevel(zoom - 1);
-    zoomSlider.setValue(zoom - 1);
+    setZoomLevel(zoom - 1);
 }
 
 void MainWindow::rotRight()

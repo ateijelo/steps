@@ -13,8 +13,7 @@ HEADERS += mainwindow.h \
     geotools.h \
     tile.h \
     tilemanager.h \
-    mainscene.h \
-    settings.h
+    mainscene.h
 FORMS += mainwindow.ui
 SOURCES += main.cpp \
     mainwindow.cpp \
@@ -23,6 +22,5 @@ SOURCES += main.cpp \
     geotools.cpp \
     tile.cpp \
     tilemanager.cpp \
-    mainscene.cpp \
-    settings.cpp
+    mainscene.cpp
 RESOURCES += qtgmaps.qrc
