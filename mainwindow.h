@@ -53,6 +53,7 @@ class MainWindow : public QMainWindow
         void setMapStyle();
         void setSatStyle();
         void setHybStyle();
+        void openCacheDirectory();
 };
 
 #endif

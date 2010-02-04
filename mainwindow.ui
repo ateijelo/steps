@@ -35,6 +35,9 @@
       <property name="dragMode">
        <enum>QGraphicsView::ScrollHandDrag</enum>
       </property>
+      <property name="transformationAnchor">
+       <enum>QGraphicsView::AnchorUnderMouse</enum>
+      </property>
      </widget>
     </item>
    </layout>
@@ -45,9 +48,19 @@
      <x>0</x>
      <y>0</y>
      <width>562</width>
-     <height>25</height>
+     <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu_File">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="openAction"/>
+    <addaction name="action_Preferences"/>
+    <addaction name="separator"/>
+    <addaction name="action_Exit"/>
+   </widget>
+   <addaction name="menu_File"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
@@ -67,7 +80,7 @@
   <action name="rotRightAction">
    <property name="icon">
     <iconset resource="qtgmaps.qrc">
-     <normaloff>:/img/rotate-right.png</normaloff>:/img/rotate-right.png</iconset>
+     <normaloff>:/rotate-right.png</normaloff>:/rotate-right.png</iconset>
    </property>
    <property name="text">
     <string>Rotate &amp;Right</string>
@@ -79,7 +92,7 @@
   <action name="rotLeftAction">
    <property name="icon">
     <iconset resource="qtgmaps.qrc">
-     <normaloff>:/img/rotate-left.png</normaloff>:/img/rotate-left.png</iconset>
+     <normaloff>:/rotate-left.png</normaloff>:/rotate-left.png</iconset>
    </property>
    <property name="text">
     <string>Rotate &amp;Left</string>
@@ -91,7 +104,7 @@
   <action name="zoomInAction">
    <property name="icon">
     <iconset resource="qtgmaps.qrc">
-     <normaloff>:/img/zoom-in.png</normaloff>:/img/zoom-in.png</iconset>
+     <normaloff>:/zoom-in.png</normaloff>:/zoom-in.png</iconset>
    </property>
    <property name="text">
     <string>Zoom &amp;In</string>
@@ -99,17 +112,45 @@
    <property name="toolTip">
     <string>Zoom In</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+=</string>
+   </property>
   </action>
   <action name="zoomOutAction">
    <property name="icon">
     <iconset resource="qtgmaps.qrc">
-     <normaloff>:/img/zoom-out.png</normaloff>:/img/zoom-out.png</iconset>
+     <normaloff>:/zoom-out.png</normaloff>:/zoom-out.png</iconset>
    </property>
    <property name="text">
     <string>Zoom &amp;Out</string>
    </property>
    <property name="toolTip">
     <string>Zoom Out</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+-</string>
+   </property>
+  </action>
+  <action name="openAction">
+   <property name="icon">
+    <iconset resource="qtgmaps.qrc">
+     <normaloff>:/open.png</normaloff>:/open.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open</string>
+   </property>
+   <property name="toolTip">
+    <string>Open Cache Directory</string>
+   </property>
+  </action>
+  <action name="action_Exit">
+   <property name="text">
+    <string>&amp;Exit</string>
+   </property>
+  </action>
+  <action name="action_Preferences">
+   <property name="text">
+    <string>&amp;Preferences</string>
    </property>
   </action>
  </widget>
@@ -123,5 +164,22 @@
  <resources>
   <include location="qtgmaps.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>action_Exit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>280</x>
+     <y>263</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

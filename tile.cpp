@@ -3,6 +3,7 @@
 #include <QGraphicsRectItem>
 #include <QFile>
 #include <QPainter>
+#include <QSettings>
 
 #include "tile.h"
 
@@ -104,7 +105,7 @@ QPixmap Tile::loadTile(QString filename, int x, int y)
     }
     else
     {
-        qDebug() << "error opening " << filename << " for reading";
+        //qDebug() << "error opening " << filename << " for reading";
     }
     return 0;
 }
@@ -113,8 +114,9 @@ QString Tile::getTileFileName(QString filenameFormat, int x, int y, int zoom)
 {
     int mgm_x = x >> 3;
     int mgm_y = y >> 3;
+    QSettings settings;
     return filenameFormat
-            .arg("../MGMapsCache")
+            .arg(settings.value("CachePath",QString("")).toString())
             .arg(zoom)
             .arg(mgm_x)
             .arg(mgm_y);

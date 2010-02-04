@@ -1,4 +1,6 @@
 #include <QtDebug>
+#include <QFileDialog>
+#include <QSettings>
 #include <QGraphicsPixmapItem>
 
 #include "mainwindow.h"
@@ -25,11 +27,8 @@ MainWindow::MainWindow(QWidget *parent)
     zoomSlider.setMaximum(18);
     zoomSlider.setOrientation(Qt::Horizontal);
     zoomSlider.setFixedWidth(30+18*4);
-
     ui.toolBar->insertWidget(ui.zoomInAction, &zoomSlider);
-
     connect(&zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(setZoomLevel(int)));
-
 
     mapOption.setChecked(true);
     mapOption.setText("&Maps");
@@ -44,7 +43,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&mapOption, SIGNAL(clicked()), this, SLOT(setMapStyle()));
     connect(&satOption, SIGNAL(clicked()), this, SLOT(setSatStyle()));
     connect(&hybOption, SIGNAL(clicked()), this, SLOT(setHybStyle()));
-
 
     latLabel.setFixedWidth(90);
     lonLabel.setFixedWidth(90);
@@ -67,6 +65,10 @@ MainWindow::MainWindow(QWidget *parent)
 //    t->setPos(gt.Pixels2Meters(QPointF(0,0),zoom));
 //    tiles.append(t);
 //    scene->addItem(t);
+    Tile *t = new Tile(TILE_STYLE_MAP,0,0,0);
+    t->setPixmap(QPixmap("00-0_0.mgm.00x00.png"));
+    displayNewTile(t,0,0,0);
+    //t->setZValue(0);
 
     tm.setTileStyle(TILE_STYLE_MAP);
 
@@ -77,13 +79,25 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui.zoomOutAction,SIGNAL(triggered()),this,SLOT(zoomOut()));
     connect(ui.rotRightAction,SIGNAL(triggered()),this,SLOT(rotRight()));
     connect(ui.rotLeftAction,SIGNAL(triggered()),this,SLOT(rotLeft()));
+    connect(ui.openAction,SIGNAL(triggered()),this,SLOT(openCacheDirectory()));
 
+    ui.zoomInAction->setShortcut(QKeySequence::ZoomIn);
+    ui.zoomOutAction->setShortcut(QKeySequence::ZoomOut);
 
     //setZoomLevel(12);
     zoomSlider.setValue(12);
     ui.mapView->centerOn(gt.LatLon2Meters(center));
 
     updateLatLonLabels(center);
+}
+
+void MainWindow::openCacheDirectory()
+{
+    QSettings settings;
+    QString path = QFileDialog::getExistingDirectory(this,
+                                                     "Open Cache Directory",
+                                                     settings.value("CachePath","").toString());
+    settings.setValue("CachePath",path);
 }
 
 void MainWindow::setZoomLevel(int zoom)
@@ -102,9 +116,9 @@ void MainWindow::setZoomLevel(int zoom)
         ui.zoomInAction->setEnabled(false);
     else
         ui.zoomInAction->setEnabled(true);
+    tm.clear();
     ui.mapView->resetTransform();
     ui.mapView->rotate(angle);
-    tm.clear();
     double res = gt.resolution(zoom);
     ui.mapView->scale(1/res,1/res);
     this->zoom = zoom;
@@ -172,8 +186,8 @@ void MainWindow::displayNewTile(Tile *t, int x, int y, int zoom)
 
 void MainWindow::mapViewHadToPaint()
 {
-    QRectF drawArea = ui.mapView->mapToScene(ui.mapView->viewport()->rect().adjusted(+180,+180,-180,-180)).boundingRect();
-    //QRectF drawArea = ui.mapView->mapToScene(ui.mapView->viewport()->rect().adjusted(-20,-20,20,20)).boundingRect();
+    //QRectF drawArea = ui.mapView->mapToScene(ui.mapView->viewport()->rect().adjusted(+180,+180,-180,-180)).boundingRect();
+    QRectF drawArea = ui.mapView->mapToScene(ui.mapView->viewport()->rect().adjusted(-20,-20,20,20)).boundingRect();
     QPoint tl = gt.Meters2GoogleTile(drawArea.topLeft(),zoom);
     QPoint br = gt.Meters2GoogleTile(drawArea.bottomRight(),zoom);
     tm.setRegion(QRect(tl,br),zoom);
