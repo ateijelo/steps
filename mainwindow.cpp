@@ -29,11 +29,11 @@ MainWindow::MainWindow(QWidget *parent)
     zoomSlider.setFixedWidth(30+18*4);
     zoomSlider.setTickInterval(1);
     zoomSlider.setTickPosition(QSlider::TicksBelow);
+    zoomSlider.setPageStep(1);
 
     ui.toolBar->insertWidget(ui.zoomInAction, &zoomSlider);
     connect(&zoomSlider, SIGNAL(valueChanged(int)), this, SLOT(setZoomLevel(int)));
 
-    mapOption.setChecked(true);
     mapOption.setText("&Maps");
     satOption.setText("&Satellite");
     hybOption.setText("&Hybrid");
@@ -73,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent)
     displayNewTile(t,0,0,0);
     //t->setZValue(0);
 
-    tm.setTileStyle(TILE_STYLE_MAP);
+    //tm.setTileStyle(TILE_STYLE_MAP);
 
     connect(&tm,SIGNAL(tileCreated(Tile*,int,int,int)),this,SLOT(displayNewTile(Tile*,int,int,int)));
     connect(ui.mapView,SIGNAL(hadToPaint()),this,SLOT(mapViewHadToPaint()));
@@ -87,6 +87,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui.zoomInAction->setShortcut(QKeySequence::ZoomIn);
     ui.zoomOutAction->setShortcut(QKeySequence::ZoomOut);
 
+    mapOption.click();
     setZoomLevel(12);
     ui.mapView->centerOn(gt.LatLon2Meters(center));
 
@@ -119,13 +120,20 @@ void MainWindow::setZoomLevel(int zoom)
     else
         ui.zoomInAction->setEnabled(true);
     tm.clear();
-    ui.mapView->resetTransform();
-    ui.mapView->rotate(angle);
     double res = gt.resolution(zoom);
-    ui.mapView->scale(1/res,1/res);
+    QTransform t;
+    QPointF lastPos = gt.LatLon2Meters(lastLatLon);
+    t.translate(-lastPos.x(),-lastPos.y());
+    t.rotate(angle);
+    t.scale(1/res,1/res);
+    t.translate(lastPos.x(),lastPos.y());
+    ui.mapView->setTransform(t);
+    //ui.mapView->resetTransform();
+    //ui.mapView->rotate(angle);
+    //ui.mapView->scale(1/res,1/res);
     this->zoom = zoom;
 
-    updateLatLonLabels(gt.Meters2LatLon(ui.mapView->mapToScene(lastCursorPos)));
+    //updateLatLonLabels(gt.Meters2LatLon(ui.mapView->mapToScene(lastCursorPos)));
     zoomSlider.setValue(zoom);
 }
 
