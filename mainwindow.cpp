@@ -87,8 +87,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui.zoomInAction->setShortcut(QKeySequence::ZoomIn);
     ui.zoomOutAction->setShortcut(QKeySequence::ZoomOut);
 
-    mapOption.click();
     setZoomLevel(4);
+    mapOption.click();
     ui.mapView->centerOn(gt.LatLon2Meters(center));
     qDebug() << gt.LatLon2Meters(center);
 
