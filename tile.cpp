@@ -13,6 +13,11 @@ Tile::Tile(int tileStyle, int x, int y, int zoom)
     //setTransformationMode(Qt::SmoothTransformation);
     QPixmap result;
     QString filename;
+    QGraphicsRectItem *r = new QGraphicsRectItem(0,0,256,256);
+    r->setParentItem(this);
+    QGraphicsTextItem *t = new QGraphicsTextItem(QString("(%1,%2,%3)").arg(x).arg(y).arg(zoom));
+    t->setParentItem(this);
+
     switch(tileStyle)
     {
         case TILE_STYLE_MAP:

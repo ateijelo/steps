@@ -20,6 +20,7 @@ void MapView::mouseMoveEvent(QMouseEvent *event)
 {
     emit mouseMoved(event->pos());
     QGraphicsView::mouseMoveEvent(event);
+    qDebug() << "MapView::mouseMoveEvent" << event->pos();
 }
 
 void MapView::mouseDoubleClickEvent(QMouseEvent *event)

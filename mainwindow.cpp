@@ -88,8 +88,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui.zoomOutAction->setShortcut(QKeySequence::ZoomOut);
 
     mapOption.click();
-    setZoomLevel(12);
+    setZoomLevel(4);
     ui.mapView->centerOn(gt.LatLon2Meters(center));
+    qDebug() << gt.LatLon2Meters(center);
 
     updateLatLonLabels(center);
 }
@@ -121,16 +122,17 @@ void MainWindow::setZoomLevel(int zoom)
         ui.zoomInAction->setEnabled(true);
     tm.clear();
     double res = gt.resolution(zoom);
-    QTransform t;
-    QPointF lastPos = gt.LatLon2Meters(lastLatLon);
-    t.translate(-lastPos.x(),-lastPos.y());
-    t.rotate(angle);
-    t.scale(1/res,1/res);
-    t.translate(lastPos.x(),lastPos.y());
-    ui.mapView->setTransform(t);
-    //ui.mapView->resetTransform();
-    //ui.mapView->rotate(angle);
-    //ui.mapView->scale(1/res,1/res);
+
+    //QTransform t;
+    //QPointF lastPos = gt.LatLon2Meters(QPointF(-82.3821,23.1362));
+    //t.translate(-lastPos.x(),-lastPos.y());
+    //t.rotate(angle);
+    //t.scale(1/res,1/res);
+    //t.translate(lastPos.x()*res,lastPos.y()*res);
+    //ui.mapView->setTransform(t);
+    ui.mapView->resetTransform();
+    ui.mapView->rotate(angle);
+    ui.mapView->scale(1/res,1/res);
     this->zoom = zoom;
 
     //updateLatLonLabels(gt.Meters2LatLon(ui.mapView->mapToScene(lastCursorPos)));
