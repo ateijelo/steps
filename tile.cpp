@@ -16,8 +16,10 @@ Tile::Tile(int tileStyle, int x, int y, int zoom)
     //QGraphicsRectItem *r = new QGraphicsRectItem(0,0,256,256);
     //r->setPen(Qt::NoPen);
     //r->setParentItem(this);
-    QGraphicsTextItem *t = new QGraphicsTextItem(QString(""));
-    t->setParentItem(this);
+    //QGraphicsTextItem *t = new QGraphicsTextItem(QString(""));
+    //t->setParentItem(this);
+    setAcceptHoverEvents(true);
+    //qDebug() << acceptHoverEvents();
 
     switch(tileStyle)
     {

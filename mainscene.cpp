@@ -1,3 +1,5 @@
+#include <QtDebug>
+
 #include "mainscene.h"
 
 void MainScene::wheelEvent(QGraphicsSceneWheelEvent *event)
@@ -16,4 +18,9 @@ void MainScene::wheelEvent(QGraphicsSceneWheelEvent *event)
         emit zoomOut();
     }
     event->accept();
+}
+
+void MainScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    qDebug() << "MainScene::mouseMoveEvent" << event->scenePos();
 }
