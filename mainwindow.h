@@ -2,9 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QGraphicsScene>
-#include <QLinkedList>
-#include <QPoint>
 #include <QRadioButton>
 #include <QLabel>
 #include <QSlider>
@@ -20,40 +17,19 @@ class MainWindow : public QMainWindow
     public:
         MainWindow(QWidget *parent = NULL);
 
-    private:
-        void updateLatLonLabels(QPointF latLon);
+    private slots:
+        void updateLatLonLabels(const QPointF& latLon);
 
     private:
         Ui::MainWindow ui;
-        QGraphicsScene *scene;
-        QLinkedList<QLinkedList<Tile*>*> columns;
-        QLinkedList<Tile*> tiles;
-        GeoTools gt;
-        TileManager tm;
-        QPointF center;
-        int zoom;
-        qreal angle;
         QSlider zoomSlider;
         QRadioButton mapOption;
         QRadioButton satOption;
         QRadioButton hybOption;
-        QPointF lastLatLon;
         QLabel latLabel;
         QLabel lonLabel;
-        QPoint lastMousePos;
 
     private slots:
-        void mapViewHadToPaint();
-        void mapViewMouseMoved(const QPoint&);
-        void displayNewTile(Tile *t, int x, int y, int zoom);
-        void zoomIn();
-        void zoomOut();
-        void rotRight();
-        void rotLeft();
-        void setZoomLevel(int zoom);
-        void setMapStyle();
-        void setSatStyle();
-        void setHybStyle();
         void openCacheDirectory();
 };
 

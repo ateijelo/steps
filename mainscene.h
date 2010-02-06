@@ -9,12 +9,10 @@ class MainScene : public QGraphicsScene
 {
     Q_OBJECT
     public:
-        void wheelEvent(QGraphicsSceneWheelEvent *event);
         void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
 
     signals:
-        void zoomIn();
-        void zoomOut();
+        void mouseMoved(const QPointF& pos);
 };
 
 #endif // MAINSCENE_H
