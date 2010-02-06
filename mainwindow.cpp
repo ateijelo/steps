@@ -123,8 +123,11 @@ void MainWindow::setZoomLevel(int zoom)
 
     ui.mapView->resetTransform();
     ui.mapView->scale(1/res,1/res);
-    QPoint d = ui.mapView->rect().center() - lastMousePos;
-    ui.mapView->centerOn(gt.LatLon2Meters(lastLatLon) + d*res);
+    ui.mapView->rotate(angle);
+    QPointF oldScenePos = gt.LatLon2Meters(lastLatLon);
+    QPointF newScenePos = ui.mapView->mapToScene(lastMousePos);
+    QPointF centerPos = ui.mapView->mapToScene(ui.mapView->rect().center());
+    ui.mapView->centerOn(centerPos + oldScenePos - newScenePos);
     this->zoom = zoom;
 
     zoomSlider.setValue(zoom);
