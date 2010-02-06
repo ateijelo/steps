@@ -22,5 +22,5 @@ void MainScene::wheelEvent(QGraphicsSceneWheelEvent *event)
 
 void MainScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << "MainScene::mouseMoveEvent" << event->scenePos();
+    //qDebug() << "MainScene::mouseMoveEvent" << event->scenePos();
 }

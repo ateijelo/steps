@@ -14,9 +14,8 @@ Tile::Tile(int tileStyle, int x, int y, int zoom)
     QPixmap result;
     QString filename;
     //QGraphicsRectItem *r = new QGraphicsRectItem(0,0,256,256);
-    //r->setPen(Qt::NoPen);
     //r->setParentItem(this);
-    //QGraphicsTextItem *t = new QGraphicsTextItem(QString(""));
+    //QGraphicsTextItem *t = new QGraphicsTextItem(QString("(%1,%2,%3)").arg(x).arg(y).arg(zoom));
     //t->setParentItem(this);
     setAcceptHoverEvents(true);
     //qDebug() << acceptHoverEvents();

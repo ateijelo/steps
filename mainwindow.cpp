@@ -106,8 +106,6 @@ void MainWindow::openCacheDirectory()
 
 void MainWindow::setZoomLevel(int zoom)
 {
-    QPoint lastCursorPos = ui.mapView->mapFromScene(gt.LatLon2Meters(lastLatLon));
-
     if (zoom < 0)
         zoom = 0;
     if (zoom > 18)
@@ -123,19 +121,12 @@ void MainWindow::setZoomLevel(int zoom)
     tm.clear();
     double res = gt.resolution(zoom);
 
-    //QTransform t;
-    //QPointF lastPos = gt.LatLon2Meters(QPointF(-82.3821,23.1362));
-    //t.translate(-lastPos.x(),-lastPos.y());
-    //t.rotate(angle);
-    //t.scale(1/res,1/res);
-    //t.translate(lastPos.x()*res,lastPos.y()*res);
-    //ui.mapView->setTransform(t);
     ui.mapView->resetTransform();
-    ui.mapView->rotate(angle);
     ui.mapView->scale(1/res,1/res);
+    QPoint d = ui.mapView->rect().center() - lastMousePos;
+    ui.mapView->centerOn(gt.LatLon2Meters(lastLatLon) + d*res);
     this->zoom = zoom;
 
-    //updateLatLonLabels(gt.Meters2LatLon(ui.mapView->mapToScene(lastCursorPos)));
     zoomSlider.setValue(zoom);
 }
 
@@ -216,4 +207,5 @@ void MainWindow::mapViewMouseMoved(const QPoint& p)
 {
     QPointF latLon = gt.Meters2LatLon(ui.mapView->mapToScene(p));
     updateLatLonLabels(latLon);
+    lastMousePos = p;
 }

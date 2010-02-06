@@ -40,6 +40,7 @@ class MainWindow : public QMainWindow
         QPointF lastLatLon;
         QLabel latLabel;
         QLabel lonLabel;
+        QPoint lastMousePos;
 
     private slots:
         void mapViewHadToPaint();
