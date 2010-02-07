@@ -65,7 +65,10 @@ void MainWindow::openCacheDirectory()
     QString path = QFileDialog::getExistingDirectory(this,
                                                      "Open Cache Directory",
                                                      settings.value("CachePath","").toString());
-    settings.setValue("CachePath",path);
+    if (path.compare("") != 0)
+    {
+        settings.setValue("CachePath",path);
+    }
 }
 
 void MainWindow::updateLatLonLabels(const QPointF& latLon)
