@@ -48,7 +48,7 @@
      <x>0</x>
      <y>0</y>
      <width>562</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -74,6 +74,7 @@
    </attribute>
    <addaction name="rotLeftAction"/>
    <addaction name="rotRightAction"/>
+   <addaction name="separator"/>
    <addaction name="zoomOutAction"/>
    <addaction name="zoomInAction"/>
   </widget>
