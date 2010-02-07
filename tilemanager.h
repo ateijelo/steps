@@ -19,14 +19,12 @@ class TileManager : public QObject
         TileManager();
         void setRegion(const QRect& r, int zoom);
         void clear();
-        void setTileStyle(int tileStyle);
-        int getTileStyle();
 
     signals:
         void tileCreated(Tile *t,int x, int y, int zoom);
 
     private:
-        ColumnPointer adjustBeforeIntersection(const QRect& n, int zoom);        
+        ColumnPointer adjustBeforeIntersection(const QRect& n, int zoom);
         void adjustColumn(Column* col, const QRect& n, int x, int zoom);
         void adjustAfterIntersection(const QRect& n, int zoom);
         void deleteColumn(Column* col);
@@ -34,7 +32,6 @@ class TileManager : public QObject
 
         QLinkedList<Column*> columns;
         QRect region;
-        int currentTileStyle;
 };
 
 #endif // TILEMANAGER_H

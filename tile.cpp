@@ -7,7 +7,7 @@
 
 #include "tile.h"
 
-Tile::Tile(int tileStyle, int x, int y, int zoom)
+Tile::Tile(int x, int y, int zoom)
         : x(x), y(y), zoom(zoom)
 {
     //setTransformationMode(Qt::SmoothTransformation);
@@ -20,7 +20,8 @@ Tile::Tile(int tileStyle, int x, int y, int zoom)
     setAcceptHoverEvents(true);
     //qDebug() << acceptHoverEvents();
 
-    switch(tileStyle)
+    QSettings settings;
+    switch(settings.value("TileStyle", TILE_STYLE_MAP).toInt())
     {
         case TILE_STYLE_MAP:
             filename = getMapTileFileName(x, y, zoom);

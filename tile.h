@@ -10,7 +10,7 @@
 class Tile : public QGraphicsPixmapItem
 {
     public:
-        Tile(int tileStyle, int x, int y, int zoom);
+        Tile(int x, int y, int zoom);
         ~Tile();
     private:
         QString getMapTileFileName(int x, int y, int zoom);

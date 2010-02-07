@@ -13,19 +13,9 @@ TileManager::TileManager()
 //    columns.append(c);
 }
 
-int TileManager::getTileStyle()
-{
-    return currentTileStyle;
-}
-
-void TileManager::setTileStyle(int tileStyle)
-{
-    currentTileStyle = tileStyle;
-}
-
 Tile* TileManager::newTile(int x, int y, int zoom)
 {
-    Tile *t = new Tile(currentTileStyle, x,y,zoom);
+    Tile *t = new Tile(x,y,zoom);
     emit tileCreated(t,x,y,zoom);
     return t;
 }

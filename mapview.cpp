@@ -1,4 +1,5 @@
 #include <QtDebug>
+#include <QSettings>
 
 #include "mapview.h"
 
@@ -15,8 +16,8 @@ MapView::MapView(QWidget *parent)
     connect(scene,SIGNAL(mouseMoved(QPointF)),this,SLOT(mouseMovedOverScene(QPointF)));
     angle = 0;
     zoom = -1;
-    setZoomLevel(0);
-    updateTiles();
+    //setZoomLevel(0);
+    //updateTiles();
 }
 
 void MapView::mouseMovedOverScene(const QPointF& scenePos)
@@ -86,21 +87,24 @@ void MapView::wheelEvent(QWheelEvent *event)
 
 void MapView::setMapStyle()
 {
-    tm.setTileStyle(TILE_STYLE_MAP);
+    QSettings settings;
+    settings.setValue("TileStyle", TILE_STYLE_MAP);
     tm.clear();
     updateTiles();
 }
 
 void MapView::setSatStyle()
 {
-    tm.setTileStyle(TILE_STYLE_SAT);
+    QSettings settings;
+    settings.setValue("TileStyle", TILE_STYLE_SAT);
     tm.clear();
     updateTiles();
 }
 
 void MapView::setHybStyle()
 {
-    tm.setTileStyle(TILE_STYLE_HYB);
+    QSettings settings;
+    settings.setValue("TileStyle", TILE_STYLE_HYB);
     tm.clear();
     updateTiles();
 }

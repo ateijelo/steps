@@ -56,7 +56,23 @@ MainWindow::MainWindow(QWidget *parent)
     ui.zoomInAction->setShortcut(QKeySequence::ZoomIn);
     ui.zoomOutAction->setShortcut(QKeySequence::ZoomOut);
 
-    mapOption.click();
+    QSettings settings;
+    int tileStyle = settings.value("TileStyle", TILE_STYLE_MAP).toInt();
+    switch(tileStyle)
+    {
+        case TILE_STYLE_SAT:
+            satOption.setChecked(true);
+            break;
+        case TILE_STYLE_HYB:
+            hybOption.setChecked(true);
+            break;
+        case TILE_STYLE_MAP:
+        default:
+            mapOption.setChecked(true);
+            break;
+    }
+    settings.value("TileStyle", tileStyle);
+    ui.mapView->setZoomLevel(0);
 }
 
 void MainWindow::openCacheDirectory()
