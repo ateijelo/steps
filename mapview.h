@@ -16,6 +16,7 @@ class MapView : public QGraphicsView
     Q_OBJECT
     public:
         MapView(QWidget *parent=NULL);
+        ~MapView();
 
         bool viewportEvent(QEvent *event);
         void mouseMoveEvent(QMouseEvent *event);

@@ -14,8 +14,13 @@ MapView::MapView(QWidget *parent)
 
     connect(&tm,SIGNAL(tileCreated(Tile*,int,int,int)),this,SLOT(displayNewTile(Tile*,int,int,int)));
     connect(scene,SIGNAL(mouseMoved(QPointF)),this,SLOT(mouseMovedOverScene(QPointF)));
-    angle = 0;
+
+    QSettings settings;
+
+    angle = settings.value("Angle", 0.0F).toDouble();
+
     zoom = -1;
+
     //setZoomLevel(0);
     //updateTiles();
 }
@@ -173,4 +178,12 @@ void MapView::rotLeft()
 {
     rotate(-15);
     angle = (angle-15 < 0)? angle + 345 : angle - 15;
+}
+
+MapView::~MapView()
+{
+    QSettings settings;
+    settings.setValue("ZoomLevel", zoom);
+    settings.setValue("CenterOn", mapToScene(rect().center()) + sceneAnchor - mapToScene(viewAnchor));
+    settings.setValue("Angle", angle);
 }

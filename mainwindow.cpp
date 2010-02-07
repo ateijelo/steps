@@ -57,7 +57,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui.zoomOutAction->setShortcut(QKeySequence::ZoomOut);
 
     QSettings settings;
+
     int tileStyle = settings.value("TileStyle", TILE_STYLE_MAP).toInt();
+    settings.value("TileStyle", tileStyle);
     switch(tileStyle)
     {
         case TILE_STYLE_SAT:
@@ -71,8 +73,14 @@ MainWindow::MainWindow(QWidget *parent)
             mapOption.setChecked(true);
             break;
     }
-    settings.value("TileStyle", tileStyle);
-    ui.mapView->setZoomLevel(0);
+
+    int zoomLevel = settings.value("ZoomLevel", 0).toInt();
+    settings.value("ZoomLevel", zoomLevel);
+    ui.mapView->setZoomLevel(zoomLevel);
+
+    QPointF centerOn = settings.value("CenterOn", QPointF()).toPointF();
+    settings.setValue("CenterOn", centerOn);
+    ui.mapView->centerOn(centerOn);
 }
 
 void MainWindow::openCacheDirectory()
