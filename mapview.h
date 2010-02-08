@@ -5,6 +5,8 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QGraphicsView>
+#include <QContextMenuEvent>
+#include <QSignalMapper>
 
 #include "tile.h"
 #include "geotools.h"
@@ -23,6 +25,7 @@ class MapView : public QGraphicsView
         void mouseDoubleClickEvent(QMouseEvent *event);
         void leaveEvent(QEvent *event);
         void wheelEvent(QWheelEvent *event);
+        void contextMenuEvent (QContextMenuEvent *event);
 
     signals:
         void canZoomIn(bool);
@@ -40,12 +43,15 @@ class MapView : public QGraphicsView
         void setMapStyle();
         void setSatStyle();
         void setHybStyle();
+        void setAsCenter(QObject *newCenter);
 
     private slots:
         void mouseMovedOverScene(const QPointF& scenePos);
+        void copyToClipboard(QString text);
 
     private:
         void updateTiles();
+        void addMenuAction(QSignalMapper *signalMapper, QMenu *menu, QString text);
 
         MainScene *scene;
         GeoTools gt;

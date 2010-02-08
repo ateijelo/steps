@@ -1,5 +1,8 @@
 #include <QtDebug>
 #include <QSettings>
+#include <QMenu>
+#include <QApplication>
+#include <QClipboard>
 
 #include "mapview.h"
 
@@ -88,6 +91,59 @@ void MapView::wheelEvent(QWheelEvent *event)
         return;
     }
     QGraphicsView::wheelEvent(event);
+}
+
+void MapView::contextMenuEvent (QContextMenuEvent *event)
+{
+    if (event->modifiers() & Qt::ControlModifier)
+    {
+        QPointF latLon = gt.Meters2LatLon(mapToScene(event->pos()));
+
+        QSignalMapper *signalMapper = new QSignalMapper(this);
+
+        QMenu *menu = new QMenu();
+
+        QMenu *copyMenu = new QMenu("&Copy to clipboard");
+        menu->addMenu(copyMenu);
+
+        addMenuAction(signalMapper, copyMenu, QString("(%1;%2)").arg(latLon.y()).arg(latLon.x()));
+        addMenuAction(signalMapper, copyMenu, QString("Latitude: %1 ; Longitude: %2").arg(latLon.y()).arg(latLon.x()));
+        addMenuAction(signalMapper, copyMenu, QString("Latitude: %1").arg(latLon.y()));
+        addMenuAction(signalMapper, copyMenu, QString("Longitude: %1").arg(latLon.x()));
+        //QString::fromUtf8("°")
+
+        ////menu->addAction("&Set as center", this, SLOT(setAnchorAsCenter()));
+        //QAction *setCenterAction = new QAction("&Set as center", menu);
+        //signalMapper->setMapping(setCenterAction, (QObject*)(&latLon));
+        //menu->addAction(setCenterAction);
+
+        //connect(signalMapper, SIGNAL(mapped(QObject*)), this, SLOT(setAsCenter(QObject*)));
+        connect(signalMapper, SIGNAL(mapped(QString)), this, SLOT(copyToClipboard(QString)));
+        menu->exec(mapToGlobal(event->pos()));
+
+        event->accept();
+    }
+}
+
+void MapView::setAsCenter(QObject *newCenter)
+{
+    //QPointF viewAnchorScenePos = mapToScene(viewAnchor);
+    //centerOn(mapToScene(rect().center()) + sceneAnchor - viewAnchorScenePos);
+    qDebug() << newCenter;
+    centerOn(mapToScene(((QPoint*)newCenter)[0]));
+}
+
+void MapView::addMenuAction(QSignalMapper *signalMapper, QMenu *menu, QString text)
+{
+    QAction *action = new QAction(text, menu);
+    signalMapper->setMapping(action, text);
+    connect(action, SIGNAL(triggered()), signalMapper, SLOT(map()));
+    menu->addAction(action);
+}
+
+void MapView::copyToClipboard(QString text)
+{
+    QApplication::clipboard()->setText(text);
 }
 
 void MapView::setMapStyle()
