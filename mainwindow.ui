@@ -42,6 +42,9 @@
       <property name="transformationAnchor">
        <enum>QGraphicsView::AnchorViewCenter</enum>
       </property>
+      <property name="resizeAnchor">
+       <enum>QGraphicsView::AnchorViewCenter</enum>
+      </property>
      </widget>
     </item>
    </layout>
