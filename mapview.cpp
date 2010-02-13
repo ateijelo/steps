@@ -3,6 +3,7 @@
 #include <QMenu>
 #include <QApplication>
 #include <QClipboard>
+#include <QSettings>
 
 #include "mapview.h"
 
@@ -18,14 +19,25 @@ MapView::MapView(QWidget *parent)
     connect(&tm,SIGNAL(tileCreated(Tile*,int,int,int)),this,SLOT(displayNewTile(Tile*,int,int,int)));
     connect(scene,SIGNAL(mouseMoved(QPointF)),this,SLOT(mouseMovedOverScene(QPointF)));
 
-    QSettings settings;
-
-    angle = settings.value("Angle", 0.0F).toDouble();
-
     zoom = -1;
 
-    //setZoomLevel(0);
+    QSettings settings;
+    angle = settings.value("Angle", 0.0F).toDouble();
+    setZoomLevel(settings.value("ZoomLevel", 0).toInt());
+    GeoTools gt;
+    QPointF center(settings.value("Longitude", 0).toDouble(), settings.value("Latitude", 0).toDouble());
+    centerOn(gt.LatLon2Meters(center));
     //updateTiles();
+}
+
+bool MapView::canZoomIn()
+{
+    return (zoom < 18);
+}
+
+bool MapView::canZoomOut()
+{
+    return (zoom > 0);
 }
 
 void MapView::mouseMovedOverScene(const QPointF& scenePos)
@@ -55,7 +67,6 @@ void MapView::mouseMoveEvent(QMouseEvent *event)
     viewAnchor = event->pos();
     sceneAnchor = mapToScene(viewAnchor);
     QGraphicsView::mouseMoveEvent(event);
-    //qDebug() << "MapView::mouseMoveEvent" << event->pos();
 }
 
 void MapView::leaveEvent(QEvent *event)
@@ -129,8 +140,8 @@ void MapView::setAsCenter(QObject *newCenter)
 {
     //QPointF viewAnchorScenePos = mapToScene(viewAnchor);
     //centerOn(mapToScene(rect().center()) + sceneAnchor - viewAnchorScenePos);
-    qDebug() << newCenter;
-    centerOn(mapToScene(((QPoint*)newCenter)[0]));
+    //qDebug() << newCenter;
+    //centerOn(mapToScene(((QPoint*)newCenter)[0]));
 }
 
 void MapView::addMenuAction(QSignalMapper *signalMapper, QMenu *menu, QString text)
@@ -202,6 +213,8 @@ void MapView::setZoomLevel(int zoom)
     emit canZoomOut(zo);
     emit canZoomIn(zi);
     this->zoom = zoom;
+    QSettings settings;
+    settings.setValue("ZoomLevel", zoom);
     emit zoomChanged(zoom);
 
     tm.clear();
@@ -224,22 +237,31 @@ void MapView::zoomOut()
     setZoomLevel(zoom - 1);
 }
 
+int MapView::zoomLevel()
+{
+    return zoom;
+}
+
 void MapView::rotRight()
 {
     rotate(15);
     angle = (angle+15 > 360)? angle - 345 : angle + 15;
+    QSettings settings;
+    settings.setValue("Angle", angle);
 }
 
 void MapView::rotLeft()
 {
     rotate(-15);
     angle = (angle-15 < 0)? angle + 345 : angle - 15;
+    QSettings settings;
+    settings.setValue("Angle", angle);
 }
 
 MapView::~MapView()
 {
     QSettings settings;
-    settings.setValue("ZoomLevel", zoom);
-    settings.setValue("CenterOn", mapToScene(rect().center()) + sceneAnchor - mapToScene(viewAnchor));
-    settings.setValue("Angle", angle);
+    QPointF center = gt.Meters2LatLon(mapToScene(rect().center()));
+    settings.setValue("Latitude", center.y());
+    settings.setValue("Longitude", center.x());
 }
