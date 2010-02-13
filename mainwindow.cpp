@@ -74,13 +74,21 @@ MainWindow::MainWindow(QWidget *parent)
             break;
     }
 
-    int zoomLevel = settings.value("ZoomLevel", 0).toInt();
-    settings.value("ZoomLevel", zoomLevel);
-    ui.mapView->setZoomLevel(zoomLevel);
+    //int zoomLevel = settings.value("ZoomLevel", 0).toInt();
+    //settings.value("ZoomLevel", zoomLevel);
+    //ui.mapView->setZoomLevel(zoomLevel);
 
-    QPointF centerOn = settings.value("CenterOn", QPointF()).toPointF();
-    settings.setValue("CenterOn", centerOn);
-    ui.mapView->centerOn(centerOn);
+    //QPointF centerOn = settings.value("Center", QPointF()).toPointF();
+    //settings.setValue("Center", centerOn);
+    //GeoTools gt;
+    //ui.mapView->centerOn(gt.LatLon2Meters(centerOn));
+    //qDebug() << "loading...";
+    //qDebug() << centerOn;
+    //qDebug() << gt.LatLon2Meters(centerOn);
+
+    ui.zoomInAction->setEnabled(ui.mapView->canZoomIn());
+    ui.zoomOutAction->setEnabled(ui.mapView->canZoomOut());
+    zoomSlider.setValue(ui.mapView->zoomLevel());
 }
 
 void MainWindow::openCacheDirectory()
