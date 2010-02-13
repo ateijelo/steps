@@ -73,13 +73,10 @@ QPointF GeoTools::LatLon2Meters(const QPointF& l)
 QPointF GeoTools::Meters2LatLon(const QPointF& m)
 {
     double lat,lon;
-    //lon =  (m.x() / originShift) * 180.0;
-    lat =  (m.x() / originShift) * 180.0;
-    //lat = -(m.y() / originShift) * 180.0;
-    lon = -(m.y() / originShift) * 180.0;
-    //lat = 180 / M_PI * (2 * atan( exp( lat * M_PI / 180.0)) - M_PI / 2.0);
-    lon = 180 / M_PI * (2 * atan( exp( lon * M_PI / 180.0)) - M_PI / 2.0);
-    return QPointF(lat,lon);
+    lon =  (m.x() / originShift) * 180.0;
+    lat = -(m.y() / originShift) * 180.0;
+    lat = 180 / M_PI * (2 * atan( exp( lat * M_PI / 180.0)) - M_PI / 2.0);
+    return QPointF(lon,lat);
 }
 
 // Gives how many projection meters 1 pixel represents at given zoom leven
