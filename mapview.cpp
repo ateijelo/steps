@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QSettings>
+#include <QToolTip>
 
 #include "mapview.h"
 
@@ -50,6 +51,14 @@ bool MapView::viewportEvent(QEvent *event)
     if (event->type() == QEvent::Paint)
     {
         updateTiles();
+    }
+    else if (event->type() == QEvent::ToolTip)
+    {
+         QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
+         GeoTools gt;
+         QPointF latLon = gt.Meters2LatLon(mapToScene(helpEvent->pos()));
+         QToolTip::showText(helpEvent->globalPos(), QString("(%1 ; %2)").arg(latLon.x()).arg(latLon.y()));
+         return true;
     }
     return QGraphicsView::viewportEvent(event);
 }
