@@ -88,7 +88,11 @@ void MapView::mouseDoubleClickEvent(QMouseEvent *event)
 
 void MapView::wheelEvent(QWheelEvent *event)
 {
+#if Q_OS_MAC
     if ((event->modifiers() & Qt::ControlModifier))
+#else
+    if (!event->modifiers())
+#endif
     {
         if (event->delta() > 0)
         {
