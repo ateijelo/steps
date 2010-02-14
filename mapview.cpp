@@ -97,7 +97,7 @@ void MapView::mouseDoubleClickEvent(QMouseEvent *event)
 
 void MapView::wheelEvent(QWheelEvent *event)
 {
-#if Q_OS_MAC
+#ifdef Q_OS_DARWIN
     if ((event->modifiers() & Qt::ControlModifier))
 #else
     if (!event->modifiers())
