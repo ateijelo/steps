@@ -1,10 +1,12 @@
 #ifndef TILEPYRAMID_H
 #define TILEPYRAMID_H
 
-class TilePyramid
+#include <QGraphicsItem>
+
+class TilePyramid : public QGraphicsItem
 {
-public:
-    TilePyramid();
+    public:
+        TilePyramid(QGraphicsItem *parent=0);
 };
 
 #endif // TILEPYRAMID_H

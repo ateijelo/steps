@@ -1,5 +1,6 @@
 #include "tilepyramid.h"
 
-TilePyramid::TilePyramid()
+TilePyramid::TilePyramid(QGraphicsItem *parent)
+        : QGraphicsItem(parent)
 {
 }
