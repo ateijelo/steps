@@ -13,6 +13,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui.setupUi(this);
 
+    preferences = new Preferences(this);
+
     zoomSlider.setMinimum(0);
     zoomSlider.setMaximum(18);
     zoomSlider.setOrientation(Qt::Horizontal);
@@ -49,6 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui.rotRightAction,SIGNAL(triggered()),ui.mapView,SLOT(rotRight()));
     connect(ui.rotLeftAction,SIGNAL(triggered()),ui.mapView,SLOT(rotLeft()));
     connect(ui.openAction,SIGNAL(triggered()),this,SLOT(openCacheDirectory()));
+    connect(ui.action_Preferences, SIGNAL(triggered()), preferences, SLOT(show()));
     connect(ui.mapView,SIGNAL(canZoomIn(bool)),ui.zoomInAction,SLOT(setEnabled(bool)));
     connect(ui.mapView,SIGNAL(canZoomOut(bool)),ui.zoomOutAction,SLOT(setEnabled(bool)));
     connect(ui.mapView,SIGNAL(zoomChanged(int)),&zoomSlider,SLOT(setValue(int)));

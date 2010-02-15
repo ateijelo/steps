@@ -100,11 +100,24 @@ void MapView::mouseDoubleClickEvent(QMouseEvent *event)
 
 void MapView::wheelEvent(QWheelEvent *event)
 {
-#if Q_OS_MAC
-    if ((event->modifiers() & Qt::ControlModifier))
+    QSettings settings;
+    QString defaultWheelOption;
+#ifdef Q_OS_MAC
+    defaultWheelOption = WheelOptions::ZoomsWithCtrlKeyPressed;
 #else
-    if (!event->modifiers())
+    defaultWheelOption = WheelOptions::ZoomsWithNoKeyPressed;
 #endif
+    QString wheelOption = settings.value(SettingsKeys::WheelOption, defaultWheelOption).toString();
+    bool cond;
+    if (wheelOption == WheelOptions::ZoomsWithNoKeyPressed)
+    {
+        cond = !event->modifiers();
+    }
+    else //(wheelOption == WheelOptions::ZoomsWithCtrlKeyPressed)
+    {
+        cond = event->modifiers() == Qt::ControlModifier;
+    }
+    if (cond)
     {
         if (event->delta() > 0)
         {

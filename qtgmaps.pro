@@ -14,8 +14,10 @@ HEADERS += mainwindow.h \
     tile.h \
     tilemanager.h \
     mainscene.h \
-    constants.h
-FORMS += mainwindow.ui
+    constants.h \
+    preferences.h
+FORMS += mainwindow.ui \
+    preferences.ui
 SOURCES += main.cpp \
     mainwindow.cpp \
     mapview.cpp \
@@ -23,5 +25,6 @@ SOURCES += main.cpp \
     geotools.cpp \
     tile.cpp \
     tilemanager.cpp \
-    mainscene.cpp
+    mainscene.cpp \
+    preferences.cpp
 RESOURCES += qtgmaps.qrc

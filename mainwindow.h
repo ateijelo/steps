@@ -10,6 +10,7 @@
 #include "geotools.h"
 #include "tilemanager.h"
 #include "tile.h"
+#include "preferences.h"
 
 class MainWindow : public QMainWindow
 {
@@ -28,6 +29,7 @@ class MainWindow : public QMainWindow
         QRadioButton hybOption;
         QLabel latLabel;
         QLabel lonLabel;
+        Preferences *preferences;
 
     private slots:
         void openCacheDirectory();
