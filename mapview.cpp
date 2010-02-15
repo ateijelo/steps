@@ -7,6 +7,7 @@
 #include <QToolTip>
 
 #include "mapview.h"
+#include "constants.h"
 
 MapView::MapView(QWidget *parent)
     : QGraphicsView(parent)
@@ -20,15 +21,17 @@ MapView::MapView(QWidget *parent)
     connect(&tm,SIGNAL(tileCreated(Tile*,int,int,int)),this,SLOT(displayNewTile(Tile*,int,int,int)));
     connect(scene,SIGNAL(mouseMoved(QPointF)),this,SLOT(mouseMovedOverScene(QPointF)));
 
-    zoom = -1;
-
     QSettings settings;
-    angle = settings.value("Angle", 0.0F).toDouble();
-    setZoomLevel(settings.value("ZoomLevel", 0).toInt());
     GeoTools gt;
-    QPointF center(settings.value("Longitude", 0).toDouble(), settings.value("Latitude", 0).toDouble());
-    centerOn(gt.LatLon2Meters(center));
-    //updateTiles();
+
+    angle = settings.value(SettingsKeys::Angle, 0.0F).toDouble();
+
+    zoom = -1;
+    setZoomLevel(settings.value(SettingsKeys::ZoomLevel, 0).toInt());
+
+    qreal lat = settings.value(SettingsKeys::Latitude, 0).toDouble();
+    qreal lon = settings.value(SettingsKeys::Longitude, 0).toDouble();
+    centerOn(gt.LatLon2Meters(QPointF(lon,lat)));
 }
 
 bool MapView::canZoomIn()
@@ -173,7 +176,7 @@ void MapView::copyToClipboard(QString text)
 void MapView::setMapStyle()
 {
     QSettings settings;
-    settings.setValue("TileStyle", TILE_STYLE_MAP);
+    settings.setValue(SettingsKeys::CacheStyle, CacheStyles::GoogleMap);
     tm.clear();
     updateTiles();
 }
@@ -181,7 +184,7 @@ void MapView::setMapStyle()
 void MapView::setSatStyle()
 {
     QSettings settings;
-    settings.setValue("TileStyle", TILE_STYLE_SAT);
+    settings.setValue(SettingsKeys::CacheStyle, CacheStyles::GoogleSat);
     tm.clear();
     updateTiles();
 }
@@ -189,7 +192,7 @@ void MapView::setSatStyle()
 void MapView::setHybStyle()
 {
     QSettings settings;
-    settings.setValue("TileStyle", TILE_STYLE_HYB);
+    settings.setValue(SettingsKeys::CacheStyle, CacheStyles::GoogleHyb);
     tm.clear();
     updateTiles();
 }
@@ -227,7 +230,7 @@ void MapView::setZoomLevel(int zoom)
     emit canZoomIn(zi);
     this->zoom = zoom;
     QSettings settings;
-    settings.setValue("ZoomLevel", zoom);
+    settings.setValue(SettingsKeys::ZoomLevel, zoom);
     emit zoomChanged(zoom);
 
     tm.clear();
@@ -260,7 +263,7 @@ void MapView::rotRight()
     rotate(15);
     angle = (angle+15 > 360)? angle - 345 : angle + 15;
     QSettings settings;
-    settings.setValue("Angle", angle);
+    settings.setValue(SettingsKeys::Angle, angle);
 }
 
 void MapView::rotLeft()
@@ -268,13 +271,13 @@ void MapView::rotLeft()
     rotate(-15);
     angle = (angle-15 < 0)? angle + 345 : angle - 15;
     QSettings settings;
-    settings.setValue("Angle", angle);
+    settings.setValue(SettingsKeys::Angle, angle);
 }
 
 MapView::~MapView()
 {
     QSettings settings;
     QPointF center = gt.Meters2LatLon(mapToScene(rect().center()));
-    settings.setValue("Latitude", center.y());
-    settings.setValue("Longitude", center.x());
+    settings.setValue(SettingsKeys::Latitude, center.y());
+    settings.setValue(SettingsKeys::Longitude, center.x());
 }

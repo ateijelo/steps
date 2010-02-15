@@ -6,6 +6,7 @@
 #include <QSettings>
 
 #include "tile.h"
+#include "constants.h"
 
 Tile::Tile(int x, int y, int zoom)
         : x(x), y(y), zoom(zoom)
@@ -18,11 +19,11 @@ Tile::Tile(int x, int y, int zoom)
     setAcceptHoverEvents(true);
 
     QSettings settings;
-    QString tileStyle = settings.value("TileStyle", TILE_STYLE_MAP).toString();
+    QString tileStyle = settings.value(SettingsKeys::CacheStyle, CacheStyles::GoogleMap).toString();
     QPixmap result = loadTile(tileStyle, x, y, zoom);
-    if (tileStyle == TILE_STYLE_HYB)
+    if (tileStyle == CacheStyles::GoogleHyb)
     {
-        QPixmap sat = loadTile(TILE_STYLE_SAT, x, y, zoom);
+        QPixmap sat = loadTile(CacheStyles::GoogleSat, x, y, zoom);
         if (!sat.isNull())
         {
             QPainter painter(&sat);
@@ -107,7 +108,7 @@ QString Tile::getTileFileName(QString tileStyle, int x, int y, int zoom)
     int mgm_y = y >> 3;
     QSettings settings;
     return QString("%1/%2_%3/%4_%5.mgm")
-            .arg(settings.value("CachePath","").toString())
+            .arg(settings.value(SettingsKeys::CachePath,"").toString())
             .arg(tileStyle)
             .arg(zoom)
             .arg(mgm_x)

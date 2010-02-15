@@ -13,7 +13,8 @@ HEADERS += mainwindow.h \
     geotools.h \
     tile.h \
     tilemanager.h \
-    mainscene.h
+    mainscene.h \
+    constants.h
 FORMS += mainwindow.ui
 SOURCES += main.cpp \
     mainwindow.cpp \

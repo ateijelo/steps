@@ -6,6 +6,7 @@
 #include "mainwindow.h"
 #include "mgmreader.h"
 #include "mainscene.h"
+#include "constants.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -58,8 +59,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     QSettings settings;
 
-    QString tileStyle = settings.value("TileStyle", TILE_STYLE_MAP).toString();
-    settings.value("TileStyle", tileStyle);
+    QString tileStyle = settings.value(SettingsKeys::CacheStyle, CacheStyles::GoogleMap).toString();
+    //settings.setValue(SettingsKeys::CacheStyle, tileStyle);
     if (tileStyle == TILE_STYLE_SAT)
     {
         satOption.setChecked(true);
@@ -83,10 +84,10 @@ void MainWindow::openCacheDirectory()
     QSettings settings;
     QString path = QFileDialog::getExistingDirectory(this,
                                                      "Open Cache Directory",
-                                                     settings.value("CachePath","").toString());
+                                                     settings.value(SettingsKeys::CachePath,"").toString());
     if (path.compare("") != 0)
     {
-        settings.setValue("CachePath",path);
+        settings.setValue(SettingsKeys::CachePath,path);
     }
 }
 
