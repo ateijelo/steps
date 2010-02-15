@@ -11,54 +11,36 @@ Tile::Tile(int x, int y, int zoom)
         : x(x), y(y), zoom(zoom)
 {
     //setTransformationMode(Qt::SmoothTransformation);
-    QPixmap result;
-    QString filename;
     //QGraphicsRectItem *r = new QGraphicsRectItem(0,0,256,256);
     //r->setParentItem(this);
     //QGraphicsTextItem *t = new QGraphicsTextItem(QString("(%1,%2,%3)").arg(x).arg(y).arg(zoom));
     //t->setParentItem(this);
     setAcceptHoverEvents(true);
-    //qDebug() << acceptHoverEvents();
 
     QSettings settings;
-    switch(settings.value("TileStyle", TILE_STYLE_MAP).toInt())
+    QString tileStyle = settings.value("TileStyle", TILE_STYLE_MAP).toString();
+    QPixmap result = loadTile(tileStyle, x, y, zoom);
+    if (tileStyle == TILE_STYLE_HYB)
     {
-        case TILE_STYLE_MAP:
-            filename = getMapTileFileName(x, y, zoom);
-            result = loadTile(filename, x, y);
-            break;
-        case TILE_STYLE_SAT:
-            filename = getSatTileFileName(x, y, zoom);
-            result = loadTile(filename, x, y);
-            break;
-        case TILE_STYLE_HYB:
-            filename = getSatTileFileName(x, y, zoom);
-            result = loadTile(filename, x, y);
-
-            filename = getHybTileFileName(x, y, zoom);
-            QPixmap hyb = loadTile(filename, x, y);
-            if (result.isNull())
-            {
-                result = hyb;
-            }
-            else
-            {
-                QPainter painter(&result);
-                painter.drawPixmap(0, 0, hyb.width(), hyb.height(), hyb);
-                painter.end();
-            }
-            break;
+        QPixmap sat = loadTile(TILE_STYLE_SAT, x, y, zoom);
+        if (!sat.isNull())
+        {
+            QPainter painter(&sat);
+            painter.drawPixmap(0, 0, result.width(), result.height(), result);
+            painter.end();
+            result = sat;
+        }
     }
 
     setPixmap(result);
     setZValue(zoom);
 }
 
-QPixmap Tile::loadTile(QString filename, int x, int y)
+QPixmap Tile::loadTile(QString tileStyle, int x, int y, int zoom)
 {
     int in_x = x & 7;
     int in_y = y & 7;
-    QFile mgm(filename);
+    QFile mgm(getTileFileName(tileStyle, x, y, zoom));
     if (mgm.open(QIODevice::ReadOnly))
     {
         quint64 r = 0;
@@ -119,31 +101,17 @@ QPixmap Tile::loadTile(QString filename, int x, int y)
     return 0;
 }
 
-QString Tile::getTileFileName(QString filenameFormat, int x, int y, int zoom)
+QString Tile::getTileFileName(QString tileStyle, int x, int y, int zoom)
 {
     int mgm_x = x >> 3;
     int mgm_y = y >> 3;
     QSettings settings;
-    return filenameFormat
+    return QString("%1/%2_%3/%4_%5.mgm")
             .arg(settings.value("CachePath","").toString())
+            .arg(tileStyle)
             .arg(zoom)
             .arg(mgm_x)
             .arg(mgm_y);
-}
-
-QString Tile::getMapTileFileName(int x, int y, int zoom)
-{
-    return getTileFileName("%1/GoogleMap_%2/%3_%4.mgm", x, y, zoom);
-}
-
-QString Tile::getSatTileFileName(int x, int y, int zoom)
-{
-    return getTileFileName("%1/GoogleSat_%2/%3_%4.mgm", x, y, zoom);
-}
-
-QString Tile::getHybTileFileName(int x, int y, int zoom)
-{
-    return getTileFileName("%1/GoogleHyb_%2/%3_%4.mgm", x, y, zoom);
 }
 
 Tile::~Tile()

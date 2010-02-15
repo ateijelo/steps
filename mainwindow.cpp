@@ -58,33 +58,20 @@ MainWindow::MainWindow(QWidget *parent)
 
     QSettings settings;
 
-    int tileStyle = settings.value("TileStyle", TILE_STYLE_MAP).toInt();
+    QString tileStyle = settings.value("TileStyle", TILE_STYLE_MAP).toString();
     settings.value("TileStyle", tileStyle);
-    switch(tileStyle)
+    if (tileStyle == TILE_STYLE_SAT)
     {
-        case TILE_STYLE_SAT:
-            satOption.setChecked(true);
-            break;
-        case TILE_STYLE_HYB:
-            hybOption.setChecked(true);
-            break;
-        case TILE_STYLE_MAP:
-        default:
-            mapOption.setChecked(true);
-            break;
+        satOption.setChecked(true);
     }
-
-    //int zoomLevel = settings.value("ZoomLevel", 0).toInt();
-    //settings.value("ZoomLevel", zoomLevel);
-    //ui.mapView->setZoomLevel(zoomLevel);
-
-    //QPointF centerOn = settings.value("Center", QPointF()).toPointF();
-    //settings.setValue("Center", centerOn);
-    //GeoTools gt;
-    //ui.mapView->centerOn(gt.LatLon2Meters(centerOn));
-    //qDebug() << "loading...";
-    //qDebug() << centerOn;
-    //qDebug() << gt.LatLon2Meters(centerOn);
+    else if (tileStyle == TILE_STYLE_HYB)
+    {
+        hybOption.setChecked(true);
+    }
+    else //if (tileStyle == TILE_STYLE_MAP)
+    {
+        mapOption.setChecked(true);
+    }
 
     ui.zoomInAction->setEnabled(ui.mapView->canZoomIn());
     ui.zoomOutAction->setEnabled(ui.mapView->canZoomOut());
