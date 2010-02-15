@@ -19,11 +19,11 @@ Tile::Tile(int x, int y, int zoom)
     setAcceptHoverEvents(true);
 
     QSettings settings;
-    QString tileStyle = settings.value(SettingsKeys::CacheStyle, CacheStyles::GoogleMap).toString();
+    QString tileStyle = settings.value(SettingsKeys::MapType, MapTypes::GoogleMap).toString();
     QPixmap result = loadTile(tileStyle, x, y, zoom);
-    if (tileStyle == CacheStyles::GoogleHyb)
+    if (tileStyle == MapTypes::GoogleHyb)
     {
-        QPixmap sat = loadTile(CacheStyles::GoogleSat, x, y, zoom);
+        QPixmap sat = loadTile(MapTypes::GoogleSat, x, y, zoom);
         if (!sat.isNull())
         {
             QPainter painter(&sat);

@@ -33,9 +33,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui.toolBar->insertWidget(0, &satOption);
     ui.toolBar->insertWidget(0, &hybOption);
 
-    connect(&mapOption, SIGNAL(clicked()), ui.mapView, SLOT(setMapStyle()));
-    connect(&satOption, SIGNAL(clicked()), ui.mapView, SLOT(setSatStyle()));
-    connect(&hybOption, SIGNAL(clicked()), ui.mapView, SLOT(setHybStyle()));
+    connect(&mapOption, SIGNAL(clicked()), ui.mapView, SLOT(setMapType2GoogleMap()));
+    connect(&satOption, SIGNAL(clicked()), ui.mapView, SLOT(setMapType2GoogleSat()));
+    connect(&hybOption, SIGNAL(clicked()), ui.mapView, SLOT(setMapType2GoogleHyb()));
 
     latLabel.setFixedWidth(90);
     lonLabel.setFixedWidth(90);
@@ -59,8 +59,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     QSettings settings;
 
-    QString tileStyle = settings.value(SettingsKeys::CacheStyle, CacheStyles::GoogleMap).toString();
-    //settings.setValue(SettingsKeys::CacheStyle, tileStyle);
+    QString tileStyle = settings.value(SettingsKeys::MapType, MapTypes::GoogleMap).toString();
+    //settings.setValue(SettingsKeys::MapType, tileStyle);
     if (tileStyle == TILE_STYLE_SAT)
     {
         satOption.setChecked(true);

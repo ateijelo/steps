@@ -4,14 +4,14 @@
 namespace SettingsKeys
 {
     const QString CachePath = "CachePath";
-    const QString CacheStyle = "CacheStyle";
+    const QString MapType = "MapType";
     const QString ZoomLevel = "ZoomLevel";
     const QString Latitude = "Latitude";
     const QString Longitude = "Longitude";
     const QString Angle = "Angle";
 }
 
-namespace CacheStyles
+namespace MapTypes
 {
     const QString GoogleMap = "GoogleMap";
     const QString GoogleSat = "GoogleSat";

@@ -173,26 +173,26 @@ void MapView::copyToClipboard(QString text)
     QApplication::clipboard()->setText(text);
 }
 
-void MapView::setMapStyle()
+void MapView::setMapType2GoogleMap()
 {
     QSettings settings;
-    settings.setValue(SettingsKeys::CacheStyle, CacheStyles::GoogleMap);
+    settings.setValue(SettingsKeys::MapType, MapTypes::GoogleMap);
     tm.clear();
     updateTiles();
 }
 
-void MapView::setSatStyle()
+void MapView::setMapType2GoogleSat()
 {
     QSettings settings;
-    settings.setValue(SettingsKeys::CacheStyle, CacheStyles::GoogleSat);
+    settings.setValue(SettingsKeys::MapType, MapTypes::GoogleSat);
     tm.clear();
     updateTiles();
 }
 
-void MapView::setHybStyle()
+void MapView::setMapType2GoogleHyb()
 {
     QSettings settings;
-    settings.setValue(SettingsKeys::CacheStyle, CacheStyles::GoogleHyb);
+    settings.setValue(SettingsKeys::MapType, MapTypes::GoogleHyb);
     tm.clear();
     updateTiles();
 }
