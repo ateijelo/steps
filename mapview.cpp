@@ -7,6 +7,7 @@
 #include <QToolTip>
 
 #include "mapview.h"
+#include "constants.h"
 
 MapView::MapView(QWidget *parent)
     : QGraphicsView(parent)
@@ -20,15 +21,17 @@ MapView::MapView(QWidget *parent)
     connect(&tm,SIGNAL(tileCreated(Tile*,int,int,int)),this,SLOT(displayNewTile(Tile*,int,int,int)));
     connect(scene,SIGNAL(mouseMoved(QPointF)),this,SLOT(mouseMovedOverScene(QPointF)));
 
-    zoom = -1;
-
     QSettings settings;
-    angle = settings.value("Angle", 0.0F).toDouble();
-    setZoomLevel(settings.value("ZoomLevel", 0).toInt());
     GeoTools gt;
-    QPointF center(settings.value("Longitude", 0).toDouble(), settings.value("Latitude", 0).toDouble());
-    centerOn(gt.LatLon2Meters(center));
-    //updateTiles();
+
+    angle = settings.value(SettingsKeys::Angle, 0.0F).toDouble();
+
+    zoom = -1;
+    setZoomLevel(settings.value(SettingsKeys::ZoomLevel, 0).toInt());
+
+    qreal lat = settings.value(SettingsKeys::Latitude, 0).toDouble();
+    qreal lon = settings.value(SettingsKeys::Longitude, 0).toDouble();
+    centerOn(gt.LatLon2Meters(QPointF(lon,lat)));
 }
 
 bool MapView::canZoomIn()
@@ -97,11 +100,24 @@ void MapView::mouseDoubleClickEvent(QMouseEvent *event)
 
 void MapView::wheelEvent(QWheelEvent *event)
 {
-#ifdef Q_OS_DARWIN
-    if ((event->modifiers() & Qt::ControlModifier))
+    QSettings settings;
+    QString defaultWheelOption;
+#ifdef Q_OS_MAC
+    defaultWheelOption = WheelOptions::ZoomsWithCtrlKeyPressed;
 #else
-    if (!event->modifiers())
+    defaultWheelOption = WheelOptions::ZoomsWithNoKeyPressed;
 #endif
+    QString wheelOption = settings.value(SettingsKeys::WheelOption, defaultWheelOption).toString();
+    bool cond;
+    if (wheelOption == WheelOptions::ZoomsWithNoKeyPressed)
+    {
+        cond = !event->modifiers();
+    }
+    else //(wheelOption == WheelOptions::ZoomsWithCtrlKeyPressed)
+    {
+        cond = event->modifiers() == Qt::ControlModifier;
+    }
+    if (cond)
     {
         if (event->delta() > 0)
         {
@@ -170,26 +186,26 @@ void MapView::copyToClipboard(QString text)
     QApplication::clipboard()->setText(text);
 }
 
-void MapView::setMapStyle()
+void MapView::setMapType2GoogleMap()
 {
     QSettings settings;
-    settings.setValue("TileStyle", TILE_STYLE_MAP);
+    settings.setValue(SettingsKeys::MapType, MapTypes::GoogleMap);
     tm.clear();
     updateTiles();
 }
 
-void MapView::setSatStyle()
+void MapView::setMapType2GoogleSat()
 {
     QSettings settings;
-    settings.setValue("TileStyle", TILE_STYLE_SAT);
+    settings.setValue(SettingsKeys::MapType, MapTypes::GoogleSat);
     tm.clear();
     updateTiles();
 }
 
-void MapView::setHybStyle()
+void MapView::setMapType2GoogleHyb()
 {
     QSettings settings;
-    settings.setValue("TileStyle", TILE_STYLE_HYB);
+    settings.setValue(SettingsKeys::MapType, MapTypes::GoogleHyb);
     tm.clear();
     updateTiles();
 }
@@ -227,7 +243,7 @@ void MapView::setZoomLevel(int zoom)
     emit canZoomIn(zi);
     this->zoom = zoom;
     QSettings settings;
-    settings.setValue("ZoomLevel", zoom);
+    settings.setValue(SettingsKeys::ZoomLevel, zoom);
     emit zoomChanged(zoom);
 
     tm.clear();
@@ -260,7 +276,7 @@ void MapView::rotRight()
     rotate(15);
     angle = (angle+15 > 360)? angle - 345 : angle + 15;
     QSettings settings;
-    settings.setValue("Angle", angle);
+    settings.setValue(SettingsKeys::Angle, angle);
 }
 
 void MapView::rotLeft()
@@ -268,13 +284,13 @@ void MapView::rotLeft()
     rotate(-15);
     angle = (angle-15 < 0)? angle + 345 : angle - 15;
     QSettings settings;
-    settings.setValue("Angle", angle);
+    settings.setValue(SettingsKeys::Angle, angle);
 }
 
 MapView::~MapView()
 {
     QSettings settings;
     QPointF center = gt.Meters2LatLon(mapToScene(rect().center()));
-    settings.setValue("Latitude", center.y());
-    settings.setValue("Longitude", center.x());
+    settings.setValue(SettingsKeys::Latitude, center.y());
+    settings.setValue(SettingsKeys::Longitude, center.x());
 }

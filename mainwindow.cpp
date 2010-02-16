@@ -6,11 +6,14 @@
 #include "mainwindow.h"
 #include "mgmreader.h"
 #include "mainscene.h"
+#include "constants.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
+
+    preferences = new Preferences(this);
 
     zoomSlider.setMinimum(0);
     zoomSlider.setMaximum(18);
@@ -32,9 +35,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui.toolBar->insertWidget(0, &satOption);
     ui.toolBar->insertWidget(0, &hybOption);
 
-    connect(&mapOption, SIGNAL(clicked()), ui.mapView, SLOT(setMapStyle()));
-    connect(&satOption, SIGNAL(clicked()), ui.mapView, SLOT(setSatStyle()));
-    connect(&hybOption, SIGNAL(clicked()), ui.mapView, SLOT(setHybStyle()));
+    connect(&mapOption, SIGNAL(clicked()), ui.mapView, SLOT(setMapType2GoogleMap()));
+    connect(&satOption, SIGNAL(clicked()), ui.mapView, SLOT(setMapType2GoogleSat()));
+    connect(&hybOption, SIGNAL(clicked()), ui.mapView, SLOT(setMapType2GoogleHyb()));
 
     latLabel.setFixedWidth(90);
     lonLabel.setFixedWidth(90);
@@ -48,6 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui.rotRightAction,SIGNAL(triggered()),ui.mapView,SLOT(rotRight()));
     connect(ui.rotLeftAction,SIGNAL(triggered()),ui.mapView,SLOT(rotLeft()));
     connect(ui.openAction,SIGNAL(triggered()),this,SLOT(openCacheDirectory()));
+    connect(ui.action_Preferences, SIGNAL(triggered()), preferences, SLOT(show()));
     connect(ui.mapView,SIGNAL(canZoomIn(bool)),ui.zoomInAction,SLOT(setEnabled(bool)));
     connect(ui.mapView,SIGNAL(canZoomOut(bool)),ui.zoomOutAction,SLOT(setEnabled(bool)));
     connect(ui.mapView,SIGNAL(zoomChanged(int)),&zoomSlider,SLOT(setValue(int)));
@@ -58,33 +62,20 @@ MainWindow::MainWindow(QWidget *parent)
 
     QSettings settings;
 
-    int tileStyle = settings.value("TileStyle", TILE_STYLE_MAP).toInt();
-    settings.value("TileStyle", tileStyle);
-    switch(tileStyle)
+    QString tileStyle = settings.value(SettingsKeys::MapType, MapTypes::GoogleMap).toString();
+    //settings.setValue(SettingsKeys::MapType, tileStyle);
+    if (tileStyle == TILE_STYLE_SAT)
     {
-        case TILE_STYLE_SAT:
-            satOption.setChecked(true);
-            break;
-        case TILE_STYLE_HYB:
-            hybOption.setChecked(true);
-            break;
-        case TILE_STYLE_MAP:
-        default:
-            mapOption.setChecked(true);
-            break;
+        satOption.setChecked(true);
     }
-
-    //int zoomLevel = settings.value("ZoomLevel", 0).toInt();
-    //settings.value("ZoomLevel", zoomLevel);
-    //ui.mapView->setZoomLevel(zoomLevel);
-
-    //QPointF centerOn = settings.value("Center", QPointF()).toPointF();
-    //settings.setValue("Center", centerOn);
-    //GeoTools gt;
-    //ui.mapView->centerOn(gt.LatLon2Meters(centerOn));
-    //qDebug() << "loading...";
-    //qDebug() << centerOn;
-    //qDebug() << gt.LatLon2Meters(centerOn);
+    else if (tileStyle == TILE_STYLE_HYB)
+    {
+        hybOption.setChecked(true);
+    }
+    else //if (tileStyle == TILE_STYLE_MAP)
+    {
+        mapOption.setChecked(true);
+    }
 
     ui.zoomInAction->setEnabled(ui.mapView->canZoomIn());
     ui.zoomOutAction->setEnabled(ui.mapView->canZoomOut());
@@ -96,10 +87,10 @@ void MainWindow::openCacheDirectory()
     QSettings settings;
     QString path = QFileDialog::getExistingDirectory(this,
                                                      "Open Cache Directory",
-                                                     settings.value("CachePath","").toString());
+                                                     settings.value(SettingsKeys::CachePath,"").toString());
     if (path.compare("") != 0)
     {
-        settings.setValue("CachePath",path);
+        settings.setValue(SettingsKeys::CachePath,path);
     }
 }
 

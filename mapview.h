@@ -43,9 +43,9 @@ class MapView : public QGraphicsView
         void rotRight();
         void rotLeft();
         void setZoomLevel(int zoom);
-        void setMapStyle();
-        void setSatStyle();
-        void setHybStyle();
+        void setMapType2GoogleMap();
+        void setMapType2GoogleSat();
+        void setMapType2GoogleHyb();
         void setAsCenter(QObject *newCenter);
 
     private slots:
