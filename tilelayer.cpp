@@ -2,21 +2,31 @@
 
 #include "tilelayer.h"
 
-TileLayer::TileLayer()
+TileLayer::TileLayer(int zoom, QGraphicsItem *parent)
+        : QGraphicsItem(parent), zoom(zoom)
 {
     // This class considers the boundaries
-    // of the rectangle to be inclusive.
-    // So, 0,0,0,0 is a region with one tile.
-    region.setCoords(0,0,-1,-1);
-//    Column *c = new Column();
-//    c->append(newTile(0,0,0));
-//    columns.append(c);
+    // of the tileRegion rectangle to be inclusive
+    // So, setCoords(0,0,0,0) sets a tile region of one tile.
+    // Note that width and height would be 1 in that
+    // case.
+    tileRegion.setCoords(0,0,-1,-1);
+#if QT_VERSION >= 0x040600
+    setFlag(QGraphicsItem::ItemHasNoContents);
+#endif
 }
 
-Tile* TileLayer::newTile(int x, int y, int zoom)
+Tile *TileLayer::newTile(int x, int y)
 {
     Tile *t = new Tile(x,y,zoom);
-    emit tileCreated(t,x,y,zoom);
+    t->setParentItem(this);
+    double res = gt.resolution(zoom);
+#if QT_VERSION >= 0x040600
+    t->setScale(res);
+#else
+    t->scale(res,res);
+#endif
+    t->setPos(gt.GoogleTile2Meters(x,y,zoom));
     return t;
 }
 
@@ -31,9 +41,9 @@ void TileLayer::deleteColumn(Column *c)
     delete c;
 }
 
-TileLayer::ColumnPointer TileLayer::adjustBeforeIntersection(const QRect& n, int zoom)
+TileLayer::ColumnPointer TileLayer::adjustBeforeIntersection(const QRect& n)
 {
-    QRect& o = region; // n => new, o => old
+    QRect& o = tileRegion; // n => new, o => old
 
     // Columns to be deleted from front
     for (int i=o.left(); i<=qMin(o.right(),n.left()-1); i++)
@@ -49,7 +59,7 @@ TileLayer::ColumnPointer TileLayer::adjustBeforeIntersection(const QRect& n, int
         Column *c = new Column();
         for (int j=n.top(); j<=n.bottom(); j++)
         {
-            c->append(newTile(i,j,zoom));
+            c->append(newTile(i,j));
         }
         columns.insert(p,c);
     }
@@ -57,9 +67,9 @@ TileLayer::ColumnPointer TileLayer::adjustBeforeIntersection(const QRect& n, int
     return p;
 }
 
-void TileLayer::adjustColumn(Column* col, const QRect& n, int x, int zoom)
+void TileLayer::adjustColumn(Column* col, const QRect& n, int x)
 {
-    QRect& o = region; // n => new, o => old
+    QRect& o = tileRegion; // n => new, o => old
     TilePointer p;
 
     // Tiles to be deleted from the beginning of the column
@@ -72,7 +82,7 @@ void TileLayer::adjustColumn(Column* col, const QRect& n, int x, int zoom)
     p = col->begin();
     for (int i=n.top(); i<=qMin(n.bottom(),o.top()-1); i++)
     {
-        col->insert(p,newTile(x,i,zoom));
+        col->insert(p,newTile(x,i));
     }
 
     // Tiles to be deleted from the end of the column
@@ -85,13 +95,13 @@ void TileLayer::adjustColumn(Column* col, const QRect& n, int x, int zoom)
     p = col->end();
     for (int i=qMax(o.bottom()+1,n.top()); i<=n.bottom(); i++)
     {
-        col->insert(p,newTile(x,i,zoom));
+        col->insert(p,newTile(x,i));
     }
 }
 
-void TileLayer::adjustAfterIntersection(const QRect& n, int zoom)
+void TileLayer::adjustAfterIntersection(const QRect& n)
 {
-    QRect& o = region; // n => new, o => old
+    QRect& o = tileRegion; // n => new, o => old
     for (int i=qMax(o.left(),n.right()+1); i<=o.right(); i++)
     {
         Column *c = columns.takeLast();
@@ -102,18 +112,20 @@ void TileLayer::adjustAfterIntersection(const QRect& n, int zoom)
         Column *c = new Column();
         for (int j=n.top(); j<=n.bottom(); j++)
         {
-            c->append(newTile(i,j,zoom));
+            c->append(newTile(i,j));
         }
         columns.append(c);
     }
 }
 
-void TileLayer::setRegion(const QRect& n, int zoom)
+void TileLayer::setRegion(const QRectF& sceneRegion)
 {
     //qDebug() << "setRegion: " << n;
-    QRect& o = region; // n => new, o => old
+    QRect& o = tileRegion; // n => new, o => old
+    QRect n(gt.Meters2GoogleTile(sceneRegion.topLeft(),zoom),
+            gt.Meters2GoogleTile(sceneRegion.bottomRight(),zoom));
 
-    ColumnPointer p = adjustBeforeIntersection(n,zoom);
+    ColumnPointer p = adjustBeforeIntersection(n);
 
     // Only if the following condition holds
     // there's something to do in the intersection
@@ -121,17 +133,30 @@ void TileLayer::setRegion(const QRect& n, int zoom)
     {
         for (int i=qMax(n.left(),o.left()); i<=qMin(n.right(),o.right()); i++)
         {
-            adjustColumn(*p,n,i,zoom);
+            adjustColumn(*p,n,i);
             p++;
         }
     }
 
-    adjustAfterIntersection(n,zoom);
+    adjustAfterIntersection(n);
 
-    region = n;
+    tileRegion = n;
 }
 
 void TileLayer::clear()
 {
-    setRegion(QRect(0,0,0,0),0);
+}
+
+QRectF TileLayer::boundingRect() const
+{
+    QPointF tl = gt.GoogleTile2Meters(tileRegion.topLeft(),zoom);
+    QPointF br = gt.GoogleTile2Meters(tileRegion.bottomRight() + QPoint(1,1),zoom);
+    return QRectF(tl,br);
+}
+
+void TileLayer::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    Q_UNUSED(painter);
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
 }

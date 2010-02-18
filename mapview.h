@@ -37,7 +37,6 @@ class MapView : public QGraphicsView
         void mouseMoved(const QPointF& latlon);
 
     public slots:
-        void displayNewTile(Tile *t, int x, int y, int zoom);
         void zoomIn();
         void zoomOut();
         void rotRight();
@@ -62,7 +61,7 @@ class MapView : public QGraphicsView
         qreal angle;
         QPointF sceneAnchor;
         QPoint viewAnchor;
-        TileLayer tm;
+        TileLayer *tl;
 };
 
 #endif

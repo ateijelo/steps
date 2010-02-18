@@ -18,7 +18,6 @@ MapView::MapView(QWidget *parent)
     setSceneRect(QRectF(gt.Pixels2Meters(QPointF(0,0),0),
                         gt.Pixels2Meters(QPointF(256,256),0)));
 
-    connect(&tm,SIGNAL(tileCreated(Tile*,int,int,int)),this,SLOT(displayNewTile(Tile*,int,int,int)));
     connect(scene,SIGNAL(mouseMoved(QPointF)),this,SLOT(mouseMovedOverScene(QPointF)));
 
     QSettings settings;
@@ -32,6 +31,10 @@ MapView::MapView(QWidget *parent)
     qreal lat = settings.value(SettingsKeys::Latitude, 0).toDouble();
     qreal lon = settings.value(SettingsKeys::Longitude, 0).toDouble();
     centerOn(gt.LatLon2Meters(QPointF(lon,lat)));
+
+    tl = new TileLayer(3);
+    tl->setPos(0,0);
+    scene->addItem(tl);
 }
 
 bool MapView::canZoomIn()
@@ -68,10 +71,7 @@ bool MapView::viewportEvent(QEvent *event)
 
 void MapView::updateTiles()
 {
-    QRectF drawArea = mapToScene(viewport()->rect().adjusted(-20,-20,20,20)).boundingRect();
-    QPoint tl = gt.Meters2GoogleTile(drawArea.topLeft(),zoom);
-    QPoint br = gt.Meters2GoogleTile(drawArea.bottomRight(),zoom);
-    tm.setRegion(QRect(tl,br),zoom);
+    tl->setRegion(mapToScene(viewport()->rect().adjusted(-20,-20,20,20)).boundingRect());
 }
 
 void MapView::mouseMoveEvent(QMouseEvent *event)
@@ -191,7 +191,7 @@ void MapView::setMapType2GoogleMap()
 {
     QSettings settings;
     settings.setValue(SettingsKeys::MapType, MapTypes::GoogleMap);
-    tm.clear();
+    //tm.clear();
     updateTiles();
 }
 
@@ -199,7 +199,7 @@ void MapView::setMapType2GoogleSat()
 {
     QSettings settings;
     settings.setValue(SettingsKeys::MapType, MapTypes::GoogleSat);
-    tm.clear();
+    //tm.clear();
     updateTiles();
 }
 
@@ -207,21 +207,8 @@ void MapView::setMapType2GoogleHyb()
 {
     QSettings settings;
     settings.setValue(SettingsKeys::MapType, MapTypes::GoogleHyb);
-    tm.clear();
+    //tm.clear();
     updateTiles();
-}
-
-void MapView::displayNewTile(Tile *t, int x, int y, int zoom)
-{
-    t->resetTransform();
-    double res = gt.resolution(zoom);
-#if QT_VERSION >= 0x040600
-    t->setScale(res);
-#else
-    t->scale(res,res);
-#endif
-    t->setPos(gt.GoogleTile2Meters(x,y,zoom));
-    scene->addItem(t);
 }
 
 void MapView::setZoomLevel(int zoom)
@@ -247,7 +234,7 @@ void MapView::setZoomLevel(int zoom)
     settings.setValue(SettingsKeys::ZoomLevel, zoom);
     emit zoomChanged(zoom);
 
-    tm.clear();
+    //tm.clear();
 
     double res = gt.resolution(zoom);
     resetTransform();

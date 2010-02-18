@@ -1,37 +1,49 @@
 #ifndef TILELAYER_H
 #define TILELAYER_H
 
-#include <QObject>
-#include <QRect>
+#include <QGraphicsItem>
 #include <QLinkedList>
+#include <QRectF>
 
 #include "tile.h"
+#include "geotools.h"
 
-class TileLayer : public QObject
+class TileLayer : public QGraphicsItem
 {
-    Q_OBJECT
-
     typedef QLinkedList<Tile*> Column;
     typedef Column::iterator TilePointer;
     typedef QLinkedList<Column*>::iterator ColumnPointer;
 
     public:
-        TileLayer();
-        void setRegion(const QRect& r, int zoom);
+        TileLayer(int zoom, QGraphicsItem *parent=NULL);
+        void setRegion(const QRectF& r);
         void clear();
-
-    signals:
-        void tileCreated(Tile *t,int x, int y, int zoom);
+        QRectF boundingRect() const;
+        void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget=0);
 
     private:
-        ColumnPointer adjustBeforeIntersection(const QRect& n, int zoom);
-        void adjustColumn(Column* col, const QRect& n, int x, int zoom);
-        void adjustAfterIntersection(const QRect& n, int zoom);
+        ColumnPointer adjustBeforeIntersection(const QRect& n);
+        void adjustColumn(Column* col, const QRect& n, int x);
+        void adjustAfterIntersection(const QRect& n);
         void deleteColumn(Column* col);
-        Tile* newTile(int x, int y, int zoom);
+        Tile *newTile(int x, int y);
 
+        int zoom;
+        QRectF sceneRegion;
         QLinkedList<Column*> columns;
-        QRect region;
+        QRect tileRegion;
+        GeoTools gt;
+//        TileLayer();
+//        void setRegion(const QRect& r, int zoom);
+//        void clear();
+//
+//    signals:
+//        void tileCreated(Tile *t,int x, int y, int zoom);
+//
+//    private:
+//
+//        QLinkedList<Column*> columns;
+//        QRect region;
 };
 
-#endif // TILEMANAGER_H
+#endif // TILELAYER_H
