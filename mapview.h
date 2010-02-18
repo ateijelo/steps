@@ -11,7 +11,7 @@
 #include "tile.h"
 #include "geotools.h"
 #include "mainscene.h"
-#include "tilelayer.h"
+#include "tilepyramid.h"
 
 class MapView : public QGraphicsView
 {
@@ -61,7 +61,7 @@ class MapView : public QGraphicsView
         qreal angle;
         QPointF sceneAnchor;
         QPoint viewAnchor;
-        TileLayer *tl;
+        TilePyramid *tp;
 };
 
 #endif

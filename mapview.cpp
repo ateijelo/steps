@@ -32,9 +32,9 @@ MapView::MapView(QWidget *parent)
     qreal lon = settings.value(SettingsKeys::Longitude, 0).toDouble();
     centerOn(gt.LatLon2Meters(QPointF(lon,lat)));
 
-    tl = new TileLayer(3);
-    tl->setPos(0,0);
-    scene->addItem(tl);
+    tp = new TilePyramid();
+    tp->setPos(0,0);
+    scene->addItem(tp);
 }
 
 bool MapView::canZoomIn()
@@ -71,7 +71,8 @@ bool MapView::viewportEvent(QEvent *event)
 
 void MapView::updateTiles()
 {
-    tl->setRegion(mapToScene(viewport()->rect().adjusted(-20,-20,20,20)).boundingRect());
+    tp->setRegion(mapToScene(viewport()->rect().adjusted(-20,-20,20,20)).boundingRect());
+    tp->displayUpToLevel(zoom+1);
 }
 
 void MapView::mouseMoveEvent(QMouseEvent *event)
