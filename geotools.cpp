@@ -131,3 +131,20 @@ QPointF GeoTools::GoogleTile2Meters(const QPoint &g, int zoom)
 {
     return GoogleTile2Meters(g.x(),g.y(),zoom);
 }
+
+qreal GeoTools::VincentyDistance(const QPointF& from, const QPointF& to)
+{
+    return 0;
+}
+
+qreal GeoTools::HaversineDistance(const QPointF& from, const QPointF& to)
+{
+    qreal latitudeArc = (from.y() - to.y()) * DEG_TO_RAD;
+    qreal longitudeArc = (from.x() - to.x()) * DEG_TO_RAD;
+    double latitudeH = sin(latitudeArc * 0.5);
+    latitudeH *= latitudeH;
+    double lontitudeH = sin(longitudeArc * 0.5);
+    lontitudeH *= lontitudeH;
+    double tmp = cos(from.y()*DEG_TO_RAD) * cos(to.y()*DEG_TO_RAD);
+    return 2.0 * asin(sqrt(latitudeH + tmp*lontitudeH)) * EARTH_RADIUS_IN_METERS;
+}

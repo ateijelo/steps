@@ -48,6 +48,11 @@
 #include <QPoint>
 #include <QPointF>
 
+/// The usual PI/180 constant
+#define DEG_TO_RAD 0.017453292519943295769236907684886
+/// Earth's quatratic mean radius for WGS-84
+#define EARTH_RADIUS_IN_METERS 6372797.560856
+
 class GeoTools
 {
     public:
@@ -64,6 +69,8 @@ class GeoTools
         QPoint Meters2GoogleTile(const QPointF& m, int zoom);
         QPointF GoogleTile2Meters(int x, int y, int zoom);
         QPointF GoogleTile2Meters(const QPoint& g, int zoom);
+        double VincentyDistance(const QPointF& from, const QPointF& to);
+        double HaversineDistance(const QPointF& from, const QPointF& to);
 
     private:
         int tileSize;
