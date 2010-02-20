@@ -15,7 +15,7 @@ void TilePyramid::setRegion(const QRectF& sceneRegion)
 void TilePyramid::displayUpToLevel(int z)
 {
     int s = layers.size();
-    while (s < (z+1))  // If the user requests level n, layers must have n+1 elements
+    while (s < (z+1))  // If the user requests level n, layers must have n+1 elements (0, 1, 2, ..., n)
     {
         TileLayer *t = new TileLayer(s,scene);
         t->setRegion(sceneRegion);
