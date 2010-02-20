@@ -33,6 +33,9 @@ class TileLayer : public QGraphicsItem
         QLinkedList<Column*> columns;
         QRect tileRegion;
         GeoTools gt;
+        QRectF innerSafeRect;
+        QRectF outerSafeRect;
+        bool singleTile;
 //        TileLayer();
 //        void setRegion(const QRect& r, int zoom);
 //        void clear();

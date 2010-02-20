@@ -14,6 +14,7 @@ TileLayer::TileLayer(int zoom, QGraphicsItem *parent)
 #if QT_VERSION >= 0x040600
     setFlag(QGraphicsItem::ItemHasNoContents);
 #endif
+    singleTile = false;
 }
 
 Tile *TileLayer::newTile(int x, int y)
@@ -120,10 +121,18 @@ void TileLayer::adjustAfterIntersection(const QRect& n)
 
 void TileLayer::setRegion(const QRectF& sceneRegion)
 {
+    //if (outerSafeRect.contains(sceneRegion))
+    //    return;
+
     //qDebug() << "setRegion: " << n;
     QRect& o = tileRegion; // n => new, o => old
     QRect n(gt.Meters2GoogleTile(sceneRegion.topLeft(),zoom),
             gt.Meters2GoogleTile(sceneRegion.bottomRight(),zoom));
+
+    singleTile = (n.width() * n.height() == 1);
+
+    outerSafeRect.setTopLeft(gt.GoogleTile2Meters(tileRegion.topLeft(),zoom));
+    outerSafeRect.setBottomRight(gt.GoogleTile2Meters(tileRegion.bottomRight() + QPoint(1,1),zoom));
 
     ColumnPointer p = adjustBeforeIntersection(n);
 
@@ -149,9 +158,7 @@ void TileLayer::clear()
 
 QRectF TileLayer::boundingRect() const
 {
-    QPointF tl = gt.GoogleTile2Meters(tileRegion.topLeft(),zoom);
-    QPointF br = gt.GoogleTile2Meters(tileRegion.bottomRight() + QPoint(1,1),zoom);
-    return QRectF(tl,br);
+    return outerSafeRect;
 }
 
 void TileLayer::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

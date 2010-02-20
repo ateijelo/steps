@@ -15,6 +15,7 @@ class Tile : public QGraphicsPixmapItem
     private:
         QString getTileFileName(QString tileStyle, int x, int y, int zoom);
         QPixmap loadTile(QString tileStyle, int x, int y, int zoom);
+        void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
     private:
         int x,y,zoom;

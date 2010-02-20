@@ -1,4 +1,7 @@
+#include <QtDebug>
 #include <QApplication>
+
+#include <QRectF>
 
 #include "mainwindow.h"
 
@@ -12,6 +15,11 @@ int main(int argc, char *argv[])
 
     MainWindow m;
     m.show();
+
+    QRectF r1(100,100,0,0);
+    QRectF r2(50,50,100,100);
+
+    qDebug() << r2.contains(r1) << endl;
 
     return app.exec();
 }
