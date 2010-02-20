@@ -1,7 +1,7 @@
 #include "tilepyramid.h"
 
-TilePyramid::TilePyramid(QGraphicsScene *scene)
-        : scene(scene)
+TilePyramid::TilePyramid(QGraphicsItem *parent)
+        : QGraphicsItem(parent)
 {
 }
 
@@ -17,7 +17,8 @@ void TilePyramid::displayUpToLevel(int z)
     int s = layers.size();
     while (s < (z+1))  // If the user requests level n, layers must have n+1 elements (0, 1, 2, ..., n)
     {
-        TileLayer *t = new TileLayer(s,scene);
+        TileLayer *t = new TileLayer(s,this);
+        t->setZValue(s);
         t->setRegion(sceneRegion);
         layers.append(t);
         s++;
@@ -28,4 +29,18 @@ void TilePyramid::displayUpToLevel(int z)
         delete t;
         s--;
     }
+}
+
+QRectF TilePyramid::boundingRect() const
+{
+    QPointF tl = gt.GoogleTile2Meters(0,0,0);
+    QPointF br = gt.GoogleTile2Meters(1,1,0);
+    return QRectF(tl,br);
+}
+
+void TilePyramid::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    Q_UNUSED(painter);
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
 }
