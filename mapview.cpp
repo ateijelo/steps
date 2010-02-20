@@ -32,11 +32,10 @@ MapView::MapView(QWidget *parent)
     qreal lon = settings.value(SettingsKeys::Longitude, 0).toDouble();
     centerOn(gt.LatLon2Meters(QPointF(lon,lat)));
 
-    tp = new TilePyramid();
-    tp->setPos(0,0);
+    tp = new TilePyramid(scene);
     tp->setRegion(QRectF(-9.17078e+06,-2.64852e+06,81.2143,39.4128));
     tp->displayUpToLevel(18);
-    scene->addItem(tp);
+    //scene->addItem(tp);
 }
 
 bool MapView::canZoomIn()

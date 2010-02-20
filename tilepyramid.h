@@ -1,22 +1,21 @@
 #ifndef TILEPYRAMID_H
 #define TILEPYRAMID_H
 
-#include <QGraphicsItem>
+#include <QGraphicsScene>
 #include <QRectF>
 
 #include "tilelayer.h"
 #include "geotools.h"
 
-class TilePyramid : public QGraphicsItem
+class TilePyramid
 {
     public:
-        TilePyramid(QGraphicsItem *parent=0);
-        QRectF boundingRect() const;
-        void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget=0);
+        TilePyramid(QGraphicsScene *scene);
         void setRegion(const QRectF& sceneRegion);
         void displayUpToLevel(int z);
 
     private:
+        QGraphicsScene *scene;
         QRectF sceneRegion;
         QList<TileLayer*> layers;
         GeoTools gt;

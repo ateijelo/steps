@@ -2,8 +2,8 @@
 
 #include "tilelayer.h"
 
-TileLayer::TileLayer(int zoom, QGraphicsItem *parent)
-        : QGraphicsItem(parent), zoom(zoom)
+TileLayer::TileLayer(int zoom, QGraphicsScene *scene)
+        : zoom(zoom), scene(scene)
 {
     // This class considers the boundaries
     // of the tileRegion rectangle to be inclusive
@@ -11,16 +11,13 @@ TileLayer::TileLayer(int zoom, QGraphicsItem *parent)
     // Note that width and height would be 1 in that
     // case.
     tileRegion.setCoords(0,0,-1,-1);
-#if QT_VERSION >= 0x040600
-    setFlag(QGraphicsItem::ItemHasNoContents);
-#endif
-    singleTile = false;
 }
 
 Tile *TileLayer::newTile(int x, int y)
 {
     Tile *t = new Tile(x,y,zoom);
-    t->setParentItem(this);
+    scene->addItem(t);
+    t->setZValue(zoom);
     double res = gt.resolution(zoom);
 #if QT_VERSION >= 0x040600
     t->setScale(res);
@@ -129,8 +126,6 @@ void TileLayer::setRegion(const QRectF& sceneRegion)
     QRect n(gt.Meters2GoogleTile(sceneRegion.topLeft(),zoom),
             gt.Meters2GoogleTile(sceneRegion.bottomRight(),zoom));
 
-    singleTile = (n.width() * n.height() == 1);
-
     outerSafeRect.setTopLeft(gt.GoogleTile2Meters(tileRegion.topLeft(),zoom));
     outerSafeRect.setBottomRight(gt.GoogleTile2Meters(tileRegion.bottomRight() + QPoint(1,1),zoom));
 
@@ -154,16 +149,4 @@ void TileLayer::setRegion(const QRectF& sceneRegion)
 
 void TileLayer::clear()
 {
-}
-
-QRectF TileLayer::boundingRect() const
-{
-    return outerSafeRect;
-}
-
-void TileLayer::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    Q_UNUSED(painter);
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
 }

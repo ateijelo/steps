@@ -1,25 +1,23 @@
 #ifndef TILELAYER_H
 #define TILELAYER_H
 
-#include <QGraphicsItem>
+#include <QGraphicsScene>
 #include <QLinkedList>
 #include <QRectF>
 
 #include "tile.h"
 #include "geotools.h"
 
-class TileLayer : public QGraphicsItem
+class TileLayer
 {
     typedef QLinkedList<Tile*> Column;
     typedef Column::iterator TilePointer;
     typedef QLinkedList<Column*>::iterator ColumnPointer;
 
     public:
-        TileLayer(int zoom, QGraphicsItem *parent=NULL);
+        TileLayer(int zoom, QGraphicsScene *scene);
         void setRegion(const QRectF& r);
         void clear();
-        QRectF boundingRect() const;
-        void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget=0);
 
     private:
         ColumnPointer adjustBeforeIntersection(const QRect& n);
@@ -29,13 +27,13 @@ class TileLayer : public QGraphicsItem
         Tile *newTile(int x, int y);
 
         int zoom;
+        QGraphicsScene *scene;
         QRectF sceneRegion;
         QLinkedList<Column*> columns;
         QRect tileRegion;
         GeoTools gt;
         QRectF innerSafeRect;
         QRectF outerSafeRect;
-        bool singleTile;
 //        TileLayer();
 //        void setRegion(const QRect& r, int zoom);
 //        void clear();
