@@ -123,6 +123,6 @@ QString Tile::getTileFileName(QString tileStyle, int x, int y, int zoom)
 
 void Tile::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    qDebug() << "Tile::paint" << zoom;
+    //qDebug() << "Tile::paint" << zoom;
     QGraphicsPixmapItem::paint(painter,option,widget);
 }

@@ -5,6 +5,7 @@
 #include <QClipboard>
 #include <QSettings>
 #include <QToolTip>
+#include <QGLWidget>
 
 #include "mapview.h"
 #include "constants.h"
@@ -34,9 +35,10 @@ MapView::MapView(QWidget *parent)
 
     tp = new TilePyramid();
     tp->setPos(0,0);
-    tp->setRegion(QRectF(-9.17078e+06,-2.64852e+06,81.2143,39.4128));
-    tp->displayUpToLevel(18);
+    //tp->setRegion(QRectF(-9.17078e+06,-2.64852e+06,81.2143,39.4128));
+    //tp->displayUpToLevel(18);
     scene->addItem(tp);
+    setViewport(new QGLWidget());
 }
 
 bool MapView::canZoomIn()
@@ -73,8 +75,8 @@ bool MapView::viewportEvent(QEvent *event)
 
 void MapView::updateTiles()
 {
-//    tp->setRegion(mapToScene(viewport()->rect().adjusted(-20,-20,20,20)).boundingRect());
-//    tp->displayUpToLevel(zoom);
+    tp->setRegion(mapToScene(viewport()->rect().adjusted(-20,-20,20,20)).boundingRect());
+    tp->displayUpToLevel(zoom);
 }
 
 void MapView::mouseMoveEvent(QMouseEvent *event)

@@ -5,6 +5,7 @@ TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
 INCLUDEPATH += .
+QT += opengl
 
 # Input
 HEADERS += mainwindow.h \
