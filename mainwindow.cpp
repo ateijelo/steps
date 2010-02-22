@@ -85,10 +85,7 @@ MainWindow::MainWindow(QWidget *parent)
     QSize size = settings.value(SettingsKeys::WindowSize, QSize(400, 400)).toSize();
     resize(size);
     move(pos);
-    QString windowStatus = settings.value(SettingsKeys::WindowStatus, WindowStates::Normal).toString();
-    if (windowStatus == WindowStates::Minimized)
-        showMinimized();
-    else if (windowStatus == WindowStates::Maximized)
+    if (settings.value(SettingsKeys::WindowIsMaximized, false).toBool())
         showMaximized();
     else
         showNormal();
@@ -117,13 +114,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QSettings settings;
     settings.setValue(SettingsKeys::WindowPosition, pos());
     settings.setValue(SettingsKeys::WindowSize, size());
-    QString windowStatus;
-    if (isMinimized())
-        windowStatus = WindowStates::Minimized;
-    else if (isMaximized())
-        windowStatus = WindowStates::Maximized;
-    else
-        windowStatus = WindowStates::Normal;
-    settings.setValue(SettingsKeys::WindowStatus, windowStatus);
+    settings.setValue(SettingsKeys::WindowIsMaximized, isMaximized());
     event->accept();
 }
