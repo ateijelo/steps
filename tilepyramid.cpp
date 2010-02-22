@@ -8,8 +8,13 @@ TilePyramid::TilePyramid(QGraphicsItem *parent)
 void TilePyramid::setRegion(const QRectF& sceneRegion)
 {
     this->sceneRegion = sceneRegion;
-    foreach (TileLayer *t, layers)
-        t->setRegion(sceneRegion);
+    for (int i=layers.size() - 1; i>=0; i--)
+    {
+        if (layers.at(i)->wouldChangeWithRegion(sceneRegion))
+            layers.at(i)->setRegion(sceneRegion);
+        else
+            break;
+    }
 }
 
 void TilePyramid::displayUpToLevel(int z)
@@ -19,7 +24,6 @@ void TilePyramid::displayUpToLevel(int z)
     {
         TileLayer *t = new TileLayer(s,this);
         t->setZValue(s);
-        t->setRegion(sceneRegion);
         layers.append(t);
         s++;
     }
@@ -27,8 +31,14 @@ void TilePyramid::displayUpToLevel(int z)
     {
         TileLayer *t = layers.takeLast();
         delete t;
+        if (!layers.isEmpty())
+            layers.last()->show();
         s--;
     }
+    for (int i=0; i<layers.size() - 2; i++)
+        layers.at(i)->hide();
+    for (int i=qMax(0,layers.size() - 2); i<layers.size(); i++)
+          layers.at(i)->show();
 }
 
 QRectF TilePyramid::boundingRect() const

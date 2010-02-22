@@ -35,12 +35,13 @@ Tile::Tile(int x, int y, int zoom)
 
     setPixmap(result);
     setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
-    //setCacheMode(QGraphicsItem::ItemCoordinateCache);
+    //qDebug() << "Created Tile:" << x << y << zoom;
+    setCacheMode(QGraphicsItem::ItemCoordinateCache);
 }
 
 Tile::~Tile()
 {
-    // qDebug() << "deleted Tile:" << x << y << zoom;
+    //qDebug() << "Deleted Tile:" << x << y << zoom;
 }
 
 QPixmap Tile::loadTile(QString tileStyle, int x, int y, int zoom)

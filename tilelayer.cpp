@@ -14,7 +14,6 @@ TileLayer::TileLayer(int zoom, QGraphicsItem *parent)
 #if QT_VERSION >= 0x040600
     setFlag(QGraphicsItem::ItemHasNoContents);
 #endif
-    singleTile = false;
 }
 
 Tile *TileLayer::newTile(int x, int y)
@@ -119,20 +118,24 @@ void TileLayer::adjustAfterIntersection(const QRect& n)
     }
 }
 
+bool TileLayer::wouldChangeWithRegion(const QRectF &r)
+{
+    return !(topLeftSafeRange.contains(r.topLeft()) &&
+             bottomRightSafeRange.contains(r.bottomRight()));
+}
+
 void TileLayer::setRegion(const QRectF& sceneRegion)
 {
-    //if (outerSafeRect.contains(sceneRegion))
-    //    return;
-
-    //qDebug() << "setRegion: " << n;
+    qDebug() << "TileLayer::setRegion(" << sceneRegion << ")";
     QRect& o = tileRegion; // n => new, o => old
     QRect n(gt.Meters2GoogleTile(sceneRegion.topLeft(),zoom),
             gt.Meters2GoogleTile(sceneRegion.bottomRight(),zoom));
 
-    singleTile = (n.width() * n.height() == 1);
+    topLeftSafeRange.setTopLeft(gt.GoogleTile2Meters(tileRegion.topLeft(),zoom));
+    topLeftSafeRange.setBottomRight(gt.GoogleTile2Meters(tileRegion.topLeft() + QPoint(1,1),zoom));
 
-    outerSafeRect.setTopLeft(gt.GoogleTile2Meters(tileRegion.topLeft(),zoom));
-    outerSafeRect.setBottomRight(gt.GoogleTile2Meters(tileRegion.bottomRight() + QPoint(1,1),zoom));
+    bottomRightSafeRange.setTopLeft(gt.GoogleTile2Meters(tileRegion.bottomRight(),zoom));
+    bottomRightSafeRange.setBottomRight(gt.GoogleTile2Meters(tileRegion.bottomRight() + QPoint(1,1),zoom));
 
     ColumnPointer p = adjustBeforeIntersection(n);
 
@@ -158,7 +161,7 @@ void TileLayer::clear()
 
 QRectF TileLayer::boundingRect() const
 {
-    return outerSafeRect;
+    return QRectF(topLeftSafeRange.topLeft(),bottomRightSafeRange.bottomRight());
 }
 
 void TileLayer::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)

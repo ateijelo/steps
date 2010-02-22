@@ -16,6 +16,7 @@ class TileLayer : public QGraphicsItem
 
     public:
         TileLayer(int zoom, QGraphicsItem *parent=NULL);
+        bool wouldChangeWithRegion(const QRectF& r);
         void setRegion(const QRectF& r);
         void clear();
         QRectF boundingRect() const;
@@ -29,24 +30,12 @@ class TileLayer : public QGraphicsItem
         Tile *newTile(int x, int y);
 
         int zoom;
-        QRectF sceneRegion;
         QLinkedList<Column*> columns;
         QRect tileRegion;
         GeoTools gt;
-        QRectF innerSafeRect;
-        QRectF outerSafeRect;
-        bool singleTile;
-//        TileLayer();
-//        void setRegion(const QRect& r, int zoom);
-//        void clear();
-//
-//    signals:
-//        void tileCreated(Tile *t,int x, int y, int zoom);
-//
-//    private:
-//
-//        QLinkedList<Column*> columns;
-//        QRect region;
+
+        QRectF topLeftSafeRange;
+        QRectF bottomRightSafeRange;
 };
 
 #endif // TILELAYER_H

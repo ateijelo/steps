@@ -45,7 +45,6 @@ class MapView : public QGraphicsView
         void setMapType2GoogleMap();
         void setMapType2GoogleSat();
         void setMapType2GoogleHyb();
-        void setAsCenter(QObject *newCenter);
 
     private slots:
         void mouseMovedOverScene(const QPointF& scenePos);

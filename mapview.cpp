@@ -38,7 +38,7 @@ MapView::MapView(QWidget *parent)
     //tp->setRegion(QRectF(-9.17078e+06,-2.64852e+06,81.2143,39.4128));
     //tp->displayUpToLevel(18);
     scene->addItem(tp);
-    setViewport(new QGLWidget());
+    //setViewport(new QGLWidget());
 }
 
 bool MapView::canZoomIn()
@@ -75,8 +75,8 @@ bool MapView::viewportEvent(QEvent *event)
 
 void MapView::updateTiles()
 {
-    tp->setRegion(mapToScene(viewport()->rect().adjusted(-20,-20,20,20)).boundingRect());
     tp->displayUpToLevel(zoom);
+    tp->setRegion(mapToScene(viewport()->rect().adjusted(-20,-20,20,20)).boundingRect());
 }
 
 void MapView::mouseMoveEvent(QMouseEvent *event)
@@ -169,14 +169,6 @@ void MapView::contextMenuEvent (QContextMenuEvent *event)
 
         event->accept();
     }
-}
-
-void MapView::setAsCenter(QObject *newCenter)
-{
-    //QPointF viewAnchorScenePos = mapToScene(viewAnchor);
-    //centerOn(mapToScene(rect().center()) + sceneAnchor - viewAnchorScenePos);
-    //qDebug() << newCenter;
-    //centerOn(mapToScene(((QPoint*)newCenter)[0]));
 }
 
 void MapView::addMenuAction(QSignalMapper *signalMapper, QMenu *menu, QString text)
