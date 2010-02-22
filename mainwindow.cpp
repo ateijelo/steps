@@ -81,10 +81,17 @@ MainWindow::MainWindow(QWidget *parent)
     ui.zoomOutAction->setEnabled(ui.mapView->canZoomOut());
     zoomSlider.setValue(ui.mapView->zoomLevel());
 
-    QPoint pos = settings.value(SettingsKeys::WindowsPosition, QPoint(100, 100)).toPoint();
-    QSize size = settings.value(SettingsKeys::WindowsSize, QSize(400, 400)).toSize();
+    QPoint pos = settings.value(SettingsKeys::WindowPosition, QPoint(100, 100)).toPoint();
+    QSize size = settings.value(SettingsKeys::WindowSize, QSize(400, 400)).toSize();
     resize(size);
     move(pos);
+    QString windowStatus = settings.value(SettingsKeys::WindowStatus, WindowStates::Normal).toString();
+    if (windowStatus == WindowStates::Minimized)
+        showMinimized();
+    else if (windowStatus == WindowStates::Maximized)
+        showMaximized();
+    else
+        showNormal();
 }
 
 void MainWindow::openCacheDirectory()
@@ -108,7 +115,15 @@ void MainWindow::updateLatLonLabels(const QPointF& latLon)
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     QSettings settings;
-    settings.setValue(SettingsKeys::WindowsPosition, pos());
-    settings.setValue(SettingsKeys::WindowsSize, size());
+    settings.setValue(SettingsKeys::WindowPosition, pos());
+    settings.setValue(SettingsKeys::WindowSize, size());
+    QString windowStatus;
+    if (isMinimized())
+        windowStatus = WindowStates::Minimized;
+    else if (isMaximized())
+        windowStatus = WindowStates::Maximized;
+    else
+        windowStatus = WindowStates::Normal;
+    settings.setValue(SettingsKeys::WindowStatus, windowStatus);
     event->accept();
 }
