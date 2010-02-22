@@ -78,6 +78,7 @@ class GeoTools
         QPointF GoogleTile2Meters(const QPoint& g, int zoom);
         double VincentyDistance(const QPointF& from, const QPointF& to);
         double HaversineDistance(const QPointF& from, const QPointF& to);
+        double Distance(const QPointF& from, const QPointF& to);
 
     private:
         int tileSize;
