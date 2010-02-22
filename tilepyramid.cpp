@@ -35,9 +35,9 @@ void TilePyramid::displayUpToLevel(int z)
             layers.last()->show();
         s--;
     }
-    for (int i=0; i<layers.size() - 2; i++)
+    for (int i=0; i<layers.size() - 1; i++)
         layers.at(i)->hide();
-    for (int i=qMax(0,layers.size() - 2); i<layers.size(); i++)
+    for (int i=qMax(0,layers.size() - 1); i<layers.size(); i++)
           layers.at(i)->show();
 }
 

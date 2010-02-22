@@ -48,22 +48,36 @@
 #include <QPoint>
 #include <QPointF>
 
+/// The usual PI/180 constant
+#define DEG_TO_RAD 0.017453292519943295769236907684886
+/// Earth's quatratic mean radius for WGS-84
+#define EARTH_RADIUS_IN_METERS 6372797.560856
+
+/// Major semiaxis of the ellipsoid
+#define MAJOR_EARTH_RADIUS_IN_METERS 6378137.0
+/// Minor semiaxis of the ellipsoid
+#define MINOR_EARTH_RADIUS_IN_METERS 6356752.3142
+/// Flattening
+#define FLATTENING 1/298.257223563
+
 class GeoTools
 {
     public:
         GeoTools(int tileSize=256);
 
-        double resolution(int zoom) const;
-        QPointF LatLon2Meters(const QPointF& l) const;
-        QPointF Meters2LatLon(const QPointF& m) const;
-        QPointF Meters2Pixels(const QPointF& m, int zoom) const;
-        QPointF Pixels2Meters(const QPointF& p, int zoom) const;
-        QPoint Pixels2GoogleTile(const QPointF& p) const;
-        QPointF GoogleTile2Pixels(int x, int y) const;
-        QPointF GoogleTile2Pixels(const QPoint& g) const;
-        QPoint Meters2GoogleTile(const QPointF& m, int zoom) const;
-        QPointF GoogleTile2Meters(int x, int y, int zoom) const;
-        QPointF GoogleTile2Meters(const QPoint& g, int zoom) const;
+        double resolution(int zoom);
+        QPointF LatLon2Meters(const QPointF& l);
+        QPointF Meters2LatLon(const QPointF& m);
+        QPointF Meters2Pixels(const QPointF& m, int zoom);
+        QPointF Pixels2Meters(const QPointF& p, int zoom);
+        QPoint Pixels2GoogleTile(const QPointF& p);
+        QPointF GoogleTile2Pixels(int x, int y);
+        QPointF GoogleTile2Pixels(const QPoint& g);
+        QPoint Meters2GoogleTile(const QPointF& m, int zoom);
+        QPointF GoogleTile2Meters(int x, int y, int zoom);
+        QPointF GoogleTile2Meters(const QPoint& g, int zoom);
+        double VincentyDistance(const QPointF& from, const QPointF& to);
+        double HaversineDistance(const QPointF& from, const QPointF& to);
 
     private:
         int tileSize;

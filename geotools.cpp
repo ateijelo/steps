@@ -132,3 +132,68 @@ QPointF GeoTools::GoogleTile2Meters(const QPoint &g, int zoom) const
 {
     return GoogleTile2Meters(g.x(),g.y(),zoom);
 }
+
+double GeoTools::VincentyDistance(const QPointF& from, const QPointF& to)
+{
+    double L = (to.x() - from.x()) * DEG_TO_RAD;
+    double U1 = atan((1-FLATTENING) * tan(from.y() * DEG_TO_RAD));
+    double U2 = atan((1-FLATTENING) * tan(to.y() * DEG_TO_RAD));
+    double sinU1 = sin(U1);
+    double cosU1 = cos(U1);
+    double sinU2 = sin(U2);
+    double cosU2 = cos(U2);
+
+    double lambda = L;
+    double lambdaP, iterLimit = 100;
+    double sinSigma = 0;
+    double cosSigma = 0;
+    double sigma = 0;
+    double cosSqAlpha = 0;
+    double cos2SigmaM = 0;
+    do
+    {
+        double sinLambda = sin(lambda);
+        double cosLambda = cos(lambda);
+        sinSigma = sqrt((cosU2*sinLambda) * (cosU2*sinLambda) +
+                               (cosU1*sinU2 - sinU1*cosU2*cosLambda) * (cosU1*sinU2 - sinU1*cosU2*cosLambda));
+        if (sinSigma == 0)
+            return 0; // co-incident points
+        cosSigma = sinU1*sinU2 + cosU1*cosU2*cosLambda;
+        sigma = atan2(sinSigma, cosSigma);
+        double sinAlpha = cosU1 * cosU2 * sinLambda / sinSigma;
+        cosSqAlpha = 1 - sinAlpha*sinAlpha;
+        if (cosSqAlpha == 0)
+            cos2SigmaM = 0;  // equatorial line: cosSqAlpha=0 (§6)
+        else
+            cos2SigmaM = cosSigma - 2*sinU1*sinU2/cosSqAlpha;
+        double C = FLATTENING/16*cosSqAlpha*(4+FLATTENING*(4-3*cosSqAlpha));
+        lambdaP = lambda;
+        lambda = L + (1-C) * FLATTENING * sinAlpha * (sigma + C*sinSigma*(cos2SigmaM+C*cosSigma*(-1+2*cos2SigmaM*cos2SigmaM)));
+    }
+    while (fabs(lambda-lambdaP) > 1e-12 && --iterLimit>0);
+
+    if (iterLimit==0) return -1;  // formula failed to converge
+
+    double uSq = cosSqAlpha *
+                 (MAJOR_EARTH_RADIUS_IN_METERS*MAJOR_EARTH_RADIUS_IN_METERS - MINOR_EARTH_RADIUS_IN_METERS*MINOR_EARTH_RADIUS_IN_METERS) / (MINOR_EARTH_RADIUS_IN_METERS*MINOR_EARTH_RADIUS_IN_METERS);
+    double A = 1 + uSq/16384*(4096+uSq*(-768+uSq*(320-175*uSq)));
+    double B = uSq/1024 * (256+uSq*(-128+uSq*(74-47*uSq)));
+    double deltaSigma = B*sinSigma*(cos2SigmaM+B/4*(cosSigma*(-1+2*cos2SigmaM*cos2SigmaM)-
+            B/6*cos2SigmaM*(-3+4*sinSigma*sinSigma)*(-3+4*cos2SigmaM*cos2SigmaM)));
+    double s = MINOR_EARTH_RADIUS_IN_METERS*A*(sigma-deltaSigma);
+
+    //s = s.toFixed(3); // round to 1mm precision
+    return s;
+}
+
+double GeoTools::HaversineDistance(const QPointF& from, const QPointF& to)
+{
+    qreal latitudeArc = (from.y() - to.y()) * DEG_TO_RAD;
+    qreal longitudeArc = (from.x() - to.x()) * DEG_TO_RAD;
+    double latitudeH = sin(latitudeArc * 0.5);
+    latitudeH *= latitudeH;
+    double lontitudeH = sin(longitudeArc * 0.5);
+    lontitudeH *= lontitudeH;
+    double tmp = cos(from.y()*DEG_TO_RAD) * cos(to.y()*DEG_TO_RAD);
+    return 2.0 * asin(sqrt(latitudeH + tmp*lontitudeH)) * EARTH_RADIUS_IN_METERS;
+}
