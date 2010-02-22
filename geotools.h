@@ -53,6 +53,13 @@
 /// Earth's quatratic mean radius for WGS-84
 #define EARTH_RADIUS_IN_METERS 6372797.560856
 
+/// Major semiaxis of the ellipsoid
+#define MAJOR_EARTH_RADIUS_IN_METERS 6378137.0
+/// Minor semiaxis of the ellipsoid
+#define MINOR_EARTH_RADIUS_IN_METERS 6356752.3142
+/// Flattening
+#define FLATTENING 1/298.257223563
+
 class GeoTools
 {
     public:
