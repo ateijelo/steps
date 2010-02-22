@@ -18,6 +18,9 @@ class MainWindow : public QMainWindow
     public:
         MainWindow(QWidget *parent = NULL);
 
+    protected:
+        void closeEvent(QCloseEvent *event);
+
     private slots:
         void updateLatLonLabels(const QPointF& latLon);
 

@@ -80,6 +80,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui.zoomInAction->setEnabled(ui.mapView->canZoomIn());
     ui.zoomOutAction->setEnabled(ui.mapView->canZoomOut());
     zoomSlider.setValue(ui.mapView->zoomLevel());
+
+    QPoint pos = settings.value(SettingsKeys::WindowsPosition, QPoint(100, 100)).toPoint();
+    QSize size = settings.value(SettingsKeys::WindowsSize, QSize(400, 400)).toSize();
+    resize(size);
+    move(pos);
 }
 
 void MainWindow::openCacheDirectory()
@@ -98,4 +103,12 @@ void MainWindow::updateLatLonLabels(const QPointF& latLon)
 {
     latLabel.setText(QString("Lat: %1").arg(latLon.y()));
     lonLabel.setText(QString("Lon: %1").arg(latLon.x()));
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    QSettings settings;
+    settings.setValue(SettingsKeys::WindowsPosition, pos());
+    settings.setValue(SettingsKeys::WindowsSize, size());
+    event->accept();
 }
