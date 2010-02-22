@@ -65,19 +65,19 @@ class GeoTools
     public:
         GeoTools(int tileSize=256);
 
-        double resolution(int zoom);
-        QPointF LatLon2Meters(const QPointF& l);
-        QPointF Meters2LatLon(const QPointF& m);
-        QPointF Meters2Pixels(const QPointF& m, int zoom);
-        QPointF Pixels2Meters(const QPointF& p, int zoom);
-        QPoint Pixels2GoogleTile(const QPointF& p);
-        QPointF GoogleTile2Pixels(int x, int y);
-        QPointF GoogleTile2Pixels(const QPoint& g);
-        QPoint Meters2GoogleTile(const QPointF& m, int zoom);
-        QPointF GoogleTile2Meters(int x, int y, int zoom);
-        QPointF GoogleTile2Meters(const QPoint& g, int zoom);
-        double VincentyDistance(const QPointF& from, const QPointF& to);
-        double HaversineDistance(const QPointF& from, const QPointF& to);
+        double resolution(int zoom) const;
+        QPointF LatLon2Meters(const QPointF& l) const;
+        QPointF Meters2LatLon(const QPointF& m) const;
+        QPointF Meters2Pixels(const QPointF& m, int zoom) const;
+        QPointF Pixels2Meters(const QPointF& p, int zoom) const;
+        QPoint Pixels2GoogleTile(const QPointF& p) const;
+        QPointF GoogleTile2Pixels(int x, int y) const;
+        QPointF GoogleTile2Pixels(const QPoint& g) const;
+        QPoint Meters2GoogleTile(const QPointF& m, int zoom) const;
+        QPointF GoogleTile2Meters(int x, int y, int zoom) const;
+        QPointF GoogleTile2Meters(const QPoint& g, int zoom) const;
+        double VincentyDistance(const QPointF& from, const QPointF& to) const;
+        double HaversineDistance(const QPointF& from, const QPointF& to) const;
 
     private:
         int tileSize;

@@ -133,7 +133,7 @@ QPointF GeoTools::GoogleTile2Meters(const QPoint &g, int zoom) const
     return GoogleTile2Meters(g.x(),g.y(),zoom);
 }
 
-double GeoTools::VincentyDistance(const QPointF& from, const QPointF& to)
+double GeoTools::VincentyDistance(const QPointF& from, const QPointF& to) const
 {
     double L = (to.x() - from.x()) * DEG_TO_RAD;
     double U1 = atan((1-FLATTENING) * tan(from.y() * DEG_TO_RAD));
@@ -186,7 +186,7 @@ double GeoTools::VincentyDistance(const QPointF& from, const QPointF& to)
     return s;
 }
 
-double GeoTools::HaversineDistance(const QPointF& from, const QPointF& to)
+double GeoTools::HaversineDistance(const QPointF& from, const QPointF& to) const
 {
     qreal latitudeArc = (from.y() - to.y()) * DEG_TO_RAD;
     qreal longitudeArc = (from.x() - to.x()) * DEG_TO_RAD;
