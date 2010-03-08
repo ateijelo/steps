@@ -6,6 +6,7 @@ TARGET =
 DEPENDPATH += .
 INCLUDEPATH += .
 QT += opengl
+CONFIG += debug
 
 # Input
 HEADERS += mainwindow.h \

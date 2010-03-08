@@ -126,7 +126,6 @@ bool TileLayer::wouldChangeWithRegion(const QRectF &r)
 
 void TileLayer::setRegion(const QRectF& sceneRegion)
 {
-    qDebug() << "TileLayer::setRegion(" << sceneRegion << ")";
     QRect& o = tileRegion; // n => new, o => old
     QRect n(gt.Meters2GoogleTile(sceneRegion.topLeft(),zoom),
             gt.Meters2GoogleTile(sceneRegion.bottomRight(),zoom));

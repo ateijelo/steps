@@ -27,17 +27,17 @@ MapView::MapView(QWidget *parent)
     angle = settings.value(SettingsKeys::Angle, 0.0F).toDouble();
 
     zoom = -1;
+    tp = new TilePyramid();
+    tp->setPos(0,0);
+    scene->addItem(tp);
     setZoomLevel(settings.value(SettingsKeys::ZoomLevel, 0).toInt());
 
     qreal lat = settings.value(SettingsKeys::Latitude, 0).toDouble();
     qreal lon = settings.value(SettingsKeys::Longitude, 0).toDouble();
     centerOn(gt.LatLon2Meters(QPointF(lon,lat)));
 
-    tp = new TilePyramid();
-    tp->setPos(0,0);
     //tp->setRegion(QRectF(-9.17078e+06,-2.64852e+06,81.2143,39.4128));
     //tp->displayUpToLevel(18);
-    scene->addItem(tp);
     //setViewport(new QGLWidget());
 }
 
@@ -75,7 +75,6 @@ bool MapView::viewportEvent(QEvent *event)
 
 void MapView::updateTiles()
 {
-    tp->displayUpToLevel(zoom);
     tp->setRegion(mapToScene(viewport()->rect().adjusted(-20,-20,20,20)).boundingRect());
 }
 
@@ -232,6 +231,7 @@ void MapView::setZoomLevel(int zoom)
     emit zoomChanged(zoom);
 
     //tm.clear();
+    tp->displayUpToLevel(zoom);
 
     double res = gt.resolution(zoom);
     resetTransform();
