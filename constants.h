@@ -13,6 +13,7 @@ namespace SettingsKeys
     const QString WindowPosition = "WindowPosition";
     const QString WindowSize = "WindowSize";
     const QString WindowIsMaximized = "WindowIsMaximized";
+    const QString ShowLatLonAsToolTip = "ShowLatLonAsToolTip";
 }
 
 namespace MapTypes

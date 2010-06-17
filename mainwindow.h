@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QRadioButton>
+#include <QCheckBox>
 #include <QLabel>
 #include <QSlider>
 
@@ -30,6 +31,7 @@ class MainWindow : public QMainWindow
         QRadioButton mapOption;
         QRadioButton satOption;
         QRadioButton hybOption;
+        QCheckBox showLatLonAsToolTip;
         QLabel latLabel;
         QLabel lonLabel;
         Preferences *preferences;
