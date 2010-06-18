@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QRadioButton>
+#include <QCheckBox>
 #include <QLabel>
 #include <QSlider>
 
@@ -15,6 +16,9 @@ class MainWindow : public QMainWindow
     public:
         MainWindow(QWidget *parent = NULL);
 
+    protected:
+        void closeEvent(QCloseEvent *event);
+
     private slots:
         void updateLatLonLabels(const QPointF& latLon);
 
@@ -24,6 +28,7 @@ class MainWindow : public QMainWindow
         QRadioButton mapOption;
         QRadioButton satOption;
         QRadioButton hybOption;
+        QCheckBox showLatLonAsToolTip;
         QLabel latLabel;
         QLabel lonLabel;
         Preferences *preferences;

@@ -10,6 +10,10 @@ namespace SettingsKeys
     const QString Longitude = "Longitude";
     const QString Angle = "Angle";
     const QString WheelOption = "Wheel";
+    const QString WindowPosition = "WindowPosition";
+    const QString WindowSize = "WindowSize";
+    const QString WindowIsMaximized = "WindowIsMaximized";
+    const QString ShowLatLonAsToolTip = "ShowLatLonAsToolTip";
 }
 
 namespace MapTypes

@@ -47,6 +47,7 @@ class MapView : public QGraphicsView
         void setMapType2GoogleSat();
         void setMapType2GoogleHyb();
         void setAsCenter(QObject *newCenter);
+        void showLatLonAsToolTip(bool);
 
     private slots:
         void mouseMovedOverScene(const QPointF& scenePos);
@@ -62,7 +63,8 @@ class MapView : public QGraphicsView
         qreal angle;
         QPointF sceneAnchor;
         QPoint viewAnchor;
-        TileLayer tm;
+        TileManager tm;
+        bool showToolTip;
 };
 
 #endif
