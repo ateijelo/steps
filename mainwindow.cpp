@@ -81,7 +81,7 @@ MainWindow::MainWindow(QWidget *parent)
         mapOption.setChecked(true);
     }
 
-    showLatLonAsToolTip.setChecked(settings.value(SettingsKeys::ShowLatLonAsToolTip, true).toBool());
+    showLatLonAsToolTip.setChecked(settings.value(SettingsKeys::ShowLatLonAsToolTip, false).toBool());
 
     ui.zoomInAction->setEnabled(ui.mapView->canZoomIn());
     ui.zoomOutAction->setEnabled(ui.mapView->canZoomOut());
