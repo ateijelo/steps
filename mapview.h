@@ -63,7 +63,7 @@ class MapView : public QGraphicsView
         qreal angle;
         QPointF sceneAnchor;
         QPoint viewAnchor;
-        TileManager tm;
+        TileLayer tm;
         bool showToolTip;
 };
 
