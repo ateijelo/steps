@@ -193,26 +193,10 @@ void MapView::copyToClipboard(QString text)
     QApplication::clipboard()->setText(text);
 }
 
-void MapView::setMapType2GoogleMap()
+void MapView::setCacheStyle(QString cacheStyle)
 {
     QSettings settings;
-    settings.setValue(SettingsKeys::MapType, MapTypes::GoogleMap);
-    tm.clear();
-    updateTiles();
-}
-
-void MapView::setMapType2GoogleSat()
-{
-    QSettings settings;
-    settings.setValue(SettingsKeys::MapType, MapTypes::GoogleSat);
-    tm.clear();
-    updateTiles();
-}
-
-void MapView::setMapType2GoogleHyb()
-{
-    QSettings settings;
-    settings.setValue(SettingsKeys::MapType, MapTypes::GoogleHyb);
+    settings.setValue(SettingsKeys::MapType, cacheStyle);
     tm.clear();
     updateTiles();
 }

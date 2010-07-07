@@ -6,6 +6,7 @@
 #include <QCheckBox>
 #include <QLabel>
 #include <QSlider>
+#include <QComboBox>
 
 #include "ui_mainwindow.h"
 #include "geotools.h"
@@ -22,22 +23,21 @@ class MainWindow : public QMainWindow
     protected:
         void closeEvent(QCloseEvent *event);
 
-    private slots:
-        void updateLatLonLabels(const QPointF& latLon);
-
     private:
         Ui::MainWindow ui;
         QSlider zoomSlider;
-        QRadioButton mapOption;
-        QRadioButton satOption;
-        QRadioButton hybOption;
         QCheckBox showLatLonAsToolTip;
         QLabel latLabel;
         QLabel lonLabel;
+        QComboBox cacheStyles;
         Preferences *preferences;
 
     private slots:
         void openCacheDirectory();
+        void updateLatLonLabels(const QPointF& latLon);
+
+    private:
+        void updateCacheStyles();
 };
 
 #endif
