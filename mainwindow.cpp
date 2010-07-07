@@ -26,9 +26,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui.toolBar->insertWidget(ui.zoomInAction, &zoomSlider);
     connect(&zoomSlider, SIGNAL(valueChanged(int)), ui.mapView, SLOT(setZoomLevel(int)));
 
-    connect(&cacheStyles, SIGNAL(currentIndexChanged(QString)), ui.mapView, SLOT(setCacheStyle(QString)));
+    cacheStyles.setSizeAdjustPolicy(QComboBox::AdjustToContents);
+
     ui.toolBar->insertSeparator(0);
     ui.toolBar->insertWidget(0, &cacheStyles);
+
+    connect(&cacheStyles, SIGNAL(currentIndexChanged(QString)), ui.mapView, SLOT(setCacheStyle(QString)));
     updateCacheStyles();
 
     latLabel.setFixedWidth(90);
