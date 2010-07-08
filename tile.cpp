@@ -21,9 +21,9 @@ Tile::Tile(int x, int y, int zoom)
     QSettings settings;
     QString tileStyle = settings.value(SettingsKeys::MapType, "").toString();
     QPixmap result = loadTile(tileStyle, x, y, zoom);
-    if (tileStyle.endsWith("Hyb"))
+    if (tileStyle.endsWith("Hyb") || tileStyle.endsWith("Labels"))
     {
-        QString satStyle = tileStyle.replace("Hyb", "Sat");
+        QString satStyle = tileStyle.replace("Hyb", "Sat").replace("Labels", "Sat");
         QPixmap sat = loadTile(satStyle, x, y, zoom);
         if (!sat.isNull())
         {
