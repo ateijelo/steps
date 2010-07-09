@@ -81,7 +81,8 @@ void MainWindow::updateCacheStyles()
     QSettings settings;
     QString cachePath = settings.value(SettingsKeys::CachePath, "").toString();
     QDir cacheDir(cachePath);
-    QFileInfoList list = cacheDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
+    QStringList cacheDirPattern("*_*");
+    QFileInfoList list = cacheDir.entryInfoList(cacheDirPattern, QDir::Dirs | QDir::NoDotAndDotDot);
     QStringList styles;
     foreach(QFileInfo fileInfo, list)
     {
