@@ -16,13 +16,6 @@ namespace SettingsKeys
     const QString ShowLatLonAsToolTip = "ShowLatLonAsToolTip";
 }
 
-namespace MapTypes
-{
-    const QString GoogleMap = "GoogleMap";
-    const QString GoogleSat = "GoogleSat";
-    const QString GoogleHyb = "GoogleHyb";
-}
-
 namespace WheelOptions
 {
     const QString ZoomsWithNoKeyPressed = "ZoomsWithNoKeyPressed";

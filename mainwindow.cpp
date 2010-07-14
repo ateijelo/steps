@@ -26,18 +26,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui.toolBar->insertWidget(ui.zoomInAction, &zoomSlider);
     connect(&zoomSlider, SIGNAL(valueChanged(int)), ui.mapView, SLOT(setZoomLevel(int)));
 
-    mapOption.setText("&Maps");
-    satOption.setText("&Satellite");
-    hybOption.setText("&Hybrid");
+    cacheStyles.setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
     ui.toolBar->insertSeparator(0);
-    ui.toolBar->insertWidget(0, &mapOption);
-    ui.toolBar->insertWidget(0, &satOption);
-    ui.toolBar->insertWidget(0, &hybOption);
+    ui.toolBar->insertWidget(0, &cacheStyles);
 
-    connect(&mapOption, SIGNAL(clicked()), ui.mapView, SLOT(setMapType2GoogleMap()));
-    connect(&satOption, SIGNAL(clicked()), ui.mapView, SLOT(setMapType2GoogleSat()));
-    connect(&hybOption, SIGNAL(clicked()), ui.mapView, SLOT(setMapType2GoogleHyb()));
+    connect(&cacheStyles, SIGNAL(currentIndexChanged(QString)), ui.mapView, SLOT(setCacheStyle(QString)));
+    updateCacheStyles();
 
     latLabel.setFixedWidth(90);
     lonLabel.setFixedWidth(100);
@@ -65,22 +60,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui.zoomOutAction->setShortcut(QKeySequence::ZoomOut);
 
     QSettings settings;
-
-    QString tileStyle = settings.value(SettingsKeys::MapType, MapTypes::GoogleMap).toString();
-    //settings.setValue(SettingsKeys::MapType, tileStyle);
-    if (tileStyle == TILE_STYLE_SAT)
-    {
-        satOption.setChecked(true);
-    }
-    else if (tileStyle == TILE_STYLE_HYB)
-    {
-        hybOption.setChecked(true);
-    }
-    else //if (tileStyle == TILE_STYLE_MAP)
-    {
-        mapOption.setChecked(true);
-    }
-
     showLatLonAsToolTip.setChecked(settings.value(SettingsKeys::ShowLatLonAsToolTip, false).toBool());
 
     ui.zoomInAction->setEnabled(ui.mapView->canZoomIn());
@@ -97,6 +76,38 @@ MainWindow::MainWindow(QWidget *parent)
         showNormal();
 }
 
+void MainWindow::updateCacheStyles()
+{
+    QSettings settings;
+    QString cachePath = settings.value(SettingsKeys::CachePath, "").toString();
+    QDir cacheDir(cachePath);
+    QStringList cacheDirPattern("*_*");
+    QFileInfoList list = cacheDir.entryInfoList(cacheDirPattern, QDir::Dirs | QDir::NoDotAndDotDot);
+    QStringList styles;
+    foreach(QFileInfo fileInfo, list)
+    {
+        QString style = fileInfo.fileName().section("_", 0, 0);
+        if (!styles.contains(style))
+        {
+            styles.append(style);
+        }
+    }
+    QString tileStyle = settings.value(SettingsKeys::MapType, "").toString();
+    if (tileStyle == "" && styles.length() != 0)
+    {
+        tileStyle = styles[0];
+    }
+    cacheStyles.clear();
+    foreach(QString style, styles)
+    {
+        cacheStyles.addItem(style);
+        if (style == tileStyle)
+        {
+            cacheStyles.setCurrentIndex(cacheStyles.count()-1);
+        }
+    }
+}
+
 void MainWindow::openCacheDirectory()
 {
     QSettings settings;
@@ -106,6 +117,7 @@ void MainWindow::openCacheDirectory()
     if (path.compare("") != 0)
     {
         settings.setValue(SettingsKeys::CachePath,path);
+        updateCacheStyles();
     }
 }
 
