@@ -14,6 +14,8 @@ namespace SettingsKeys
     const QString WindowSize = "WindowSize";
     const QString WindowIsMaximized = "WindowIsMaximized";
     const QString ShowLatLonAsToolTip = "ShowLatLonAsToolTip";
+    const QString RecentPaths = "RecentPaths";
+    const QString path = "path";
 }
 
 namespace WheelOptions
