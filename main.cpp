@@ -1,9 +1,7 @@
-#include <QtDebug>
 #include <QApplication>
 
-#include <QRectF>
-
 #include "mainwindow.h"
+#include "tilemanager.h"
 
 int main(int argc, char *argv[])
 {
@@ -16,10 +14,10 @@ int main(int argc, char *argv[])
     MainWindow m;
     m.show();
 
-    QRectF r1(100,100,0,0);
-    QRectF r2(50,50,100,100);
-
-    qDebug() << r2.contains(r1) << endl;
-
     return app.exec();
+//    TileManager tm;
+//
+//    tm.setRegion(QRect(1,4,2,3),0);
+//    tm.clear();
+//    tm.setRegion(QRect(2,3,3,3),0);
 }

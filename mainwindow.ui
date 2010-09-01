@@ -45,12 +45,6 @@
       <property name="resizeAnchor">
        <enum>QGraphicsView::AnchorViewCenter</enum>
       </property>
-      <property name="viewportUpdateMode">
-       <enum>QGraphicsView::MinimalViewportUpdate</enum>
-      </property>
-      <property name="optimizationFlags">
-       <set>QGraphicsView::DontAdjustForAntialiasing</set>
-      </property>
      </widget>
     </item>
    </layout>
@@ -61,7 +55,7 @@
      <x>0</x>
      <y>0</y>
      <width>562</width>
-     <height>22</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">

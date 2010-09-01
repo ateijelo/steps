@@ -34,14 +34,7 @@ Tile::Tile(int x, int y, int zoom)
     }
 
     setPixmap(result);
-    setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
-    //qDebug() << "Created Tile:" << x << y << zoom;
-    setCacheMode(QGraphicsItem::ItemCoordinateCache);
-}
-
-Tile::~Tile()
-{
-    //qDebug() << "Deleted Tile:" << x << y << zoom;
+    setZValue(zoom);
 }
 
 QPixmap Tile::loadTile(QString tileStyle, int x, int y, int zoom)
@@ -122,8 +115,7 @@ QString Tile::getTileFileName(QString tileStyle, int x, int y, int zoom)
             .arg(mgm_y);
 }
 
-void Tile::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+Tile::~Tile()
 {
-    //qDebug() << "Tile::paint" << zoom;
-    QGraphicsPixmapItem::paint(painter,option,widget);
+    //qDebug() << "deleted Tile:" << x << y << zoom;
 }

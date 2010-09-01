@@ -4,6 +4,7 @@
 #include <QGraphicsPixmapItem>
 
 #include "mainwindow.h"
+#include "mgmreader.h"
 #include "mainscene.h"
 #include "constants.h"
 

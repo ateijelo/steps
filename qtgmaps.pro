@@ -5,7 +5,6 @@ TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
 INCLUDEPATH += .
-QT += opengl
 
 # Input
 HEADERS += mainwindow.h \
@@ -13,9 +12,8 @@ HEADERS += mainwindow.h \
     mgmreader.h \
     geotools.h \
     tile.h \
-    tilelayer.h \
+    tilemanager.h \
     mainscene.h \
-    tilepyramid.h \
     constants.h \
     preferences.h
 FORMS += mainwindow.ui \
@@ -26,8 +24,7 @@ SOURCES += main.cpp \
     mgmreader.cpp \
     geotools.cpp \
     tile.cpp \
-    tilelayer.cpp \
+    tilemanager.cpp \
     mainscene.cpp \
-    tilepyramid.cpp \
     preferences.cpp
 RESOURCES += qtgmaps.qrc

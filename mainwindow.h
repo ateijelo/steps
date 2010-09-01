@@ -7,6 +7,9 @@
 #include <QSlider>
 
 #include "ui_mainwindow.h"
+#include "geotools.h"
+#include "tilemanager.h"
+#include "tile.h"
 #include "preferences.h"
 
 class MainWindow : public QMainWindow

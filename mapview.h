@@ -11,7 +11,7 @@
 #include "tile.h"
 #include "geotools.h"
 #include "mainscene.h"
-#include "tilepyramid.h"
+#include "tilemanager.h"
 
 class MapView : public QGraphicsView
 {
@@ -37,6 +37,7 @@ class MapView : public QGraphicsView
         void mouseMoved(const QPointF& latlon);
 
     public slots:
+        void displayNewTile(Tile *t, int x, int y, int zoom);
         void zoomIn();
         void zoomOut();
         void rotRight();
@@ -45,6 +46,7 @@ class MapView : public QGraphicsView
         void setMapType2GoogleMap();
         void setMapType2GoogleSat();
         void setMapType2GoogleHyb();
+        void setAsCenter(QObject *newCenter);
 
     private slots:
         void mouseMovedOverScene(const QPointF& scenePos);
@@ -60,7 +62,7 @@ class MapView : public QGraphicsView
         qreal angle;
         QPointF sceneAnchor;
         QPoint viewAnchor;
-        TilePyramid *tp;
+        TileManager tm;
 };
 
 #endif
