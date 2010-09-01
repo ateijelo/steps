@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
+    updateRecents();
 
     preferences = new Preferences(this);
 
@@ -74,6 +75,90 @@ MainWindow::MainWindow(QWidget *parent)
         showMaximized();
     else
         showNormal();
+
+    connect(&recentsMapper, SIGNAL(mapped(QString)), this, SLOT(updateCacheDirectory(QString)));
+}
+
+void MainWindow::updateRecents(QString top)
+{
+    QSettings settings;
+
+    QStringList recents;
+    int amount = settings.beginReadArray(SettingsKeys::RecentPaths);
+    for (int i = 0; i < amount; i++)
+    {
+        settings.setArrayIndex(i);
+        recents.append(settings.value(SettingsKeys::path).toString());
+    }
+    settings.endArray();
+
+    if (top.isNull())
+    {
+        top = settings.value(SettingsKeys::CachePath, "").toString();
+
+        if (recents.isEmpty())
+        {
+            if (!top.isEmpty())
+            {
+                recents.append(top);
+            }
+        }
+        else
+        {
+            if (top.isEmpty())
+            {
+                top = recents[0];
+            }
+        }
+    }
+    else
+    {
+        if (recents.isEmpty())
+        {
+            recents.append(top);
+        }
+    }
+
+    if (!recentPaths.isEmpty())
+    {
+        foreach(QAction *action, recentPaths)
+        {
+            this->ui.menu_File->removeAction(action);
+            recentsMapper.removeMappings(action);
+        }
+        recentPaths.clear();
+    }
+
+    if (!recents.isEmpty())
+    {
+        recents.insert(0, top);
+        int index = recents.indexOf(top, 1);
+        if (index != -1)
+        {
+            recents.removeAt(index);
+        }
+
+        QAction *action;
+        for (int i = 0; i < recents.length(); i++)
+        {
+            action = new QAction(QString("&%1 %2").arg(i+1).arg(recents[i]), this->ui.menu_File);
+            recentsMapper.setMapping(action, recents[i]);
+            connect(action, SIGNAL(triggered()), &recentsMapper, SLOT(map()));
+            this->ui.menu_File->insertAction(this->ui.action_Exit, action);
+            recentPaths.append(action);
+        }
+
+        action = this->ui.menu_File->insertSeparator(this->ui.action_Exit);
+        recentPaths.append(action);
+    }
+
+    settings.beginWriteArray(SettingsKeys::RecentPaths);
+    for (int i = 0; i < recents.length(); i++)
+    {
+        settings.setArrayIndex(i);
+        settings.setValue(SettingsKeys::path, recents[i]);
+    }
+    settings.endArray();
 }
 
 void MainWindow::updateCacheStyles()
@@ -108,6 +193,15 @@ void MainWindow::updateCacheStyles()
     }
 }
 
+void MainWindow::updateCacheDirectory(QString path)
+{
+    QSettings settings;
+
+    settings.setValue(SettingsKeys::CachePath,path);
+    updateCacheStyles();
+    updateRecents(path);
+}
+
 void MainWindow::openCacheDirectory()
 {
     QSettings settings;
@@ -116,8 +210,7 @@ void MainWindow::openCacheDirectory()
                                                      settings.value(SettingsKeys::CachePath,"").toString());
     if (path.compare("") != 0)
     {
-        settings.setValue(SettingsKeys::CachePath,path);
-        updateCacheStyles();
+        updateCacheDirectory(path);
     }
 }
 
