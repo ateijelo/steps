@@ -43,10 +43,9 @@ class MapView : public QGraphicsView
         void rotRight();
         void rotLeft();
         void setZoomLevel(int zoom);
-        void setMapType2GoogleMap();
-        void setMapType2GoogleSat();
-        void setMapType2GoogleHyb();
+        void setCacheStyle(QString cacheStyle);
         void setAsCenter(QObject *newCenter);
+        void showLatLonAsToolTip(bool);
 
     private slots:
         void mouseMovedOverScene(const QPointF& scenePos);
@@ -63,6 +62,7 @@ class MapView : public QGraphicsView
         QPointF sceneAnchor;
         QPoint viewAnchor;
         TileManager tm;
+        bool showToolTip;
 };
 
 #endif

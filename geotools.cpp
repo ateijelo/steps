@@ -196,3 +196,8 @@ double GeoTools::HaversineDistance(const QPointF& from, const QPointF& to) const
     double tmp = cos(from.y()*DEG_TO_RAD) * cos(to.y()*DEG_TO_RAD);
     return 2.0 * asin(sqrt(latitudeH + tmp*lontitudeH)) * EARTH_RADIUS_IN_METERS;
 }
+
+double GeoTools::Distance(const QPointF& from, const QPointF& to) const
+{
+    return HaversineDistance(from, to);
+}

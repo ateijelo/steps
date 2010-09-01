@@ -32,6 +32,8 @@ MapView::MapView(QWidget *parent)
     qreal lat = settings.value(SettingsKeys::Latitude, 0).toDouble();
     qreal lon = settings.value(SettingsKeys::Longitude, 0).toDouble();
     centerOn(gt.LatLon2Meters(QPointF(lon,lat)));
+
+    showToolTip = settings.value(SettingsKeys::ShowLatLonAsToolTip, false).toBool();
 }
 
 bool MapView::canZoomIn()
@@ -51,17 +53,21 @@ void MapView::mouseMovedOverScene(const QPointF& scenePos)
 
 bool MapView::viewportEvent(QEvent *event)
 {
+    if (event->type() == QEvent::ToolTip)
+    {
+        if (showToolTip)
+        {
+            QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
+            GeoTools gt;
+            QPointF latLon = gt.Meters2LatLon(mapToScene(helpEvent->pos()));
+            QToolTip::showText(helpEvent->globalPos(), QString("(%1 ; %2)").arg(latLon.x()).arg(latLon.y()));
+        }
+        return true;
+    }
+
     if (event->type() == QEvent::Paint)
     {
         updateTiles();
-    }
-    else if (event->type() == QEvent::ToolTip)
-    {
-         QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
-         GeoTools gt;
-         QPointF latLon = gt.Meters2LatLon(mapToScene(helpEvent->pos()));
-         QToolTip::showText(helpEvent->globalPos(), QString("(%1 ; %2)").arg(latLon.x()).arg(latLon.y()));
-         return true;
     }
     return QGraphicsView::viewportEvent(event);
 }
@@ -187,26 +193,10 @@ void MapView::copyToClipboard(QString text)
     QApplication::clipboard()->setText(text);
 }
 
-void MapView::setMapType2GoogleMap()
+void MapView::setCacheStyle(QString cacheStyle)
 {
     QSettings settings;
-    settings.setValue(SettingsKeys::MapType, MapTypes::GoogleMap);
-    tm.clear();
-    updateTiles();
-}
-
-void MapView::setMapType2GoogleSat()
-{
-    QSettings settings;
-    settings.setValue(SettingsKeys::MapType, MapTypes::GoogleSat);
-    tm.clear();
-    updateTiles();
-}
-
-void MapView::setMapType2GoogleHyb()
-{
-    QSettings settings;
-    settings.setValue(SettingsKeys::MapType, MapTypes::GoogleHyb);
+    settings.setValue(SettingsKeys::MapType, cacheStyle);
     tm.clear();
     updateTiles();
 }
@@ -255,6 +245,13 @@ void MapView::setZoomLevel(int zoom)
     rotate(angle);
     QPointF viewAnchorScenePos = mapToScene(viewAnchor);
     centerOn(mapToScene(rect().center()) + sceneAnchor - viewAnchorScenePos);
+}
+
+void MapView::showLatLonAsToolTip(bool really)
+{
+    showToolTip = really;
+    QSettings settings;
+    settings.setValue(SettingsKeys::ShowLatLonAsToolTip, really);
 }
 
 void MapView::zoomIn()

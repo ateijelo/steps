@@ -26,25 +26,24 @@ MainWindow::MainWindow(QWidget *parent)
     ui.toolBar->insertWidget(ui.zoomInAction, &zoomSlider);
     connect(&zoomSlider, SIGNAL(valueChanged(int)), ui.mapView, SLOT(setZoomLevel(int)));
 
-    mapOption.setText("&Maps");
-    satOption.setText("&Satellite");
-    hybOption.setText("&Hybrid");
+    cacheStyles.setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
     ui.toolBar->insertSeparator(0);
-    ui.toolBar->insertWidget(0, &mapOption);
-    ui.toolBar->insertWidget(0, &satOption);
-    ui.toolBar->insertWidget(0, &hybOption);
+    ui.toolBar->insertWidget(0, &cacheStyles);
 
-    connect(&mapOption, SIGNAL(clicked()), ui.mapView, SLOT(setMapType2GoogleMap()));
-    connect(&satOption, SIGNAL(clicked()), ui.mapView, SLOT(setMapType2GoogleSat()));
-    connect(&hybOption, SIGNAL(clicked()), ui.mapView, SLOT(setMapType2GoogleHyb()));
+    connect(&cacheStyles, SIGNAL(currentIndexChanged(QString)), ui.mapView, SLOT(setCacheStyle(QString)));
+    updateCacheStyles();
 
     latLabel.setFixedWidth(90);
-    lonLabel.setFixedWidth(90);
+    lonLabel.setFixedWidth(100);
+    showLatLonAsToolTip.setText("Show as &tooltip");
 
     ui.toolBar->insertSeparator(0);
     ui.toolBar->insertWidget(0, &latLabel);
     ui.toolBar->insertWidget(0, &lonLabel);
+    ui.toolBar->insertWidget(0, &showLatLonAsToolTip);
+
+    connect(&showLatLonAsToolTip, SIGNAL(clicked(bool)), ui.mapView, SLOT(showLatLonAsToolTip(bool)));
 
     connect(ui.zoomInAction,SIGNAL(triggered()),ui.mapView,SLOT(zoomIn()));
     connect(ui.zoomOutAction,SIGNAL(triggered()),ui.mapView,SLOT(zoomOut()));
@@ -61,21 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui.zoomOutAction->setShortcut(QKeySequence::ZoomOut);
 
     QSettings settings;
-
-    QString tileStyle = settings.value(SettingsKeys::MapType, MapTypes::GoogleMap).toString();
-    //settings.setValue(SettingsKeys::MapType, tileStyle);
-    if (tileStyle == TILE_STYLE_SAT)
-    {
-        satOption.setChecked(true);
-    }
-    else if (tileStyle == TILE_STYLE_HYB)
-    {
-        hybOption.setChecked(true);
-    }
-    else //if (tileStyle == TILE_STYLE_MAP)
-    {
-        mapOption.setChecked(true);
-    }
+    showLatLonAsToolTip.setChecked(settings.value(SettingsKeys::ShowLatLonAsToolTip, false).toBool());
 
     ui.zoomInAction->setEnabled(ui.mapView->canZoomIn());
     ui.zoomOutAction->setEnabled(ui.mapView->canZoomOut());
@@ -85,13 +70,42 @@ MainWindow::MainWindow(QWidget *parent)
     QSize size = settings.value(SettingsKeys::WindowSize, QSize(400, 400)).toSize();
     resize(size);
     move(pos);
-    QString windowStatus = settings.value(SettingsKeys::WindowStatus, WindowStates::Normal).toString();
-    if (windowStatus == WindowStates::Minimized)
-        showMinimized();
-    else if (windowStatus == WindowStates::Maximized)
+    if (settings.value(SettingsKeys::WindowIsMaximized, false).toBool())
         showMaximized();
     else
         showNormal();
+}
+
+void MainWindow::updateCacheStyles()
+{
+    QSettings settings;
+    QString cachePath = settings.value(SettingsKeys::CachePath, "").toString();
+    QDir cacheDir(cachePath);
+    QStringList cacheDirPattern("*_*");
+    QFileInfoList list = cacheDir.entryInfoList(cacheDirPattern, QDir::Dirs | QDir::NoDotAndDotDot);
+    QStringList styles;
+    foreach(QFileInfo fileInfo, list)
+    {
+        QString style = fileInfo.fileName().section("_", 0, 0);
+        if (!styles.contains(style))
+        {
+            styles.append(style);
+        }
+    }
+    QString tileStyle = settings.value(SettingsKeys::MapType, "").toString();
+    if (tileStyle == "" && styles.length() != 0)
+    {
+        tileStyle = styles[0];
+    }
+    cacheStyles.clear();
+    foreach(QString style, styles)
+    {
+        cacheStyles.addItem(style);
+        if (style == tileStyle)
+        {
+            cacheStyles.setCurrentIndex(cacheStyles.count()-1);
+        }
+    }
 }
 
 void MainWindow::openCacheDirectory()
@@ -103,6 +117,7 @@ void MainWindow::openCacheDirectory()
     if (path.compare("") != 0)
     {
         settings.setValue(SettingsKeys::CachePath,path);
+        updateCacheStyles();
     }
 }
 
@@ -117,13 +132,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QSettings settings;
     settings.setValue(SettingsKeys::WindowPosition, pos());
     settings.setValue(SettingsKeys::WindowSize, size());
-    QString windowStatus;
-    if (isMinimized())
-        windowStatus = WindowStates::Minimized;
-    else if (isMaximized())
-        windowStatus = WindowStates::Maximized;
-    else
-        windowStatus = WindowStates::Normal;
-    settings.setValue(SettingsKeys::WindowStatus, windowStatus);
+    settings.setValue(SettingsKeys::WindowIsMaximized, isMaximized());
     event->accept();
 }

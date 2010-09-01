@@ -12,27 +12,14 @@ namespace SettingsKeys
     const QString WheelOption = "Wheel";
     const QString WindowPosition = "WindowPosition";
     const QString WindowSize = "WindowSize";
-    const QString WindowStatus = "WindowStatus";
-}
-
-namespace MapTypes
-{
-    const QString GoogleMap = "GoogleMap";
-    const QString GoogleSat = "GoogleSat";
-    const QString GoogleHyb = "GoogleHyb";
+    const QString WindowIsMaximized = "WindowIsMaximized";
+    const QString ShowLatLonAsToolTip = "ShowLatLonAsToolTip";
 }
 
 namespace WheelOptions
 {
     const QString ZoomsWithNoKeyPressed = "ZoomsWithNoKeyPressed";
     const QString ZoomsWithCtrlKeyPressed = "ZoomsWithCtrlKeyPressed";
-}
-
-namespace WindowStates
-{
-    const QString Minimized = "Minimized";
-    const QString Maximized = "Maximized";
-    const QString Normal = "Normal";
 }
 
 #endif // CONSTANTS_H
