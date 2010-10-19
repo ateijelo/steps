@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
+    updateRecents();
 
     preferences = new Preferences(this);
 
@@ -25,25 +26,24 @@ MainWindow::MainWindow(QWidget *parent)
     ui.toolBar->insertWidget(ui.zoomInAction, &zoomSlider);
     connect(&zoomSlider, SIGNAL(valueChanged(int)), ui.mapView, SLOT(setZoomLevel(int)));
 
-    mapOption.setText("&Maps");
-    satOption.setText("&Satellite");
-    hybOption.setText("&Hybrid");
+    cacheStyles.setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
     ui.toolBar->insertSeparator(0);
-    ui.toolBar->insertWidget(0, &mapOption);
-    ui.toolBar->insertWidget(0, &satOption);
-    ui.toolBar->insertWidget(0, &hybOption);
+    ui.toolBar->insertWidget(0, &cacheStyles);
 
-    connect(&mapOption, SIGNAL(clicked()), ui.mapView, SLOT(setMapType2GoogleMap()));
-    connect(&satOption, SIGNAL(clicked()), ui.mapView, SLOT(setMapType2GoogleSat()));
-    connect(&hybOption, SIGNAL(clicked()), ui.mapView, SLOT(setMapType2GoogleHyb()));
+    connect(&cacheStyles, SIGNAL(currentIndexChanged(QString)), ui.mapView, SLOT(setCacheStyle(QString)));
+    updateCacheStyles();
 
     latLabel.setFixedWidth(90);
-    lonLabel.setFixedWidth(90);
+    lonLabel.setFixedWidth(100);
+    showLatLonAsToolTip.setText("Show as &tooltip");
 
     ui.toolBar->insertSeparator(0);
     ui.toolBar->insertWidget(0, &latLabel);
     ui.toolBar->insertWidget(0, &lonLabel);
+    ui.toolBar->insertWidget(0, &showLatLonAsToolTip);
+
+    connect(&showLatLonAsToolTip, SIGNAL(clicked(bool)), ui.mapView, SLOT(showLatLonAsToolTip(bool)));
 
     connect(ui.zoomInAction,SIGNAL(triggered()),ui.mapView,SLOT(zoomIn()));
     connect(ui.zoomOutAction,SIGNAL(triggered()),ui.mapView,SLOT(zoomOut()));
@@ -60,25 +60,145 @@ MainWindow::MainWindow(QWidget *parent)
     ui.zoomOutAction->setShortcut(QKeySequence::ZoomOut);
 
     QSettings settings;
-
-    QString tileStyle = settings.value(SettingsKeys::MapType, MapTypes::GoogleMap).toString();
-    //settings.setValue(SettingsKeys::MapType, tileStyle);
-    if (tileStyle == TILE_STYLE_SAT)
-    {
-        satOption.setChecked(true);
-    }
-    else if (tileStyle == TILE_STYLE_HYB)
-    {
-        hybOption.setChecked(true);
-    }
-    else //if (tileStyle == TILE_STYLE_MAP)
-    {
-        mapOption.setChecked(true);
-    }
+    showLatLonAsToolTip.setChecked(settings.value(SettingsKeys::ShowLatLonAsToolTip, false).toBool());
 
     ui.zoomInAction->setEnabled(ui.mapView->canZoomIn());
     ui.zoomOutAction->setEnabled(ui.mapView->canZoomOut());
     zoomSlider.setValue(ui.mapView->zoomLevel());
+
+    QPoint pos = settings.value(SettingsKeys::WindowPosition, QPoint(100, 100)).toPoint();
+    QSize size = settings.value(SettingsKeys::WindowSize, QSize(400, 400)).toSize();
+    resize(size);
+    move(pos);
+    if (settings.value(SettingsKeys::WindowIsMaximized, false).toBool())
+        showMaximized();
+    else
+        showNormal();
+
+    connect(&recentsMapper, SIGNAL(mapped(QString)), this, SLOT(updateCacheDirectory(QString)));
+}
+
+void MainWindow::updateRecents(QString top)
+{
+    QSettings settings;
+
+    QStringList recents;
+    int amount = settings.beginReadArray(SettingsKeys::RecentPaths);
+    for (int i = 0; i < amount; i++)
+    {
+        settings.setArrayIndex(i);
+        recents.append(settings.value(SettingsKeys::path).toString());
+    }
+    settings.endArray();
+
+    if (top.isNull())
+    {
+        top = settings.value(SettingsKeys::CachePath, "").toString();
+
+        if (recents.isEmpty())
+        {
+            if (!top.isEmpty())
+            {
+                recents.append(top);
+            }
+        }
+        else
+        {
+            if (top.isEmpty())
+            {
+                top = recents[0];
+            }
+        }
+    }
+    else
+    {
+        if (recents.isEmpty())
+        {
+            recents.append(top);
+        }
+    }
+
+    if (!recentPaths.isEmpty())
+    {
+        foreach(QAction *action, recentPaths)
+        {
+            this->ui.menu_File->removeAction(action);
+            recentsMapper.removeMappings(action);
+        }
+        recentPaths.clear();
+    }
+
+    if (!recents.isEmpty())
+    {
+        recents.insert(0, top);
+        int index = recents.indexOf(top, 1);
+        if (index != -1)
+        {
+            recents.removeAt(index);
+        }
+
+        QAction *action;
+        for (int i = 0; i < recents.length(); i++)
+        {
+            action = new QAction(QString("&%1 %2").arg(i+1).arg(recents[i]), this->ui.menu_File);
+            recentsMapper.setMapping(action, recents[i]);
+            connect(action, SIGNAL(triggered()), &recentsMapper, SLOT(map()));
+            this->ui.menu_File->insertAction(this->ui.action_Exit, action);
+            recentPaths.append(action);
+        }
+
+        action = this->ui.menu_File->insertSeparator(this->ui.action_Exit);
+        recentPaths.append(action);
+    }
+
+    settings.beginWriteArray(SettingsKeys::RecentPaths);
+    for (int i = 0; i < recents.length(); i++)
+    {
+        settings.setArrayIndex(i);
+        settings.setValue(SettingsKeys::path, recents[i]);
+    }
+    settings.endArray();
+}
+
+void MainWindow::updateCacheStyles()
+{
+    QSettings settings;
+    QString cachePath = settings.value(SettingsKeys::CachePath, "").toString();
+    QDir cacheDir(cachePath);
+    QStringList cacheDirPattern("*_*");
+    QFileInfoList list = cacheDir.entryInfoList(cacheDirPattern, QDir::Dirs | QDir::NoDotAndDotDot);
+    QStringList styles;
+    foreach(QFileInfo fileInfo, list)
+    {
+        QString style = fileInfo.fileName().section("_", 0, 0);
+        if (!styles.contains(style))
+        {
+            styles.append(style);
+        }
+    }
+    QString tileStyle = settings.value(SettingsKeys::MapType, "").toString();
+    if (tileStyle == "" && styles.length() != 0)
+    {
+        tileStyle = styles[0];
+    }
+    cacheStyles.clear();
+    foreach(QString style, styles)
+    {
+        cacheStyles.addItem(style);
+        if (style == tileStyle)
+        {
+            cacheStyles.setCurrentIndex(cacheStyles.count()-1);
+        }
+    }
+}
+
+void MainWindow::updateCacheDirectory(QString path)
+{
+    QSettings settings;
+
+    settings.setValue(SettingsKeys::CachePath,path);
+    updateCacheStyles();
+    updateRecents(path);
 }
 
 void MainWindow::openCacheDirectory()
@@ -89,7 +209,7 @@ void MainWindow::openCacheDirectory()
                                                      settings.value(SettingsKeys::CachePath,"").toString());
     if (path.compare("") != 0)
     {
-        settings.setValue(SettingsKeys::CachePath,path);
+        updateCacheDirectory(path);
     }
 }
 
@@ -97,4 +217,13 @@ void MainWindow::updateLatLonLabels(const QPointF& latLon)
 {
     latLabel.setText(QString("Lat: %1").arg(latLon.y()));
     lonLabel.setText(QString("Lon: %1").arg(latLon.x()));
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    QSettings settings;
+    settings.setValue(SettingsKeys::WindowPosition, pos());
+    settings.setValue(SettingsKeys::WindowSize, size());
+    settings.setValue(SettingsKeys::WindowIsMaximized, isMaximized());
+    event->accept();
 }

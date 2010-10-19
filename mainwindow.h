@@ -3,8 +3,11 @@
 
 #include <QMainWindow>
 #include <QRadioButton>
+#include <QCheckBox>
 #include <QLabel>
 #include <QSlider>
+#include <QComboBox>
+#include <QSignalMapper>
 
 #include "ui_mainwindow.h"
 #include "preferences.h"
@@ -15,21 +18,28 @@ class MainWindow : public QMainWindow
     public:
         MainWindow(QWidget *parent = NULL);
 
-    private slots:
-        void updateLatLonLabels(const QPointF& latLon);
+    protected:
+        void closeEvent(QCloseEvent *event);
 
     private:
         Ui::MainWindow ui;
+        QList<QAction*> recentPaths;
+        QSignalMapper recentsMapper;
         QSlider zoomSlider;
-        QRadioButton mapOption;
-        QRadioButton satOption;
-        QRadioButton hybOption;
+        QCheckBox showLatLonAsToolTip;
         QLabel latLabel;
         QLabel lonLabel;
+        QComboBox cacheStyles;
         Preferences *preferences;
 
     private slots:
         void openCacheDirectory();
+        void updateCacheDirectory(QString path);
+        void updateLatLonLabels(const QPointF& latLon);
+
+    private:
+        void updateCacheStyles();
+        void updateRecents(QString top=0);
 };
 
 #endif
