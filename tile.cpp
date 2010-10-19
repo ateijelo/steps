@@ -35,8 +35,8 @@ Tile::Tile(int x, int y, int zoom)
     }
 
     setPixmap(result);
-    setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
     //qDebug() << "Created Tile:" << x << y << zoom;
+    //setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
     setCacheMode(QGraphicsItem::ItemCoordinateCache);
 }
 
