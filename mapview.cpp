@@ -5,6 +5,8 @@
 #include <QClipboard>
 #include <QSettings>
 #include <QToolTip>
+#include <QHBoxLayout>
+#include <QSlider>
 
 #include "mapview.h"
 #include "constants.h"
@@ -34,6 +36,11 @@ MapView::MapView(QWidget *parent)
     centerOn(gt.LatLon2Meters(QPointF(lon,lat)));
 
     showToolTip = settings.value(SettingsKeys::ShowLatLonAsToolTip, false).toBool();
+    //QWidget *uiLayer = new QWidget(this);
+    //uiLayer->setGeometry(10,10,50,50);
+    QHBoxLayout *l = new QHBoxLayout();
+    l->addWidget(new QSlider());
+    this->setLayout(l);
 }
 
 bool MapView::canZoomIn()
