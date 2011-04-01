@@ -17,7 +17,8 @@ HEADERS += mainwindow.h \
     constants.h \
     preferences.h
 FORMS += mainwindow.ui \
-    preferences.ui
+    preferences.ui \
+    viewwidgets.ui
 SOURCES += main.cpp \
     mainwindow.cpp \
     mapview.cpp \
