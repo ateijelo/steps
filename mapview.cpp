@@ -239,7 +239,7 @@ void MapView::setZoomLevel(int zoom)
 
     tlayer.clear();
 
-    double res = gt.resolution(zoom);
+    double res = gt.resolution(zoom)*2;
     resetTransform();
     scale(1/res,1/res);
     rotate(angle);

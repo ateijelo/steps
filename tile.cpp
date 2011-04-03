@@ -1,12 +1,6 @@
-#include <QtDebug>
-#include <QtEndian>
 #include <QGraphicsRectItem>
-#include <QFile>
-#include <QPainter>
-#include <QSettings>
 
 #include "tile.h"
-#include "constants.h"
 
 Tile::Tile(int x, int y, int zoom)
         : x(x), y(y), zoom(zoom)
