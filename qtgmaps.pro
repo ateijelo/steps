@@ -5,6 +5,7 @@ TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
 INCLUDEPATH += .
+QT += network
 
 # Input
 HEADERS += mainwindow.h \
@@ -16,7 +17,8 @@ HEADERS += mainwindow.h \
     mainscene.h \
     constants.h \
     preferences.h \
-    tilefetcher.h
+    tilefetcher.h \
+    fetchtask.h
 FORMS += mainwindow.ui \
     preferences.ui
 SOURCES += main.cpp \
@@ -28,5 +30,6 @@ SOURCES += main.cpp \
     tilelayer.cpp \
     mainscene.cpp \
     preferences.cpp \
-    tilefetcher.cpp
+    tilefetcher.cpp \
+    fetchtask.cpp
 RESOURCES += qtgmaps.qrc

@@ -3,9 +3,11 @@
 
 #include <QObject>
 #include <QRect>
+#include <QByteArray>
 #include <QLinkedList>
 
 #include "tile.h"
+#include "tilefetcher.h"
 
 class TileLayer : public QObject
 {
@@ -23,6 +25,9 @@ class TileLayer : public QObject
     signals:
         void tileCreated(Tile *t,int x, int y, int zoom);
 
+    private slots:
+        void tileDataReady(const QByteArray& bytes);
+
     private:
         ColumnPointer adjustBeforeIntersection(const QRect& n, int zoom);
         void adjustColumn(Column* col, const QRect& n, int x, int zoom);
@@ -32,6 +37,7 @@ class TileLayer : public QObject
 
         QLinkedList<Column*> columns;
         QRect region;
+        TileFetcher fetcher;
 };
 
 #endif // TILEMANAGER_H

@@ -11,6 +11,12 @@ TileLayer::TileLayer()
 //    Column *c = new Column();
 //    c->append(newTile(0,0,0));
 //    columns.append(c);
+    connect(&fetcher,SIGNAL(tileDataReady(QByteArray)),this,SLOT(tileDataReady(QByteArray)));
+    fetcher.fetchTile("googlemaps",0,0,0);
+}
+
+void TileLayer::tileDataReady(const QByteArray &bytes)
+{
 }
 
 Tile* TileLayer::newTile(int x, int y, int zoom)
