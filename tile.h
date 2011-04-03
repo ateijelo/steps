@@ -13,8 +13,6 @@ class Tile : public QGraphicsPixmapItem
         Tile(int x, int y, int zoom);
         ~Tile();
     private:
-        QString getTileFileName(QString tileStyle, int x, int y, int zoom);
-        QPixmap loadTile(QString tileStyle, int x, int y, int zoom);
 
     private:
         int x,y,zoom;

@@ -10,7 +10,6 @@
 
 #include "ui_mainwindow.h"
 #include "geotools.h"
-#include "tilemanager.h"
 #include "tile.h"
 #include "preferences.h"
 

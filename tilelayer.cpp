@@ -1,8 +1,8 @@
 #include <QtDebug>
 
-#include "tilemanager.h"
+#include "tilelayer.h"
 
-TileManager::TileManager()
+TileLayer::TileLayer()
 {
     // This class considers the boundaries
     // of the rectangle to be inclusive.
@@ -13,14 +13,14 @@ TileManager::TileManager()
 //    columns.append(c);
 }
 
-Tile* TileManager::newTile(int x, int y, int zoom)
+Tile* TileLayer::newTile(int x, int y, int zoom)
 {
     Tile *t = new Tile(x,y,zoom);
     emit tileCreated(t,x,y,zoom);
     return t;
 }
 
-void TileManager::deleteColumn(Column *c)
+void TileLayer::deleteColumn(Column *c)
 {
     TilePointer p = c->begin();
     while (p!=c->end())
@@ -31,7 +31,7 @@ void TileManager::deleteColumn(Column *c)
     delete c;
 }
 
-TileManager::ColumnPointer TileManager::adjustBeforeIntersection(const QRect& n, int zoom)
+TileLayer::ColumnPointer TileLayer::adjustBeforeIntersection(const QRect& n, int zoom)
 {
     QRect& o = region; // n => new, o => old
 
@@ -57,7 +57,7 @@ TileManager::ColumnPointer TileManager::adjustBeforeIntersection(const QRect& n,
     return p;
 }
 
-void TileManager::adjustColumn(Column* col, const QRect& n, int x, int zoom)
+void TileLayer::adjustColumn(Column* col, const QRect& n, int x, int zoom)
 {
     QRect& o = region; // n => new, o => old
     TilePointer p;
@@ -89,7 +89,7 @@ void TileManager::adjustColumn(Column* col, const QRect& n, int x, int zoom)
     }
 }
 
-void TileManager::adjustAfterIntersection(const QRect& n, int zoom)
+void TileLayer::adjustAfterIntersection(const QRect& n, int zoom)
 {
     QRect& o = region; // n => new, o => old
     for (int i=qMax(o.left(),n.right()+1); i<=o.right(); i++)
@@ -108,7 +108,7 @@ void TileManager::adjustAfterIntersection(const QRect& n, int zoom)
     }
 }
 
-void TileManager::setRegion(const QRect& n, int zoom)
+void TileLayer::setRegion(const QRect& n, int zoom)
 {
     //qDebug() << "setRegion: " << n;
     QRect& o = region; // n => new, o => old
@@ -131,7 +131,7 @@ void TileManager::setRegion(const QRect& n, int zoom)
     region = n;
 }
 
-void TileManager::clear()
+void TileLayer::clear()
 {
     setRegion(QRect(0,0,0,0),0);
 }

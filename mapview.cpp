@@ -18,7 +18,7 @@ MapView::MapView(QWidget *parent)
     setSceneRect(QRectF(gt.Pixels2Meters(QPointF(0,0),0),
                         gt.Pixels2Meters(QPointF(256,256),0)));
 
-    connect(&tm,SIGNAL(tileCreated(Tile*,int,int,int)),this,SLOT(displayNewTile(Tile*,int,int,int)));
+    connect(&tlayer,SIGNAL(tileCreated(Tile*,int,int,int)),this,SLOT(displayNewTile(Tile*,int,int,int)));
     connect(scene,SIGNAL(mouseMoved(QPointF)),this,SLOT(mouseMovedOverScene(QPointF)));
 
     QSettings settings;
@@ -77,7 +77,7 @@ void MapView::updateTiles()
     QRectF drawArea = mapToScene(viewport()->rect().adjusted(-20,-20,20,20)).boundingRect();
     QPoint tl = gt.Meters2GoogleTile(drawArea.topLeft(),zoom);
     QPoint br = gt.Meters2GoogleTile(drawArea.bottomRight(),zoom);
-    tm.setRegion(QRect(tl,br),zoom);
+    tlayer.setRegion(QRect(tl,br),zoom);
 }
 
 void MapView::mouseMoveEvent(QMouseEvent *event)
@@ -197,7 +197,7 @@ void MapView::setCacheStyle(QString cacheStyle)
 {
     QSettings settings;
     settings.setValue(SettingsKeys::MapType, cacheStyle);
-    tm.clear();
+    tlayer.clear();
     updateTiles();
 }
 
@@ -237,7 +237,7 @@ void MapView::setZoomLevel(int zoom)
     settings.setValue(SettingsKeys::ZoomLevel, zoom);
     emit zoomChanged(zoom);
 
-    tm.clear();
+    tlayer.clear();
 
     double res = gt.resolution(zoom);
     resetTransform();

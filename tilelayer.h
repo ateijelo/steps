@@ -7,7 +7,7 @@
 
 #include "tile.h"
 
-class TileManager : public QObject
+class TileLayer : public QObject
 {
     Q_OBJECT
 
@@ -16,7 +16,7 @@ class TileManager : public QObject
     typedef QLinkedList<Column*>::iterator ColumnPointer;
 
     public:
-        TileManager();
+        TileLayer();
         void setRegion(const QRect& r, int zoom);
         void clear();
 
