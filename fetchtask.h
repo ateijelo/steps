@@ -1,7 +1,6 @@
 #ifndef FETCHTASK_H
 #define FETCHTASK_H
 
-#include <QPixmap>
 #include <QObject>
 #include <QString>
 #include <QEvent>
@@ -12,16 +11,18 @@ class FetchTask : public QObject
     public:
         explicit FetchTask(const QString& tile_type, int x, int y, int zoom,
                            QObject *parent = 0);
+        ~FetchTask();
         void customEvent(QEvent *);
         void start();
 
     signals:
+        void tileData(const QString& type, int x, int y, int zoom,
+                      const QByteArray data);
 
     public slots:
 
     private:
         void work();
-        QPixmap loadTile(QString mapType, int x, int y, int zoom);
         QString getTileFileName(QString mapType, int x, int y, int zoom);
 
         enum TaskState { Start };

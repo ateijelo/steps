@@ -1,8 +1,10 @@
 #ifndef TILEMANAGER_H
 #define TILEMANAGER_H
 
-#include <QObject>
+#include <QHash>
 #include <QRect>
+#include <QObject>
+#include <QPoint>
 #include <QByteArray>
 #include <QLinkedList>
 
@@ -26,18 +28,26 @@ class TileLayer : public QObject
         void tileCreated(Tile *t,int x, int y, int zoom);
 
     private slots:
-        void tileDataReady(const QByteArray& bytes);
+        void tileData(const QString& type, int x, int y, int z,
+                           const QByteArray& bytes);
 
     private:
-        ColumnPointer adjustBeforeIntersection(const QRect& n, int zoom);
-        void adjustColumn(Column* col, const QRect& n, int x, int zoom);
-        void adjustAfterIntersection(const QRect& n, int zoom);
+        ColumnPointer adjustBeforeIntersection(const QRect& n);
+        void adjustColumn(Column* col, const QRect& n, int x);
+        void adjustAfterIntersection(const QRect& n);
         void deleteColumn(Column* col);
-        Tile* newTile(int x, int y, int zoom);
+        Tile* newTile(int x, int y);
+        void deleteTile(Tile *t);
+        QString tileKey(QString type, int x, int y, int z);
 
-        QLinkedList<Column*> columns;
+        int zoom;
+        QString type;
+        QString tileKeyTemplate;
         QRect region;
         TileFetcher fetcher;
+        QLinkedList<Column*> columns;
+        QHash<TileCoords,Tile*> tiles; // TileCoords is defined in tile.h
+
 };
 
 #endif // TILEMANAGER_H

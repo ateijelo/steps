@@ -3,15 +3,16 @@
 
 #include <QGraphicsPixmapItem>
 
-#define TILE_STYLE_MAP "GoogleMap"
-#define TILE_STYLE_SAT "GoogleSat"
-#define TILE_STYLE_HYB "GoogleHyb"
+typedef QPair<int,int> TileCoords;
 
 class Tile : public QGraphicsPixmapItem
 {
+
     public:
         Tile(int x, int y, int zoom);
         ~Tile();
+        TileCoords coords();
+
     private:
 
     private:

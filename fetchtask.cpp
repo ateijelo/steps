@@ -1,3 +1,5 @@
+#define QT_NO_DEBUG_OUTPUT
+
 #include <QtDebug>
 #include <QtEndian>
 #include <QApplication>
@@ -18,6 +20,11 @@ FetchTask::FetchTask(const QString &tile_type, int x, int y, int zoom,
     this->tile_zoom = zoom;
 
     startEvent = QEvent::Type(QEvent::registerEventType());
+}
+
+FetchTask::~FetchTask()
+{
+    qDebug() << this << "destroyed.";
 }
 
 void FetchTask::customEvent(QEvent *event)
@@ -48,14 +55,12 @@ void FetchTask::work()
     // QGraphicsPixmapItem that each tile is.
     // For Google Hybrid two different fetch tasks should be spawned and
     // their result composited somewhere else.
-    QPixmap p = loadTile(tile_type,tile_x,tile_y,tile_zoom);
-}
 
-QPixmap FetchTask::loadTile(QString tile_type, int x, int y, int zoom)
-{
-    int in_x = x & 7;
-    int in_y = y & 7;
-    QFile mgm(getTileFileName(tile_type, x, y, zoom));
+    int in_x = tile_x & 7;
+    int in_y = tile_y & 7;
+    QString filename = getTileFileName(tile_type,tile_x,tile_y,tile_zoom);
+    qDebug() << this << "started. Fetching from" << filename;
+    QFile mgm(filename);
     if (mgm.open(QIODevice::ReadOnly))
     {
         quint64 r = 0;
@@ -66,23 +71,23 @@ QPixmap FetchTask::loadTile(QString tile_type, int x, int y, int zoom)
         if (r != 2)
         {
             qDebug() << "error reading no_tiles";
-            return 0;
+            return;
         }
         no_tiles = qFromBigEndian(no_tiles);
         bool found = false;
         for (int i=0; i<no_tiles; i++)
         {
-            quint8 tile_x,tile_y;
-            r = mgm.read((char*)(&tile_x),1);
-            r += mgm.read((char*)(&tile_y),1);
+            quint8 tx,ty;
+            r = mgm.read((char*)(&tx),1);
+            r += mgm.read((char*)(&ty),1);
             r += mgm.read((char*)(&tile_end),4);
             if (r != 6)
             {
                 qDebug() << "error reading tile entry " << i;
-                return 0;
+                return;
             }
             tile_end = qFromBigEndian(tile_end);
-            if (tile_x == in_x && tile_y == in_y)
+            if (tx == in_x && ty == in_y)
             {
                 found = true;
                 break;
@@ -97,23 +102,21 @@ QPixmap FetchTask::loadTile(QString tile_type, int x, int y, int zoom)
             r = mgm.read(data,tile_size);
             if (r != tile_size)
             {
-                qDebug() << "error reading tile " << x << "," << y << "data";
+                qDebug() << "error reading tile " << tile_x << "," << tile_y << "data";
             }
             else
             {
-                QPixmap p;
-                p.loadFromData((uchar*)data,(uint)tile_size,0);
-                delete data;
-
-                return p;
+                QByteArray ba(data,tile_size);
+                emit tileData(tile_type,tile_x,tile_y,tile_zoom,ba);
             }
+            delete[] data;
         }
     }
     else
     {
         //qDebug() << "error opening " << filename << " for reading";
     }
-    return 0;
+    deleteLater();
 }
 
 QString FetchTask::getTileFileName(QString tileStyle, int x, int y, int zoom)

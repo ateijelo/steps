@@ -15,9 +15,14 @@ class TileFetcher : public QObject
         void fetchTile(const QString& maptype, int x, int y, int zoom);
 
     signals:
-        void tileDataReady(const QByteArray&);
+        void tileData(const QString& type, int x, int y, int z,
+                           const QByteArray& data);
 
     public slots:
+
+    private slots:
+        void tileFetched(const QString& type, int x, int y, int z,
+                         const QByteArray& data);
 
     private:
         QThread *fetchThread;

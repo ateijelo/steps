@@ -234,12 +234,12 @@ void MapView::setZoomLevel(int zoom)
     emit canZoomIn(zi);
     this->zoom = zoom;
     QSettings settings;
-    settings.setValue(SettingsKeys::ZoomLevel, zoom);
     emit zoomChanged(zoom);
+    settings.setValue(SettingsKeys::ZoomLevel, zoom);
 
     tlayer.clear();
 
-    double res = gt.resolution(zoom)*2;
+    double res = gt.resolution(zoom);
     resetTransform();
     scale(1/res,1/res);
     rotate(angle);
