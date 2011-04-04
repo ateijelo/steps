@@ -1,4 +1,4 @@
-#define QT_NO_DEBUG_OUTPUT
+//#define QT_NO_DEBUG_OUTPUT
 #include <QtDebug>
 #include <QSettings>
 #include <QPixmapCache>
@@ -18,6 +18,7 @@ TileLayer::TileLayer()
     connect(&fetcher,SIGNAL(tileData(QString,int,int,int,QByteArray)),
             this,SLOT(tileData(QString,int,int,int,QByteArray)));
     tileKeyTemplate = "%1:%2:%3:%4";
+    QPixmapCache::setCacheLimit(50*1024);
 }
 
 void TileLayer::tileData(const QString &type, int x, int y, int z,
@@ -58,11 +59,16 @@ Tile* TileLayer::newTile(int x, int y)
         int ry = y % (1 << (zoom - z));
         if (!QPixmapCache::find(tileKey(type,qx,qy,z),&p))
         {
+            qDebug() << "newTile: cache miss:"
+                    << " x =" << x
+                    << " y =" << y
+                    << " z =" << z
+                    << " zoom =" << zoom;
             fetcher.fetchTile(type,qx,qy,z);
         }
         else
         {
-            qDebug() << "newTile: pixmap found in cache."
+            qDebug() << "newTile: cache hit:"
                     << " x =" << x
                     << " y =" << y
                     << " z =" << z
