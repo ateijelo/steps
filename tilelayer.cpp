@@ -177,13 +177,14 @@ void TileLayer::adjustAfterIntersection(const QRect& n)
     }
 }
 
-void TileLayer::setRegion(const QRect& n, int zoom)
+void TileLayer::setRegion(const QRect& m, int zoom)
 {
     this->zoom = zoom;
     QSettings settings;
     type = settings.value(SettingsKeys::MapType, "").toString();
 
     //qDebug() << "setRegion: " << n;
+    QRect n = m.intersected(QRect(0,0,(1 << zoom),(1 << zoom)));
     QRect& o = region; // n => new, o => old
 
     ColumnPointer p = adjustBeforeIntersection(n);
