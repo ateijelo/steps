@@ -12,11 +12,7 @@ class Tile : public QGraphicsPixmapItem
         Tile(int x, int y, int zoom);
         ~Tile();
         TileCoords coords();
-
-    private:
-
-    private:
-        int x,y,zoom;
+        int x,y,zoom,current_zoom;
 };
 
 #endif // TILE_H

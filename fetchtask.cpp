@@ -56,10 +56,11 @@ void FetchTask::work()
     // For Google Hybrid two different fetch tasks should be spawned and
     // their result composited somewhere else.
 
+    //sleep(1);
     int in_x = tile_x & 7;
     int in_y = tile_y & 7;
     QString filename = getTileFileName(tile_type,tile_x,tile_y,tile_zoom);
-    qDebug() << this << "started. Fetching from" << filename;
+    //qDebug() << this << "started. Fetching from" << filename;
     QFile mgm(filename);
     if (mgm.open(QIODevice::ReadOnly))
     {

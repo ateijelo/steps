@@ -1,4 +1,4 @@
-//#define QT_NO_DEBUG_OUTPUT
+#define QT_NO_DEBUG_OUTPUT
 #include <QtDebug>
 #include <QSettings>
 #include <QPixmapCache>
@@ -24,18 +24,53 @@ TileLayer::TileLayer()
 void TileLayer::tileData(const QString &type, int x, int y, int z,
                               const QByteArray &bytes)
 {
+    qDebug() << "tileData: type =" << type << " x =" << x
+            << " y =" << y << " z =" << z << " zoom =" << zoom;
     QPixmap p;
     p.loadFromData(bytes);
     QPixmapCache::insert(tileKey(type,x,y,z),p);
-    if (z != zoom)
+    if (this->type != type)
+        return;
+    if (z > zoom)
+        return;
+    // The tile we've received, which range of tiles does it represent
+    // in our current level?
+    //QRectF c()
+    if (z < zoom)
     {
-        // this is the place for some pyramid optimization
+        foreach (Tile *t, tiles)
+        {
+            qDebug() << "  t.x =" << t->x
+                     << " t.y =" << t->y
+                     << " t.x >> (zoom - z) =" << (t->x >> (zoom - z))
+                     << " t.y >> (zoom - z) =" << (t->y >> (zoom - z))
+                     << " t.cz =" << t->current_zoom;
+            if (z > t->current_zoom &&
+                t->current_zoom < zoom &&
+                x == (t->x >> (zoom - z)) &&
+                y == (t->y >> (zoom - z)))
+            {
+                qDebug() << "    Using it for tile: t.x =" << t->x
+                        << "t.y =" << t->y
+                        << "t.cz =" << t->current_zoom;
+                int w = 256 >> (zoom - z);
+                if (w == 0) w = 1;
+                int rx = t->x % (1 << (zoom - z));
+                int ry = t->y % (1 << (zoom - z));
+
+                t->setPixmap(p.copy(rx*w,ry*w,w,w).scaled(256,256));
+                t->current_zoom = z;
+                t->update();
+            }
+        }
         return;
     }
     if (tiles.contains(TileCoords(x,y)))
     {
         Tile *t = tiles.value(TileCoords(x,y));
         t->setPixmap(p);
+        t->current_zoom = z;
+        t->update();
     }
 }
 
@@ -60,8 +95,9 @@ Tile* TileLayer::newTile(int x, int y)
         if (!QPixmapCache::find(tileKey(type,qx,qy,z),&p))
         {
             qDebug() << "newTile: cache miss:"
-                    << " x =" << x
-                    << " y =" << y
+                    << " type =" << type
+                    << " qx =" << qx
+                    << " qy =" << qy
                     << " z =" << z
                     << " zoom =" << zoom;
             fetcher.fetchTile(type,qx,qy,z);
@@ -69,13 +105,15 @@ Tile* TileLayer::newTile(int x, int y)
         else
         {
             qDebug() << "newTile: cache hit:"
-                    << " x =" << x
-                    << " y =" << y
+                    << " type =" << type
+                    << " qx =" << qx
+                    << " qy =" << qy
                     << " z =" << z
                     << " zoom =" << zoom;
             int w = 256 >> (zoom - z);
             if (w == 0) w = 1;
             t->setPixmap(p.copy(rx*w,ry*w,w,w).scaled(256,256));
+            t->current_zoom = z;
             break;
         }
     }

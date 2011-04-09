@@ -102,7 +102,7 @@ void MapView::mouseDoubleClickEvent(QMouseEvent *event)
         zoomIn();
     if (event->button() == Qt::RightButton)
         zoomOut();
-    centerOn(sceneAnchor);
+    //centerOn(sceneAnchor);
 }
 
 void MapView::wheelEvent(QWheelEvent *event)
