@@ -57,16 +57,18 @@ void FetchTask::work()
     // For Google Hybrid two different fetch tasks should be spawned and
     // their result composited somewhere else.
 
-    //sleep(1);
-    int in_x = tile_x & 7;
-    int in_y = tile_y & 7;
+    sleep(1);
+    //int in_x = tile_x & 7;
+    //int in_y = tile_y & 7;
     QString filename = getTileFileName(tile_type,tile_x,tile_y,tile_zoom);
     qDebug() << this << "started. Fetching" << tile_x << tile_y << "from" << filename;
     QFile mgm(filename);
     if (mgm.open(QIODevice::ReadOnly))
     {
+        int tiles_per_mgm = 64;
+        mgm_tile_desc tiles[tiles_per_mgm];
         quint64 r = 0;
-        quint32 tile_start = 64*6 + 2;
+        quint32 tile_start = tiles_per_mgm*6 + 2;
         quint32 tile_end;
         quint16 no_tiles;
         r += mgm.read((char*)(&no_tiles),2);
@@ -76,41 +78,30 @@ void FetchTask::work()
             return;
         }
         no_tiles = qFromBigEndian(no_tiles);
-        bool found = false;
+        r = mgm.read((char*)tiles,sizeof(mgm_tile_desc)*no_tiles);
+        if (r != sizeof(mgm_tile_desc)*no_tiles)
+        {
+            qDebug() << "error reading tile descriptions";
+        }
         for (int i=0; i<no_tiles; i++)
         {
-            quint8 tx,ty;
-            r = mgm.read((char*)(&tx),1);
-            r += mgm.read((char*)(&ty),1);
-            r += mgm.read((char*)(&tile_end),4);
-            if (r != 6)
-            {
-                qDebug() << "error reading tile entry " << i;
-                return;
-            }
-            tile_end = qFromBigEndian(tile_end);
-            if (tx == in_x && ty == in_y)
-            {
-                found = true;
-                break;
-            }
-            tile_start = tile_end;
-        }
-        if (found)
-        {
+            mgm_tile_desc td = tiles[i];
+            tile_start = (i==0)? tile_start : qFromBigEndian(tiles[i-1].end);
+            tile_end = qFromBigEndian(td.end);
             quint32 tile_size = tile_end - tile_start;
             char *data = new char[tile_size];
             mgm.seek(tile_start);
             r = mgm.read(data,tile_size);
-            if (r != tile_size)
+            if (r == tile_size)
             {
-                qDebug() << "error reading tile " << tile_x << "," << tile_y << "data";
+                QByteArray ba(data,tile_size);
+                emit tileData(tile_type,td.x,td.y,tile_zoom,ba);
             }
             else
             {
-                QByteArray ba(data,tile_size);
-                emit tileData(tile_type,tile_x,tile_y,tile_zoom,ba);
+                qDebug() << "error reading tile " << td.x << "," << td.y;
             }
+            tile_start = tile_end;
             delete[] data;
         }
     }
