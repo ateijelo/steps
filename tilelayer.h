@@ -38,7 +38,6 @@ class TileLayer : public QObject
         void deleteColumn(Column* col);
         Tile* newTile(int x, int y);
         void deleteTile(Tile *t);
-        QString tileKey(QString type, int x, int y, int z);
 
         int zoom;
         QString type;

@@ -18,6 +18,7 @@ class FetchTask : public QObject
     signals:
         void tileData(const QString& type, int x, int y, int zoom,
                       const QByteArray data);
+        void finished(FetchTask*);
 
     public slots:
 
