@@ -48,7 +48,8 @@ class TileFetcher : public QObject
         explicit TileFetcher(QObject *parent = 0);
         ~TileFetcher();
 
-        void fetchTile(const QString& maptype, int x, int y, int zoom);
+        void fetchTile(const QString& type, int x, int y, int zoom);
+        void forgetRequest(const QString& type, int x, int y, int zoom);
 
     signals:
         void tileData(const QString& type, int x, int y, int z,

@@ -1,3 +1,4 @@
+#define QT_NO_DEBUG_OUTPUT
 #include <QtDebug>
 
 #include "fetchtask.h"
@@ -41,21 +42,36 @@ TileFetcher::~TileFetcher()
 void TileFetcher::tileFetched(const QString &type, int x, int y, int z,
                               const QByteArray &data)
 {
-    qDebug() << "TileFetcher::tileFetched" << type << x << y << z;
+    //qDebug() << "TileFetcher::tileFetched" << type << x << y << z;
     emit tileData(type,x,y,z,data);
     TileRequest r(type,x,y,z);
     if (idleRequests.contains(r))
     {
-        qDebug() << "  Removing fetched tile from queue";
+        //qDebug() << "  Removing fetched tile from queue";
         RequestPointer p = idleRequests.value(r);
         idleRequestQueue.erase(p);
     }
-    debug("  state:");
+    //debug("  state:");
+}
+
+void TileFetcher::forgetRequest(const QString &type, int x, int y, int zoom)
+{
+    qDebug() << "TileFetcher::forgetRequest" << type << x << y << zoom;
+    TileRequest r(type,x,y,zoom);
+    QHash<TileRequest,RequestPointer>::iterator i = idleRequests.find(r);
+    if (i != idleRequests.end())
+    {
+        qDebug() << "  Removing deleted tile from queue";
+        RequestPointer p = i.value();
+        idleRequestQueue.erase(p);
+        idleRequests.erase(i);
+    }
+    //debug("  state:");
 }
 
 void TileFetcher::taskFinished(FetchTask *task)
 {
-    qDebug() << "TileFetcher::taskFinished" << task;
+    //qDebug() << "TileFetcher::taskFinished" << task;
     QThread *thread = task->thread();
     if (!activeRequestReverseMap.contains(task))
     {
@@ -106,8 +122,16 @@ void TileFetcher::fetchTile(const QString &maptype, int x, int y, int zoom)
 {
     qDebug() << "TileFetcher::fetchTile" << maptype << x << y << zoom;
     TileRequest r(maptype,x,y,zoom);
-    if (activeRequests.contains(r) || idleRequests.contains(r))
+    if (activeRequests.contains(r))
+    {
+        qDebug() << "  request already active.";
         return;
+    }
+    if (idleRequests.contains(r))
+    {
+        qDebug() << "  request already queued.";
+        return;
+    }
 
     RequestPointer p = idleRequestQueue.insert(zoom,r);
     idleRequests.insert(r,p);

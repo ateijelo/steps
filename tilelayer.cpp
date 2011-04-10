@@ -62,7 +62,7 @@ void TileLayer::tileData(const QString &type, int x, int y, int z,
 
 Tile* TileLayer::newTile(int x, int y)
 {
-    Tile *t = new Tile(x,y,zoom);
+    Tile *t = new Tile(type,x,y,zoom);
     tiles.insert(t->coords(),t);
     emit tileCreated(t,x,y,zoom);
 
@@ -100,6 +100,7 @@ Tile* TileLayer::newTile(int x, int y)
 void TileLayer::deleteTile(Tile *t)
 {
     tiles.remove(t->coords());
+    fetcher.forgetRequest(t->tileType(),t->tileX(),t->tileY(),t->zoom());
     delete t;
 }
 

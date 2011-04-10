@@ -4,8 +4,8 @@
 
 #include "tile.h"
 
-Tile::Tile(int x, int y, int zoom)
-        : _x(x), _y(y), _zoom(zoom)
+Tile::Tile(QString type, int x, int y, int zoom)
+        : _type(type), _x(x), _y(y), _zoom(zoom)
 {
 //    setTransformationMode(Qt::SmoothTransformation);
 //    QGraphicsRectItem *r = new QGraphicsRectItem(0,0,256,256);
@@ -18,7 +18,8 @@ Tile::Tile(int x, int y, int zoom)
 
 Tile::~Tile()
 {
-    qDebug() << "deleted Tile:" << _x << _y << _zoom << _current_zoom;
+    qDebug() << "deleted Tile:" << _type << _x << _y
+            << _zoom << _current_zoom;
 }
 
 TileCoords Tile::coords() const
@@ -28,13 +29,18 @@ TileCoords Tile::coords() const
 
 QString Tile::tileId() const
 {
-    return QString("x=%1 y=%2 z=%3 cz=%4")
-            .arg(_x).arg(_y).arg(_zoom).arg(_current_zoom);
+    return QString("type=%1 x=%2 y=%3 z=%4 cz=%5")
+            .arg(_type).arg(_x).arg(_y).arg(_zoom).arg(_current_zoom);
 }
 
 QString Tile::tileKey(QString type, int x, int y, int z)
 {
     return QString("%1:%2:%3:%4").arg(type).arg(x).arg(y).arg(z);
+}
+
+QString Tile::tileType() const
+{
+    return _type;
 }
 
 int Tile::tileX() const
@@ -68,10 +74,16 @@ void Tile::loadPixmap(const QPixmap &pixmap, int z)
     if (z > _zoom) return;
     if (z < _current_zoom) return;
 
-    int w = 256 >> (_zoom - z);
-    if (w == 0) w = 1;
-    int rx = _x % (1 << (_zoom - z));
-    int ry = _y % (1 << (_zoom - z));
+    int dz = _zoom - z;
+    int w = 256 >> dz;
+    int rx = _x % (1 << dz);
+    int ry = _y % (1 << dz);
+    if (dz > 8)
+    {
+        w = 1;
+        rx = rx >> (dz - 8);
+        ry = ry >> (dz - 8);
+    }
 
     setPixmap(pixmap.copy(rx*w,ry*w,w,w).scaled(256,256));
     _current_zoom = z;

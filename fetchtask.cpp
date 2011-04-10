@@ -1,4 +1,4 @@
-//#define QT_NO_DEBUG_OUTPUT
+#define QT_NO_DEBUG_OUTPUT
 
 #include <QtDebug>
 #include <QtEndian>
@@ -57,7 +57,7 @@ void FetchTask::work()
     // For Google Hybrid two different fetch tasks should be spawned and
     // their result composited somewhere else.
 
-    sleep(1);
+    //sleep(1);
     int in_x = tile_x & 7;
     int in_y = tile_y & 7;
     QString filename = getTileFileName(tile_type,tile_x,tile_y,tile_zoom);
