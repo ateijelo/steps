@@ -1,4 +1,4 @@
-#define QT_NO_DEBUG_OUTPUT
+//#define QT_NO_DEBUG_OUTPUT
 
 #include <QtDebug>
 #include <QtEndian>
@@ -57,7 +57,7 @@ void FetchTask::work()
     // For Google Hybrid two different fetch tasks should be spawned and
     // their result composited somewhere else.
 
-    sleep(1);
+    //sleep(1);
     //int in_x = tile_x & 7;
     //int in_y = tile_y & 7;
     QString filename = getTileFileName(tile_type,tile_x,tile_y,tile_zoom);
@@ -78,11 +78,14 @@ void FetchTask::work()
             return;
         }
         no_tiles = qFromBigEndian(no_tiles);
+        qDebug() << "  found" << no_tiles << "tiles";
         r = mgm.read((char*)tiles,sizeof(mgm_tile_desc)*no_tiles);
         if (r != sizeof(mgm_tile_desc)*no_tiles)
         {
             qDebug() << "error reading tile descriptions";
         }
+        int x0 = (tile_x >> 3) << 3;
+        int y0 = (tile_y >> 3) << 3;
         for (int i=0; i<no_tiles; i++)
         {
             mgm_tile_desc td = tiles[i];
@@ -95,7 +98,12 @@ void FetchTask::work()
             if (r == tile_size)
             {
                 QByteArray ba(data,tile_size);
-                emit tileData(tile_type,td.x,td.y,tile_zoom,ba);
+                qDebug() << "  emit tileData" << tile_type
+                        << x0 + td.x
+                        << y0 + td.y
+                        << tile_zoom
+                        << tile_size << "bytes";
+                emit tileData(tile_type,x0 + td.x,y0 + td.y,tile_zoom,ba);
             }
             else
             {

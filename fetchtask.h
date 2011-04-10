@@ -10,7 +10,7 @@ struct mgm_tile_desc
     quint8 x;
     quint8 y;
     quint32 end;
-};
+} __attribute__((packed));
 
 class FetchTask : public QObject
 {

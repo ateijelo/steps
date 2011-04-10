@@ -40,14 +40,14 @@ void TileLayer::tileData(const QString &type, int x, int y, int z,
     {
         foreach (Tile *t, tiles)
         {
-            int tx = t->tileX();
-            int ty = t->tileY();
-            qDebug() << "  tile: " << t->tileId()
-                     << " t.x >> (zoom - z) =" << (tx >> (zoom - z))
-                     << " t.y >> (zoom - z) =" << (ty >> (zoom - z));
+            //int tx = t->tileX();
+            //int ty = t->tileY();
+            //qDebug() << "  tile: " << t->tileId()
+            //         << " t.x >> (zoom - z) =" << (tx >> (zoom - z))
+            //         << " t.y >> (zoom - z) =" << (ty >> (zoom - z));
             if (t->isWithin(x,y,z))
             {
-                qDebug() << "    Using it.";
+            //    qDebug() << "    Using it.";
                 t->loadPixmap(p,z);
             }
         }
