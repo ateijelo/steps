@@ -4,6 +4,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QNetworkProxy>
 #include <QApplication>
 #include <QSettings>
 #include <QtEndian>
@@ -52,6 +53,17 @@ void FetchTask::work()
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
     connect(manager,SIGNAL(finished(QNetworkReply*)),
             this,SLOT(replyFinished(QNetworkReply*)));
+    QSettings settings;
+    QNetworkProxy proxy;
+    //proxy.setType(QNetworkProxy::Socks5Proxy);
+    //proxy.setHostName("localhost");
+    //proxy.setPort(1080);
+    proxy.setType(QNetworkProxy::HttpCachingProxy);
+    proxy.setHostName(settings.value("ProxyHost","").toString());
+    proxy.setPort(settings.value("ProxyPort",0).toInt());
+    proxy.setUser(settings.value("ProxyUser","").toString());
+    proxy.setPassword(settings.value("ProxyPass","").toString());
+    manager->setProxy(proxy);
     manager->get(QNetworkRequest(QUrl(QString("http://tile.openstreetmap.org/%1/%2/%3.png")
                                       .arg(tile_zoom).arg(tile_x).arg(tile_y))));
     qDebug() << "request for" << tile_x << tile_y << tile_zoom;
@@ -60,7 +72,7 @@ void FetchTask::work()
 void FetchTask::replyFinished(QNetworkReply *reply)
 {
     emit tileData(tile_type,tile_x,tile_y,tile_zoom,reply->readAll());
-    qDebug() << "reply for" << tile_x << tile_y << tile_zoom;
+    qDebug() << "reply for" << tile_x << tile_y << tile_zoom << "error code:" << reply->error();
     reply->deleteLater();
     emit finished(this);
 }
