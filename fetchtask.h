@@ -5,6 +5,8 @@
 #include <QString>
 #include <QEvent>
 
+#include <QNetworkAccessManager>
+
 class FetchTask : public QObject
 {
     Q_OBJECT
@@ -21,6 +23,9 @@ class FetchTask : public QObject
         void finished(FetchTask*);
 
     public slots:
+
+    private slots:
+        void replyFinished(QNetworkReply *reply);
 
     private:
         void work();
