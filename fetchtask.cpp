@@ -71,7 +71,7 @@ void FetchTask::work()
     //manager->get(QNetworkRequest(QUrl(QString("http://mt0.google.com/vt/lyrs=m@117&hl=en&x=%1&y=%2&z=%3")
     //                                 .arg(tile_x).arg(tile_y).arg(tile_zoom))));
     //GoogleSat
-    manager->get(QNetworkRequest(QUrl(QString("http://khm0.google.com/kh/v=54&x=%1&y=%2&z=%3")
+    manager->get(QNetworkRequest(QUrl(QString("http://khm1.google.com/kh/v=83&x=%1&y=%2&z=%3&s=Galil")
                                      .arg(tile_x).arg(tile_y).arg(tile_zoom))));
     qDebug() << "request for" << tile_x << tile_y << tile_zoom;
 }
