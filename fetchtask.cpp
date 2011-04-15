@@ -64,8 +64,15 @@ void FetchTask::work()
     proxy.setUser(settings.value("ProxyUser","").toString());
     proxy.setPassword(settings.value("ProxyPass","").toString());
     manager->setProxy(proxy);
-    manager->get(QNetworkRequest(QUrl(QString("http://tile.openstreetmap.org/%1/%2/%3.png")
-                                      .arg(tile_zoom).arg(tile_x).arg(tile_y))));
+    ////OpenStreetMaps
+    // manager->get(QNetworkRequest(QUrl(QString("http://tile.openstreetmap.org/%1/%2/%3.png")
+    //                                  .arg(tile_zoom).arg(tile_x).arg(tile_y))));
+    ////GoogleMaps
+    //manager->get(QNetworkRequest(QUrl(QString("http://mt0.google.com/vt/lyrs=m@117&hl=en&x=%1&y=%2&z=%3")
+    //                                 .arg(tile_x).arg(tile_y).arg(tile_zoom))));
+    //GoogleSat
+    manager->get(QNetworkRequest(QUrl(QString("http://khm0.google.com/kh/v=54&x=%1&y=%2&z=%3")
+                                     .arg(tile_x).arg(tile_y).arg(tile_zoom))));
     qDebug() << "request for" << tile_x << tile_y << tile_zoom;
 }
 
