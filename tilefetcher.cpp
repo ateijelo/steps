@@ -133,7 +133,7 @@ void TileFetcher::fetchTile(const QString &maptype, int x, int y, int zoom)
         return;
     }
 
-    RequestPointer p = idleRequestQueue.insert(-zoom,r);
+    RequestPointer p = idleRequestQueue.insert(zoom,r);
     idleRequests.insert(r,p);
 
     schedule();
