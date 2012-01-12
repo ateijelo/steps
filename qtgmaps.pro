@@ -7,6 +7,8 @@ DEPENDPATH += .
 INCLUDEPATH += .
 QT += network
 
+CONFIG += debug
+
 # Input
 HEADERS += mainwindow.h \
     mapview.h \
