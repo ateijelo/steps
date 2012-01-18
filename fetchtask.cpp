@@ -27,11 +27,25 @@ FetchTask::FetchTask(const QString &tile_type, int x, int y, int zoom,
     this->tile_zoom = zoom;
 
     startEvent = QEvent::Type(QEvent::registerEventType());
+    net = new QNetworkAccessManager(this);
+    connect(net,SIGNAL(finished(QNetworkReply*)),
+            this,SLOT(replyFinished(QNetworkReply*)));
+    QSettings settings;
+    QNetworkProxy proxy;
+    //proxy.setType(QNetworkProxy::Socks5Proxy);
+    //proxy.setHostName("localhost");
+    //proxy.setPort(1080);
+    proxy.setType(QNetworkProxy::HttpCachingProxy);
+    proxy.setHostName(settings.value("ProxyHost","").toString());
+    proxy.setPort(settings.value("ProxyPort",0).toInt());
+    proxy.setUser(settings.value("ProxyUser","").toString());
+    proxy.setPassword(settings.value("ProxyPass","").toString());
+    net->setProxy(proxy);
 }
 
 FetchTask::~FetchTask()
 {
-    // qDebug() << this << "destroyed.";
+    //qDebug() << this << "destroyed.";
 }
 
 void FetchTask::customEvent(QEvent *event)
@@ -50,32 +64,17 @@ void FetchTask::start()
 
 void FetchTask::work()
 {
-    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
-    connect(manager,SIGNAL(finished(QNetworkReply*)),
-            this,SLOT(replyFinished(QNetworkReply*)));
-    QSettings settings;
-    QNetworkProxy proxy;
-    //proxy.setType(QNetworkProxy::Socks5Proxy);
-    //proxy.setHostName("localhost");
-    //proxy.setPort(1080);
-    proxy.setType(QNetworkProxy::HttpCachingProxy);
-    proxy.setHostName(settings.value("ProxyHost","").toString());
-    proxy.setPort(settings.value("ProxyPort",0).toInt());
-    proxy.setUser(settings.value("ProxyUser","").toString());
-    proxy.setPassword(settings.value("ProxyPass","").toString());
-    manager->setProxy(proxy);
-
-    // //OpenStreetMaps
-    //  manager->get(QNetworkRequest(QUrl(QString("http://tile.openstreetmap.org/%1/%2/%3.png")
-    //                                   .arg(tile_zoom).arg(tile_x).arg(tile_y))));
+    //OpenStreetMaps
+     net->get(QNetworkRequest(QUrl(QString("http://tile.openstreetmap.org/%1/%2/%3.png")
+                                      .arg(tile_zoom).arg(tile_x).arg(tile_y))));
 
     // //GoogleMaps
-    // manager->get(QNetworkRequest(QUrl(QString("http://mt0.google.com/vt/lyrs=m@117&hl=en&x=%1&y=%2&z=%3")
+    // net->get(QNetworkRequest(QUrl(QString("http://mt0.google.com/vt/lyrs=m@117&hl=en&x=%1&y=%2&z=%3")
     //                                  .arg(tile_x).arg(tile_y).arg(tile_zoom))));
 
-    //GoogleSat
-    manager->get(QNetworkRequest(QUrl(QString("http://khm1.google.com/kh/v=83&x=%1&y=%2&z=%3&s=Galil")
-                                     .arg(tile_x).arg(tile_y).arg(tile_zoom))));
+    // //GoogleSat
+    // net->get(QNetworkRequest(QUrl(QString("http://khm1.google.com/kh/v=83&x=%1&y=%2&z=%3&s=Galil")
+    //                                  .arg(tile_x).arg(tile_y).arg(tile_zoom))));
 
     qDebug() << "request for" << tile_x << tile_y << tile_zoom;
 }
@@ -92,6 +91,7 @@ void FetchTask::replyFinished(QNetworkReply *reply)
         qDebug() << "    error code:" << reply->error();
     }
     reply->deleteLater();
+    net->deleteLater();
     emit finished(this);
 }
 

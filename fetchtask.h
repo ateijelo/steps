@@ -40,6 +40,7 @@ class FetchTask : public QObject
 
         QEvent::Type startEvent;
         TaskState state;
+        QNetworkAccessManager *net;
 };
 
 #endif // FETCHTASK_H
