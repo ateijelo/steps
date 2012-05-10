@@ -10,6 +10,7 @@
 #include <QtEndian>
 #include <QFile>
 #include <QUrl>
+#include <QDir>
 
 #include <unistd.h>
 
@@ -50,6 +51,17 @@ void FetchTask::start()
 
 void FetchTask::work()
 {
+    QString cachedPath = QString("cache/%1/%2/%3_%4").arg(tile_type).arg(tile_zoom).arg(tile_x).arg(tile_y);
+    QFile f(cachedPath);
+    if (f.open(QIODevice::ReadOnly))
+    {
+        qDebug() << "Tile cached:" << tile_type << tile_x << tile_y << tile_zoom;
+        emit tileData(tile_type,tile_x,tile_y,tile_zoom,f.readAll());
+        emit finished(this);
+        f.close();
+        return;
+    }
+
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
     connect(manager,SIGNAL(finished(QNetworkReply*)),
             this,SLOT(replyFinished(QNetworkReply*)));
@@ -69,13 +81,13 @@ void FetchTask::work()
     //  manager->get(QNetworkRequest(QUrl(QString("http://tile.openstreetmap.org/%1/%2/%3.png")
     //                                   .arg(tile_zoom).arg(tile_x).arg(tile_y))));
 
-    // //GoogleMaps
-    // manager->get(QNetworkRequest(QUrl(QString("http://mt0.google.com/vt/lyrs=m@117&hl=en&x=%1&y=%2&z=%3")
-    //                                  .arg(tile_x).arg(tile_y).arg(tile_zoom))));
+    //GoogleMaps
+    manager->get(QNetworkRequest(QUrl(QString("http://mt0.google.com/vt/lyrs=m@117&hl=en&x=%1&y=%2&z=%3")
+                                     .arg(tile_x).arg(tile_y).arg(tile_zoom))));
 
     //GoogleSat
-    manager->get(QNetworkRequest(QUrl(QString("http://khm1.google.com/kh/v=83&x=%1&y=%2&z=%3&s=Galil")
-                                     .arg(tile_x).arg(tile_y).arg(tile_zoom))));
+    //manager->get(QNetworkRequest(QUrl(QString("http://khm1.google.com/kh/v=83&x=%1&y=%2&z=%3&s=Galil")
+    //                                 .arg(tile_x).arg(tile_y).arg(tile_zoom))));
 
     qDebug() << "request for" << tile_x << tile_y << tile_zoom;
 }
@@ -85,7 +97,17 @@ void FetchTask::replyFinished(QNetworkReply *reply)
     qDebug() << "reply for" << tile_x << tile_y << tile_zoom;
     if (reply->error() == 0)
     {
-        emit tileData(tile_type,tile_x,tile_y,tile_zoom,reply->readAll());
+        QDir d;
+        d.mkpath(QString("cache/%1/%2").arg(tile_type).arg(tile_zoom));
+        QString cachedPath = QString("cache/%1/%2/%3_%4").arg(tile_type).arg(tile_zoom).arg(tile_x).arg(tile_y);
+        QFile f(cachedPath);
+        QByteArray data(reply->readAll());
+        if (f.open(QIODevice::WriteOnly))
+        {
+            f.write(data);
+            f.close();
+        }
+        emit tileData(tile_type,tile_x,tile_y,tile_zoom,data);
     }
     else
     {
