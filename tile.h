@@ -3,6 +3,36 @@
 
 #include <QGraphicsPixmapItem>
 
+class TileId
+{
+    public:
+        TileId()
+        {
+            type = QString();
+            x = y = zoom = 0;
+        }
+
+        TileId(QString type, int x, int y, int zoom)
+        {
+            this->type = type;
+            this->x = x;
+            this->y = y;
+            this->zoom = zoom;
+        }
+
+        QString type;
+        int x;
+        int y;
+        int zoom;
+        bool operator==(const TileId& other) const
+        {
+            return other.type == type &&
+                   other.x == x && other.y == y && other.zoom == zoom;
+        }
+};
+
+int qHash(const TileId& key);
+
 typedef QPair<int,int> TileCoords;
 
 class Tile : public QGraphicsPixmapItem

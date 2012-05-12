@@ -1,18 +1,9 @@
 #define QT_NO_DEBUG_OUTPUT
 #include <QtDebug>
+#include <QApplication>
 
 #include "fetchtask.h"
 #include "tilefetcher.h"
-#include "tile.h"
-
-int qHash(const TileRequest& key)
-{
-    return qHash(QString("%1:%2:%3:%4")
-                 .arg(key.type)
-                 .arg(key.x)
-                 .arg(key.y)
-                 .arg(key.zoom));
-}
 
 TileFetcher::TileFetcher(QObject *parent) :
     QObject(parent)
@@ -23,6 +14,8 @@ TileFetcher::TileFetcher(QObject *parent) :
         idleThreads.insert(t);
         t->start();
     }
+
+    wakeUpEvent = QEvent::Type(QEvent::registerEventType());
 }
 
 TileFetcher::~TileFetcher()
@@ -39,26 +32,51 @@ TileFetcher::~TileFetcher()
     }
 }
 
+void TileFetcher::customEvent(QEvent *event)
+{
+    if (event->type() == wakeUpEvent)
+    {
+        work();
+    }
+}
+
+void TileFetcher::wakeUp()
+{
+    qApp->postEvent(this, new QEvent(wakeUpEvent));
+}
+
+void TileFetcher::fetchTile(const QString &maptype, int x, int y, int zoom)
+{
+    qDebug() << "TileFetcher::fetchTile" << maptype << x << y << zoom;
+    TileId r(maptype,x,y,zoom);
+    if (activeRequests.contains(r))
+    {
+        qDebug() << "  request already active.";
+        return;
+    }
+    if (idleRequests.contains(r))
+    {
+        qDebug() << "  request already queued.";
+        return;
+    }
+
+    RequestPointer p = idleRequestQueue.insert(zoom,r);
+    idleRequests.insert(r,p);
+
+    wakeUp();
+}
+
 void TileFetcher::tileFetched(const QString &type, int x, int y, int z,
                               const QByteArray &data)
 {
-    //qDebug() << "TileFetcher::tileFetched" << type << x << y << z;
-    emit tileData(type,x,y,z,data);
-    TileRequest r(type,x,y,z);
-    if (idleRequests.contains(r))
-    {
-        //qDebug() << "  Removing fetched tile from queue";
-        RequestPointer p = idleRequests.value(r);
-        idleRequestQueue.erase(p);
-    }
-    //debug("  state:");
+
 }
 
 void TileFetcher::forgetRequest(const QString &type, int x, int y, int zoom)
 {
     qDebug() << "TileFetcher::forgetRequest" << type << x << y << zoom;
-    TileRequest r(type,x,y,zoom);
-    QHash<TileRequest,RequestPointer>::iterator i = idleRequests.find(r);
+    TileId r(type,x,y,zoom);
+    QHash<TileId,RequestPointer>::iterator i = idleRequests.find(r);
     if (i != idleRequests.end())
     {
         qDebug() << "  Removing deleted tile from queue";
@@ -66,7 +84,6 @@ void TileFetcher::forgetRequest(const QString &type, int x, int y, int zoom)
         idleRequestQueue.erase(p);
         idleRequests.erase(i);
     }
-    //debug("  state:");
 }
 
 void TileFetcher::taskFinished(FetchTask *task)
@@ -78,22 +95,30 @@ void TileFetcher::taskFinished(FetchTask *task)
         qDebug() << "Active requests do not contain" << task;
         exit(EXIT_FAILURE);
     }
-    TileRequest r = activeRequestReverseMap.take(task);
+    TileId r = activeRequestReverseMap.take(task);
     activeRequests.remove(r);
     activeThreads.remove(thread);
 
     idleThreads.insert(thread);
     task->deleteLater();
 
-    schedule();
+    work();
 }
 
-void TileFetcher::schedule()
+void TileFetcher::work()
 {
-    while (qMin(idleThreads.count(),idleRequestQueue.count()) > 0)
+    while (idleRequestQueue.count()) > 0)
     {
         RequestPointer i = idleRequestQueue.begin();
-        TileRequest r = *i;
+        TileId r = *i;
+
+        QByteArray a = memCache.getTileData(r);
+        if (!a.isEmpty())
+        {
+            emit tileData(r.type,r.x,r.y,r.zoom,a);
+            idleR
+        }
+
 
         FetchTask *task = new FetchTask(r.type,r.x,r.y,r.zoom);
         connect(task,SIGNAL(tileData(QString,int,int,int,QByteArray)),
@@ -118,36 +143,15 @@ void TileFetcher::schedule()
     debug("TileFetcher::schedule");
 }
 
-void TileFetcher::fetchTile(const QString &maptype, int x, int y, int zoom)
-{
-    qDebug() << "TileFetcher::fetchTile" << maptype << x << y << zoom;
-    TileRequest r(maptype,x,y,zoom);
-    if (activeRequests.contains(r))
-    {
-        qDebug() << "  request already active.";
-        return;
-    }
-    if (idleRequests.contains(r))
-    {
-        qDebug() << "  request already queued.";
-        return;
-    }
-
-    RequestPointer p = idleRequestQueue.insert(zoom,r);
-    idleRequests.insert(r,p);
-
-    schedule();
-}
-
 void TileFetcher::debug(const QString& header)
 {
     qDebug() << header;
     qDebug() << "  idleThreads:" << idleThreads;
     qDebug() << "  idleRequests:";
-    foreach (const TileRequest& r, idleRequestQueue)
+    foreach (const TileId& r, idleRequestQueue)
         qDebug() << "   " << r.type << r.x << r.y << r.zoom;
     qDebug() << "  activeThreads:" << activeThreads;
     qDebug() << "  activeRequests:";
-    foreach (const TileRequest& r, activeRequests)
+    foreach (const TileId& r, activeRequests)
         qDebug() << "   " << r.type << r.x << r.y << r.zoom;
 }
