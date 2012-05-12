@@ -65,12 +65,12 @@ void FetchTask::start()
 void FetchTask::work()
 {
     //OpenStreetMaps
-     net->get(QNetworkRequest(QUrl(QString("http://tile.openstreetmap.org/%1/%2/%3.png")
-                                      .arg(tile_zoom).arg(tile_x).arg(tile_y))));
+    // net->get(QNetworkRequest(QUrl(QString("http://tile.openstreetmap.org/%1/%2/%3.png")
+    //                                  .arg(tile_zoom).arg(tile_x).arg(tile_y))));
 
-    // //GoogleMaps
-    // net->get(QNetworkRequest(QUrl(QString("http://mt0.google.com/vt/lyrs=m@117&hl=en&x=%1&y=%2&z=%3")
-    //                                  .arg(tile_x).arg(tile_y).arg(tile_zoom))));
+    //GoogleMaps
+    net->get(QNetworkRequest(QUrl(QString("http://mt0.google.com/vt/lyrs=m@117&hl=en&x=%1&y=%2&z=%3")
+                                      .arg(tile_x).arg(tile_y).arg(tile_zoom))));
 
     // //GoogleSat
     // net->get(QNetworkRequest(QUrl(QString("http://khm1.google.com/kh/v=83&x=%1&y=%2&z=%3&s=Galil")
