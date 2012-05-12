@@ -4,6 +4,16 @@
 
 #include "tile.h"
 
+int qHash(const TileId& key)
+{
+    return qHash(QString("%1:%2:%3:%4")
+                 .arg(key.type)
+                 .arg(key.x)
+                 .arg(key.y)
+                 .arg(key.zoom));
+}
+
+
 Tile::Tile(QString type, int x, int y, int zoom)
         : _type(type), _x(x), _y(y), _zoom(zoom)
 {

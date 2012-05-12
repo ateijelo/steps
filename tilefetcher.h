@@ -10,36 +10,8 @@
 #include <QSet>
 
 #include "fetchtask.h"
-
-class TileRequest
-{
-    public:
-        TileRequest()
-        {
-            type = QString();
-            x = y = zoom = 0;
-        }
-
-        TileRequest(QString type, int x, int y, int zoom)
-        {
-            this->type = type;
-            this->x = x;
-            this->y = y;
-            this->zoom = zoom;
-        }
-
-        QString type;
-        int x;
-        int y;
-        int zoom;
-        bool operator==(const TileRequest& other) const
-        {
-            return other.type == type &&
-                   other.x == x && other.y == y && other.zoom == zoom;
-        }
-};
-
-int qHash(const TileRequest& key);
+#include "tile.h"
+#include "memcache.h"
 
 class TileFetcher : public QObject
 {
@@ -62,23 +34,33 @@ class TileFetcher : public QObject
                          const QByteArray& data);
         void taskFinished(FetchTask* task);
 
+    protected:
+        void customEvent(QEvent *);
+
     private:
-        void schedule();
+        QEvent::Type wakeUpEvent;
+
+        void work();
         void debug(const QString& header);
 
-        typedef QMultiMap<int,TileRequest>::iterator RequestPointer;
+        typedef QMultiMap<int,TileId>::iterator RequestPointer;
 
         QSet<QThread*> idleThreads;
+
         // this hash is used to quickly locate a request in the queue
         // to avoid duplicates and to remove request on tileData.
-        QHash<TileRequest,RequestPointer> idleRequests;
+        QHash<TileId,RequestPointer> idleRequests;
+
         // this is the requests queue, in ascending order of zoom level
-        QMultiMap<int,TileRequest> idleRequestQueue;
+        QMultiMap<int,TileId> idleRequestQueue;
 
         QSet<QThread*> activeThreads;
-        QSet<TileRequest> activeRequests;
+        QSet<TileId> activeRequests;
+
         // this map is to remove tasks from activeRequests after they finish
-        QHash<const FetchTask*,TileRequest> activeRequestReverseMap;
+        QHash<const FetchTask*,TileId> activeRequestReverseMap;
+
+        MemCache memCache;
 };
 
 #endif // TILEFETCHER_H

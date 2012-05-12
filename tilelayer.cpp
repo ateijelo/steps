@@ -68,7 +68,7 @@ Tile* TileLayer::newTile(int x, int y)
         int qy = y >> (zoom - z); // y/(2^(zoom-z))
         if (!QPixmapCache::find(Tile::tileKey(type,qx,qy,z),&p))
         {
-            qDebug() << "newTile: cache miss:"
+            qDebug() << "newTile: pixmap cache miss:"
                     << " type =" << type
                     << " qx =" << qx
                     << " qy =" << qy
@@ -78,7 +78,7 @@ Tile* TileLayer::newTile(int x, int y)
         }
         else
         {
-            qDebug() << "newTile: cache hit:"
+            qDebug() << "newTile: pixmap cache hit:"
                     << " type =" << type
                     << " qx =" << qx
                     << " qy =" << qy
