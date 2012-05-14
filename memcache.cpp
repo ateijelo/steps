@@ -3,7 +3,7 @@
 MemCache::MemCache(QObject *parent) :
     QObject(parent)
 {
-    cache.setMaxCost(100*1024);
+    cache.setMaxCost(100*1024*1024);
 }
 
 QByteArray MemCache::getTileData(const QString &type, int x, int y, int zoom) const
@@ -31,13 +31,14 @@ bool MemCache::contains(const TileId &id) const
     return cache.contains(id);
 }
 
-void MemCache::insert(const QString &type, int x, int y, int zoom, QByteArray data)
+void MemCache::insert(const QString &type, int x, int y, int zoom, const QByteArray& data)
 {
     TileId t(type,x,y,zoom);
     insert(t,data);
 }
 
-void MemCache::insert(const TileId &id, QByteArray data)
+void MemCache::insert(const TileId &id, const QByteArray& data)
 {
-    cache.insert(id,&data,data.size());
+    QByteArray *a = new QByteArray(data);
+    cache.insert(id,a,a->size());
 }

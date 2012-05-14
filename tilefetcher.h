@@ -5,12 +5,13 @@
 #include <QMultiMap>
 #include <QObject>
 #include <QThread>
+#include <QMutex>
 #include <QList>
 #include <QHash>
 #include <QSet>
 
-#include "fetchtask.h"
 #include "tile.h"
+#include "task.h"
 #include "memcache.h"
 
 class TileFetcher : public QObject
@@ -22,6 +23,7 @@ class TileFetcher : public QObject
 
         void fetchTile(const QString& type, int x, int y, int zoom);
         void forgetRequest(const QString& type, int x, int y, int zoom);
+        void wakeUp();
 
     signals:
         void tileData(const QString& type, int x, int y, int z,
@@ -30,9 +32,12 @@ class TileFetcher : public QObject
     public slots:
 
     private slots:
-        void tileFetched(const QString& type, int x, int y, int z,
-                         const QByteArray& data);
-        void taskFinished(FetchTask* task);
+        void diskTileData(const QString& type, int x, int y, int z,
+                          const QByteArray& data);
+        void diskTaskFinished(Task* task);
+        void networkTileData(const QString& type, int x, int y, int z,
+                          const QByteArray& data);
+        void networkTaskFinished(Task* task);
 
     protected:
         void customEvent(QEvent *);
@@ -43,24 +48,20 @@ class TileFetcher : public QObject
         void work();
         void debug(const QString& header);
 
-        typedef QMultiMap<int,TileId>::iterator RequestPointer;
-
-        QSet<QThread*> idleThreads;
-
-        // this hash is used to quickly locate a request in the queue
-        // to avoid duplicates and to remove request on tileData.
-        QHash<TileId,RequestPointer> idleRequests;
-
-        // this is the requests queue, in ascending order of zoom level
-        QMultiMap<int,TileId> idleRequestQueue;
-
-        QSet<QThread*> activeThreads;
-        QSet<TileId> activeRequests;
-
-        // this map is to remove tasks from activeRequests after they finish
-        QHash<const FetchTask*,TileId> activeRequestReverseMap;
-
         MemCache memCache;
+
+        QSet<TileId> requests;
+        QSet<TileId> diskRequests;
+        QSet<TileId> networkRequests;
+
+        QHash<TileId,QByteArray> diskWriteRequests;
+
+        QSet<QThread*> idleDiskThreads;
+        QSet<QThread*> activeDiskThreads;
+        QSet<QThread*> idleNetworkThreads;
+        QSet<QThread*> activeNetworkThreads;
+
+        QMutex mutex;
 };
 
 #endif // TILEFETCHER_H
