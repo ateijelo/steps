@@ -21,7 +21,10 @@ HEADERS += mainwindow.h \
     preferences.h \
     tilefetcher.h \
     fetchtask.h \
-    memcache.h
+    memcache.h \
+    task.h \
+    disktask.h \
+    networktask.h
 FORMS += mainwindow.ui \
     preferences.ui
 SOURCES += main.cpp \
@@ -35,5 +38,8 @@ SOURCES += main.cpp \
     preferences.cpp \
     tilefetcher.cpp \
     fetchtask.cpp \
-    memcache.cpp
+    memcache.cpp \
+    task.cpp \
+    disktask.cpp \
+    networktask.cpp
 RESOURCES += qtgmaps.qrc

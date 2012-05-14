@@ -8,15 +8,14 @@
 
 TileLayer::TileLayer()
 {
-    // This class considers the boundaries
-    // of the rectangle to be inclusive.
-    // So, 0,0,0,0 is a region with one tile.
     region.setCoords(0,0,-1,-1);
-//    Column *c = new Column();
-//    c->append(newTile(0,0,0));
-//    columns.append(c);
+
+    fetcherThread = new QThread(this);
+    fetcher.moveToThread(fetcherThread);
     connect(&fetcher,SIGNAL(tileData(QString,int,int,int,QByteArray)),
             this,SLOT(tileData(QString,int,int,int,QByteArray)));
+    fetcherThread->start();
+
     tileKeyTemplate = "%1:%2:%3:%4";
     QPixmapCache::setCacheLimit(50*1024);
 }

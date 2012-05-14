@@ -5,6 +5,7 @@
 #include <QRect>
 #include <QObject>
 #include <QPoint>
+#include <QThread>
 #include <QByteArray>
 #include <QLinkedList>
 
@@ -44,6 +45,7 @@ class TileLayer : public QObject
         QString tileKeyTemplate;
         QRect region;
         TileFetcher fetcher;
+        QThread* fetcherThread;
         QLinkedList<Column*> columns;
         QHash<TileCoords,Tile*> tiles; // TileCoords is defined in tile.h
 
