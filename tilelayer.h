@@ -27,6 +27,8 @@ class TileLayer : public QObject
 
     signals:
         void tileCreated(Tile *t,int x, int y, int zoom);
+        void fetchTile(const QString& type, int x, int y, int z);
+        void forgetTile(const QString& type, int x, int y, int z);
 
     private slots:
         void tileData(const QString& type, int x, int y, int z,
@@ -48,6 +50,7 @@ class TileLayer : public QObject
         QThread* fetcherThread;
         QLinkedList<Column*> columns;
         QHash<TileCoords,Tile*> tiles; // TileCoords is defined in tile.h
+        QSet<TileId> fetchRequests;
 
 };
 

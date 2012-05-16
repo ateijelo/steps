@@ -1,7 +1,7 @@
-#define QT_NO_DEBUG_OUTPUT
+//#define QT_NO_DEBUG_OUTPUT
 #include <QtDebug>
 #include <QByteArray>
-#include <QMutexLocker>
+//#include <QMutexLocker>
 #include <QApplication>
 
 #include "disktask.h"
@@ -53,7 +53,7 @@ void TileFetcher::fetchTile(const QString &maptype, int x, int y, int zoom)
 {
     qDebug() << "TileFetcher::fetchTile" << maptype << x << y << zoom;
 
-    QMutexLocker l(&mutex);
+//    QMutexLocker l(&mutex);
     TileId r(maptype,x,y,zoom);
     if (requests.contains(r))
     {
@@ -79,7 +79,7 @@ void TileFetcher::forgetRequest(const QString &type, int x, int y, int zoom)
 {
     qDebug() << "TileFetcher::forgetRequest" << type << x << y << zoom;
 
-    QMutexLocker l(&mutex);
+//    QMutexLocker l(&mutex);
     TileId r(type,x,y,zoom);
     QSet<TileId>::iterator i;
 
@@ -113,9 +113,9 @@ void TileFetcher::diskTileData(const QString &type, int x, int y, int z,
     }
     else
     {
-        mutex.lock();
+//        mutex.lock();
         networkRequests.insert(tile);
-        mutex.unlock();
+//        mutex.unlock();
     }
     wakeUp();
 }
@@ -161,13 +161,16 @@ void TileFetcher::networkTaskFinished(Task *task)
     activeNetworkThreads.erase(i);
     idleNetworkThreads.insert(thread);
 
+    NetworkTask *n = static_cast<NetworkTask*>(task);
+    activeNetworkRequests.remove(n->tileId());
+
     task->deleteLater();
     wakeUp();
 }
 
 void TileFetcher::work()
 {
-    QMutexLocker l(&mutex);
+//    QMutexLocker l(&mutex);
     while (requests.count() > 0)
     {
         QSet<TileId>::iterator i = requests.begin();

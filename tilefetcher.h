@@ -5,7 +5,7 @@
 #include <QMultiMap>
 #include <QObject>
 #include <QThread>
-#include <QMutex>
+//#include <QMutex>
 #include <QList>
 #include <QHash>
 #include <QSet>
@@ -21,8 +21,6 @@ class TileFetcher : public QObject
         explicit TileFetcher(QObject *parent = 0);
         ~TileFetcher();
 
-        void fetchTile(const QString& type, int x, int y, int zoom);
-        void forgetRequest(const QString& type, int x, int y, int zoom);
         void wakeUp();
 
     signals:
@@ -30,6 +28,8 @@ class TileFetcher : public QObject
                            const QByteArray& data);
 
     public slots:
+        void fetchTile(const QString& type, int x, int y, int zoom);
+        void forgetRequest(const QString& type, int x, int y, int zoom);
 
     private slots:
         void diskTileData(const QString& type, int x, int y, int z,
@@ -61,7 +61,7 @@ class TileFetcher : public QObject
         QSet<QThread*> idleNetworkThreads;
         QSet<QThread*> activeNetworkThreads;
 
-        QMutex mutex;
+        //QMutex mutex;
 };
 
 #endif // TILEFETCHER_H

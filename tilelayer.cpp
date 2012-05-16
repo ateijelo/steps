@@ -14,6 +14,10 @@ TileLayer::TileLayer()
     fetcher.moveToThread(fetcherThread);
     connect(&fetcher,SIGNAL(tileData(QString,int,int,int,QByteArray)),
             this,SLOT(tileData(QString,int,int,int,QByteArray)));
+    connect(this,SIGNAL(fetchTile(QString,int,int,int)),
+            &fetcher,SLOT(fetchTile(QString,int,int,int)));
+    connect(this,SIGNAL(forgetTile(QString,int,int,int)),
+            &fetcher,SLOT(forgetRequest(QString,int,int,int)));
     fetcherThread->start();
 
     tileKeyTemplate = "%1:%2:%3:%4";
@@ -25,6 +29,8 @@ void TileLayer::tileData(const QString &type, int x, int y, int z,
 {
     qDebug() << "tileData: type =" << type << " x =" << x
             << " y =" << y << " z =" << z << " zoom =" << zoom;
+    TileId tile(type,x,y,z);
+    fetchRequests.remove(tile);
     QPixmap p;
     p.loadFromData(bytes);
     QPixmapCache::insert(Tile::tileKey(type,x,y,z),p);
@@ -73,7 +79,9 @@ Tile* TileLayer::newTile(int x, int y)
                     << " qy =" << qy
                     << " z =" << z
                     << " zoom =" << zoom;
-            fetcher.fetchTile(type,qx,qy,z);
+            TileId tile(type,qx,qy,z);
+            fetchRequests.insert(tile);
+            emit fetchTile(type,qx,qy,z);
         }
         else
         {
@@ -94,7 +102,15 @@ Tile* TileLayer::newTile(int x, int y)
 void TileLayer::deleteTile(Tile *t)
 {
     tiles.remove(t->coords());
-    fetcher.forgetRequest(t->tileType(),t->tileX(),t->tileY(),t->zoom());
+
+    while (!fetchRequests.isEmpty())
+    {
+        QSet<TileId>::iterator i = fetchRequests.begin();
+        TileId tile = *i;
+        fetchRequests.erase(i);
+        emit forgetTile(tile.type,tile.x,tile.y,tile.zoom);
+    }
+
     delete t;
 }
 
