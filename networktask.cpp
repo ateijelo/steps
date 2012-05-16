@@ -26,8 +26,11 @@ NetworkTask::~NetworkTask()
 
 void NetworkTask::work()
 {
+    qDebug() << "NetworkTask::work()";
     QSettings settings;
     QNetworkProxy proxy;
+    QNetworkProxy noProxy;
+    noProxy.setType(QNetworkProxy::NoProxy);
     //proxy.setType(QNetworkProxy::Socks5Proxy);
     //proxy.setHostName("localhost");
     //proxy.setPort(1080);
@@ -36,7 +39,11 @@ void NetworkTask::work()
     proxy.setPort(settings.value("ProxyPort",0).toInt());
     proxy.setUser(settings.value("ProxyUser","").toString());
     proxy.setPassword(settings.value("ProxyPass","").toString());
-    net->setProxy(proxy);
+    if (settings.value("UseProxy",false).toBool())
+    {
+        qDebug() << "using proxy";
+        net->setProxy(proxy);
+    }
 
     //GoogleMaps
     if (tile.type == "GoogleMap")
@@ -61,11 +68,13 @@ void NetworkTask::work()
     }
     if (tile.type == "UHGoogleMap")
     {
+        net->setProxy(noProxy);
         net->get(QNetworkRequest(QUrl(QString("http://lara.matcom.uh.cu/tiles/?type=map&x=%1&y=%2&z=%3")
                                      .arg(tile.x).arg(tile.y).arg(tile.zoom))));
     }
     if (tile.type == "UHGoogleSat")
     {
+        net->setProxy(noProxy);
         net->get(QNetworkRequest(QUrl(QString("http://lara.matcom.uh.cu/tiles/?type=sat&x=%1&y=%2&z=%3")
                                      .arg(tile.x).arg(tile.y).arg(tile.zoom))));
     }
