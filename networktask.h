@@ -11,6 +11,7 @@ class NetworkTask : public Task
     Q_OBJECT
     public:
         explicit NetworkTask(const TileId& tile, QObject *parent = 0);
+        TileId tileId();
         ~NetworkTask();
 
     signals:

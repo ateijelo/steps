@@ -20,7 +20,6 @@ HEADERS += mainwindow.h \
     constants.h \
     preferences.h \
     tilefetcher.h \
-    fetchtask.h \
     memcache.h \
     task.h \
     disktask.h \
@@ -37,7 +36,6 @@ SOURCES += main.cpp \
     mainscene.cpp \
     preferences.cpp \
     tilefetcher.cpp \
-    fetchtask.cpp \
     memcache.cpp \
     task.cpp \
     disktask.cpp \

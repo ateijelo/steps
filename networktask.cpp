@@ -14,6 +14,11 @@ NetworkTask::NetworkTask(const TileId& tile, QObject *parent) :
             this,SLOT(replyFinished(QNetworkReply*)));
 }
 
+TileId NetworkTask::tileId()
+{
+    return tile;
+}
+
 NetworkTask::~NetworkTask()
 {
     delete net;
