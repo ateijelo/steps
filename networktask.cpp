@@ -1,4 +1,4 @@
-//#define QT_NO_DEBUG_OUTPUT
+#define QT_NO_DEBUG_OUTPUT
 #include <QtDebug>
 #include <QSettings>
 #include <QNetworkReply>

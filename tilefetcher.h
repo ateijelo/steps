@@ -53,6 +53,7 @@ class TileFetcher : public QObject
         QSet<TileId> requests;
         QSet<TileId> diskRequests;
         QSet<TileId> networkRequests;
+        QSet<TileId> activeNetworkRequests;
 
         QHash<TileId,QByteArray> diskWriteRequests;
 

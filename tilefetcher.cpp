@@ -130,6 +130,7 @@ void TileFetcher::networkTileData(const QString &type, int x, int y, int z,
         memCache.insert(tile,data);
         diskWriteRequests.insert(tile,data);
     }
+    activeNetworkRequests.remove(tile);
     wakeUp();
 }
 
@@ -248,6 +249,7 @@ void TileFetcher::work()
         task->start();
 
         networkRequests.erase(i);
+        activeNetworkRequests.insert(r);
     }
 
     debug("TileFetcher::work");
@@ -256,12 +258,21 @@ void TileFetcher::work()
 void TileFetcher::debug(const QString& header)
 {
     qDebug() << header;
-    qDebug() << "  idleDiskThreads:" << idleDiskThreads;
-    qDebug() << "  actvDiskThreads:" << activeDiskThreads;
+//    qDebug() << "  idleDiskThreads:" << idleDiskThreads;
+    
     qDebug() << "  requests:";
     foreach (const TileId& r, requests)
         qDebug() << "   " << r.type << r.x << r.y << r.zoom;
+    
     qDebug() << "  diskRequests:";
     foreach (const TileId& r, diskRequests)
+        qDebug() << "   " << r.type << r.x << r.y << r.zoom;
+    
+    qDebug() << "  networkRequests:";
+    foreach (const TileId& r, networkRequests)
+        qDebug() << "   " << r.type << r.x << r.y << r.zoom;
+
+    qDebug() << "  activeNetworkRequests:";
+    foreach (const TileId& r, activeNetworkRequests)
         qDebug() << "   " << r.type << r.x << r.y << r.zoom;
 }
