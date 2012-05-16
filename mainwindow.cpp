@@ -31,8 +31,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui.toolBar->insertSeparator(0);
     ui.toolBar->insertWidget(0, &cacheStyles);
 
-    connect(&cacheStyles, SIGNAL(currentIndexChanged(QString)), ui.mapView, SLOT(setCacheStyle(QString)));
     updateCacheStyles();
+    connect(&cacheStyles, SIGNAL(currentIndexChanged(QString)), ui.mapView, SLOT(setCacheStyle(QString)));
 
     latLabel.setFixedWidth(90);
     lonLabel.setFixedWidth(100);
