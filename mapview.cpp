@@ -38,7 +38,7 @@ MapView::MapView(QWidget *parent)
 
 bool MapView::canZoomIn()
 {
-    return (zoom < 18);
+    return (zoom < maxZoomLevel());
 }
 
 bool MapView::canZoomOut()
@@ -225,9 +225,9 @@ void MapView::setZoomLevel(int zoom)
         zoom = 0;
         zo = false;
     }
-    if (zoom >= 18)
+    if (zoom >= maxZoomLevel())
     {
-        zoom = 18;
+        zoom = maxZoomLevel();
         zi = false;
     }
     emit canZoomOut(zo);
@@ -267,6 +267,11 @@ void MapView::zoomOut()
 int MapView::zoomLevel()
 {
     return zoom;
+}
+
+int MapView::maxZoomLevel()
+{
+    return 24;
 }
 
 void MapView::rotRight()

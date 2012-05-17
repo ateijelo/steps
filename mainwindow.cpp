@@ -16,9 +16,9 @@ MainWindow::MainWindow(QWidget *parent)
     preferences = new Preferences(this);
 
     zoomSlider.setMinimum(0);
-    zoomSlider.setMaximum(18);
+    zoomSlider.setMaximum(ui.mapView->maxZoomLevel());
     zoomSlider.setOrientation(Qt::Horizontal);
-    zoomSlider.setFixedWidth(30+18*4);
+    zoomSlider.setFixedWidth(30+ui.mapView->maxZoomLevel()*4);
     zoomSlider.setTickInterval(1);
     zoomSlider.setTickPosition(QSlider::TicksBelow);
     zoomSlider.setPageStep(1);
