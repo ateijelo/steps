@@ -103,10 +103,10 @@ void TileLayer::deleteTile(Tile *t)
 {
     tiles.remove(t->coords());
 
-    while (!fetchRequests.isEmpty())
+    TileId tile(t->tileType(),t->tileX(),t->tileY(),t->zoom());
+    QSet<TileId>::iterator i = fetchRequests.find(tile);
+    if (i != fetchRequests.end())
     {
-        QSet<TileId>::iterator i = fetchRequests.begin();
-        TileId tile = *i;
         fetchRequests.erase(i);
         emit forgetTile(tile.type,tile.x,tile.y,tile.zoom);
     }
@@ -233,4 +233,11 @@ void TileLayer::setRegion(const QRect& m, int zoom)
 void TileLayer::clear()
 {
     setRegion(QRect(0,0,0,0),0);
+    while (!fetchRequests.isEmpty())
+    {
+        QSet<TileId>::iterator i = fetchRequests.begin();
+        TileId tile = *i;
+        fetchRequests.erase(i);
+        emit forgetTile(tile.type,tile.x,tile.y,tile.zoom);
+    }
 }
