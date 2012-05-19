@@ -51,7 +51,7 @@ void NetworkTask::work()
         net->get(QNetworkRequest(QUrl(QString("http://mt0.google.com/vt/lyrs=m@117&hl=en&x=%1&y=%2&z=%3")
                                      .arg(tile.x).arg(tile.y).arg(tile.zoom))));
     }
-    if (tile.type == "GoogleSat")
+    else if (tile.type == "GoogleSat")
     {
         QString galileo = QString("Galileo").left((tile.x * 3 + tile.y)%8);
         net->get(QNetworkRequest(QUrl(QString("http://khm%5.google.com/kh/v=109&x=%1&y=%2&z=%3&s=%4")
@@ -61,22 +61,26 @@ void NetworkTask::work()
                                       .arg(galileo)
                                       .arg(tile.x % 2))));
     }
-    if (tile.type == "OpenStreetMaps")
+    else if (tile.type == "OpenStreetMaps")
     {
         net->get(QNetworkRequest(QUrl(QString("http://tile.openstreetmap.org/%1/%2/%3.png")
                                      .arg(tile.zoom).arg(tile.x).arg(tile.y))));
     }
-    if (tile.type == "UHGoogleMap")
+    else if (tile.type == "UHGoogleMap")
     {
         net->setProxy(noProxy);
         net->get(QNetworkRequest(QUrl(QString("http://lara.matcom.uh.cu/tiles/?type=map&x=%1&y=%2&z=%3")
                                      .arg(tile.x).arg(tile.y).arg(tile.zoom))));
     }
-    if (tile.type == "UHGoogleSat")
+    else if (tile.type == "UHGoogleSat")
     {
         net->setProxy(noProxy);
         net->get(QNetworkRequest(QUrl(QString("http://lara.matcom.uh.cu/tiles/?type=sat&x=%1&y=%2&z=%3")
                                      .arg(tile.x).arg(tile.y).arg(tile.zoom))));
+    }
+    else
+    {
+        emit finished(this);
     }
 
     qDebug() << "network request for" << tile.type << tile.x << tile.y << tile.zoom;
