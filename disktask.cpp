@@ -37,14 +37,11 @@ void DiskTask::storeTile(const QString &type, int x, int y, int zoom, QByteArray
     store_data = data;
 }
 
-QByteArray DiskTask::readMgm()
+void DiskTask::readMgm()
 {
-    int in_x = tile_x & 7;
-    int in_y = tile_y & 7;
     QString filename = getTileFileName(tile_type,tile_x,tile_y,tile_zoom);
     qDebug() << this << "started. Fetching" << tile_x << tile_y << "from" << filename;
     QFile mgm(filename);
-    QByteArray a;
     if (mgm.open(QIODevice::ReadOnly))
     {
         quint64 r = 0;
@@ -55,10 +52,12 @@ QByteArray DiskTask::readMgm()
         if (r != 2)
         {
             qDebug() << "error reading no_tiles";
-            return QByteArray();
+            return;
         }
+        quint32 max_size = 0;
         no_tiles = qFromBigEndian(no_tiles);
-        bool found = false;
+        QList<QPoint> coords;
+        QList<quint32> sizes;
         for (int i=0; i<no_tiles; i++)
         {
             quint8 tx,ty;
@@ -68,42 +67,48 @@ QByteArray DiskTask::readMgm()
             if (r != 6)
             {
                 qDebug() << "error reading tile entry " << i;
-                return QByteArray();
+                return;
             }
+            qDebug() << tx + ((tile_x >> 3) << 3) << ty + ((tile_y >> 3) << 3);
+            coords.append(QPoint(tx + ((tile_x >> 3) << 3),ty + ((tile_y >> 3) << 3)));
+            qDebug() << coords;
             tile_end = qFromBigEndian(tile_end);
-            if (tx == in_x && ty == in_y)
-            {
-                found = true;
-                break;
-            }
+            quint32 tile_size = tile_end - tile_start;
+            if (tile_size > max_size)
+                max_size = tile_size;
+            sizes.append(tile_size);
             tile_start = tile_end;
         }
-        if (found)
+        mgm.seek(64*6+2);
+        char *_data = new char[max_size];
+        for (int i=0; i<no_tiles; i++)
         {
-            quint32 tile_size = tile_end - tile_start;
-            char *_data = new char[tile_size];
-            mgm.seek(tile_start);
+            quint32 tile_size = sizes.at(i);
+            int tx = coords.at(i).x();
+            int ty = coords.at(i).y();
             r = mgm.read(_data,tile_size);
             if (r != tile_size)
             {
-                qDebug() << "error reading tile " << tile_x << "," << tile_y << "data";
+                qDebug() << "error reading tile " << tx << "," << ty << "from file" << mgm.fileName();
+                break;
             }
             else
             {
+                QByteArray a;
                 a.append(_data,tile_size);
+                qDebug() << "emitting mgm tileData for " << tile_type << tx << ty << tile_zoom;
+                emit tileData(tile_type,tx,ty,tile_zoom,a);
             }
-            delete[] _data;
-            return a;
         }
+        delete[] _data;
     }
     else
     {
-        //qDebug() << "error opening " << filename << " for reading";
+        qDebug() << "error opening " << filename << " for reading";
     }
-    return a;
 }
 
-QByteArray DiskTask::readSingleFile()
+void DiskTask::readSingleFile()
 {
     QSettings settings;
     QDir d(settings.value(SettingsKeys::CachePath,"").toString());
@@ -112,10 +117,9 @@ QByteArray DiskTask::readSingleFile()
     if (f.open(QIODevice::ReadOnly))
     {
         qDebug() << "   succeeded";
-        return f.readAll();
+        emit tileData(tile_type,tile_x,tile_y,tile_zoom,f.readAll());
     }
     qDebug() << "   failed";
-    return QByteArray();
 }
 
 void DiskTask::work()
@@ -136,19 +140,9 @@ void DiskTask::work()
     }
     else
     {
-        QByteArray a;
         qDebug() << "trying to read from single file" << tile_type << tile_x << tile_y << tile_zoom;
-        a = readSingleFile();
-        if (!a.isEmpty())
-        {
-            emit tileData(tile_type,tile_x,tile_y,tile_zoom,a);
-        }
-        else
-        {
-            qDebug() << "trying to read from mgm" << tile_type << tile_x << tile_y << tile_zoom;
-            a = readMgm();
-            emit tileData(tile_type,tile_x,tile_y,tile_zoom,a);
-        }
+        readSingleFile();
+        readMgm();
     }
     emit finished(this);
 }
