@@ -83,6 +83,7 @@ Tile* TileLayer::newTile(int x, int y)
             if (!fetchRequests.contains(tile))
             {
                 fetchRequests.insert(tile);
+                qDebug() << "TileLayer.fetchRequests" << fetchRequests;
                 emit fetchTile(type,qx,qy,z);
             }
         }
