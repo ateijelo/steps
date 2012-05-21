@@ -48,6 +48,8 @@ class TileFetcher : public QObject
 
         void work();
         void debug(const QString& header);
+        void readMgm(const TileId &tile);
+        bool readSingleFile(const TileId &tile);
 
         MemCache memCache;
 

@@ -1,16 +1,21 @@
-#define QT_NO_DEBUG_OUTPUT
-#include <QtDebug>
-#include <QByteArray>
+//#define QT_NO_DEBUG_OUTPUT
 #include <QApplication>
+#include <QByteArray>
+#include <QSettings>
+#include <QtEndian>
+#include <QtDebug>
+#include <QFile>
+#include <QDir>
 
 #include "disktask.h"
 #include "networktask.h"
 #include "tilefetcher.h"
+#include "constants.h"
 
 TileFetcher::TileFetcher(QObject *parent) :
     QObject(parent)
 {
-    for (int i=0; i<1; i++)
+    for (int i=0; i<2; i++)
     {
         QThread *t = new QThread(this);
         idleDiskThreads.insert(t);
@@ -115,7 +120,6 @@ void TileFetcher::diskTileData(const QString &type, int x, int y, int z,
     {
         emit tileData(type,x,y,z,data);
         memCache.insert(tile,data);
-        diskRequests.remove(tile);
     }
     else
     {
@@ -123,6 +127,7 @@ void TileFetcher::diskTileData(const QString &type, int x, int y, int z,
         networkRequests.insert(tile);
 //        mutex.unlock();
     }
+    diskRequests.remove(tile);
     wakeUp();
 }
 
@@ -142,15 +147,15 @@ void TileFetcher::networkTileData(const QString &type, int x, int y, int z,
 
 void TileFetcher::diskTaskFinished(Task *task)
 {
-//    QThread* thread = task->thread();
-//    QSet<QThread*>::iterator i = activeDiskThreads.find(thread);
-//    if (i == activeDiskThreads.end())
-//    {
-//        qDebug("The thread of the disk task that just finished is not in the active list!");
-//        exit(EXIT_FAILURE);
-//    }
-//    activeDiskThreads.erase(i);
-//    idleDiskThreads.insert(thread);
+    QThread* thread = task->thread();
+    QSet<QThread*>::iterator i = activeDiskThreads.find(thread);
+    if (i == activeDiskThreads.end())
+    {
+        qDebug("The thread of the disk task that just finished is not in the active list!");
+        exit(EXIT_FAILURE);
+    }
+    activeDiskThreads.erase(i);
+    idleDiskThreads.insert(thread);
 
     task->deleteLater();
     wakeUp();
@@ -175,9 +180,114 @@ void TileFetcher::networkTaskFinished(Task *task)
     wakeUp();
 }
 
+void TileFetcher::readMgm(const TileId& tile)
+{
+    int mgm_x = tile.x >> 3;
+    int mgm_y = tile.y >> 3;
+    QSettings settings;
+    QString filename = QString("%1/%2_%3/%4_%5.mgm")
+            .arg(settings.value(SettingsKeys::CachePath,"").toString())
+            .arg(tile.type)
+            .arg(tile.zoom)
+            .arg(mgm_x)
+            .arg(mgm_y);
+    qDebug() << this << "started. Fetching" << tile.x << tile.y << "from" << filename;
+    QFile mgm(filename);
+    QHash<TileId,QPair<quint32,quint32> > mgmTiles;
+    if (mgm.open(QIODevice::ReadOnly))
+    {
+        quint64 r = 0;
+        quint32 tile_start = 64*6 + 2;
+        quint32 tile_end;
+        quint16 no_tiles;
+        r += mgm.read((char*)(&no_tiles),2);
+        if (r != 2)
+        {
+            qDebug() << "error reading no_tiles";
+            no_tiles = 0;
+        }
+        no_tiles = qFromBigEndian(no_tiles);
+        for (int i=0; i<no_tiles; i++)
+        {
+            quint8 tx,ty;
+            r = mgm.read((char*)(&tx),1);
+            r += mgm.read((char*)(&ty),1);
+            r += mgm.read((char*)(&tile_end),4);
+            if (r != 6)
+            {
+                qDebug() << "error reading tile entry " << i;
+                break;
+            }
+            tile_end = qFromBigEndian(tile_end);
+            TileId t(tile.type,tx + (mgm_x << 3),ty + (mgm_y << 3),tile.zoom);
+            if (diskRequests.contains(t))
+            {
+                mgmTiles.insert(t,qMakePair(tile_start,tile_end - tile_start));
+                diskRequests.remove(t);
+            }
+            tile_start = tile_end;
+        }
+    }
+    QSet<TileId>::iterator i = diskRequests.begin();
+    while (i != diskRequests.end())
+    {
+        TileId t = *i;
+        bool tBelongsHere = ((t.type == tile.type) &&
+                             ((t.x >> 3) == mgm_x) &&
+                             ((t.y >> 3) == mgm_y) &&
+                             (t.zoom == tile.zoom));
+        if (tBelongsHere)
+        {
+            qDebug() << "tile" << t << "in queue, in the range of the mgm, but absent.";
+            i = diskRequests.erase(i);
+            networkRequests.insert(t);
+        }
+        else
+        {
+            i++;
+        }
+    }
+    for (QHash<TileId,QPair<quint32,quint32> >::iterator i = mgmTiles.begin(); i != mgmTiles.end(); i++)
+    {
+        TileId t = i.key();
+        QPair<quint32,quint32> p = i.value();
+        quint32 tile_start = p.first;
+        quint32 tile_size = p.second;
+        mgm.seek(tile_start);
+        QByteArray data = mgm.read(tile_size);
+        if (static_cast<quint32>(data.size()) != tile_size)
+        {
+            qDebug() << "error reading tile " << tile.x << "," << tile.y << "data";
+            networkRequests.insert(t);
+            continue;
+        }
+        else
+        {
+            qDebug() << "found tile" << t << "in mgm";
+            emit tileData(t.type,t.x,t.y,t.zoom,data);
+            memCache.insert(t,data);
+        }
+    }
+}
+
+bool TileFetcher::readSingleFile(const TileId& tile)
+{
+    QSettings settings;
+    QDir d(settings.value(SettingsKeys::CachePath,"").toString());
+    QFile f(d.absoluteFilePath(QString("cache/%1/%2/%3_%4").arg(tile.type).arg(tile.zoom).arg(tile.x).arg(tile.y)));
+    qDebug() << "opening" << f.fileName();
+    if (f.open(QIODevice::ReadOnly))
+    {
+        diskTileData(tile.type,tile.x,tile.y,tile.zoom,f.readAll());
+        return true;
+    }
+    qDebug() << "   failed";
+    return false;
+}
+
 void TileFetcher::work()
 {
-//    QMutexLocker l(&mutex);
+    debug("TileFetcher::work");
     while (requests.count() > 0)
     {
         QSet<TileId>::iterator i = requests.begin();
@@ -195,25 +305,15 @@ void TileFetcher::work()
         diskRequests.insert(r);
     }
 
-    while (qMin(idleDiskThreads.count(),diskRequests.count()) > 0)
+    while (diskRequests.count() > 0)
     {
+        debug("while (diskRequests.count() > 0):");
         QSet<TileId>::iterator i = diskRequests.begin();
-        TileId r = *i;
-        DiskTask *task = new DiskTask();
-        task->fetchTile(r.type,r.x,r.y,r.zoom);
+        TileId tile = *i;
 
-        connect(task,SIGNAL(tileData(QString,int,int,int,QByteArray)),
-                this,SLOT(diskTileData(QString,int,int,int,QByteArray)));
-        connect(task,SIGNAL(finished(Task*)),this,SLOT(diskTaskFinished(Task*)));
-
-//        QSet<QThread*>::iterator j = idleDiskThreads.begin();
-//        QThread *thread = *j;
-//        activeDiskThreads.insert(thread);
-//        idleDiskThreads.erase(j);
-//        task->moveToThread(thread);
-        task->start();
-
-        diskRequests.erase(i);
+        if (readSingleFile(tile))
+            continue;
+        readMgm(tile);
     }
 
     while (qMin(idleDiskThreads.count(),diskWriteRequests.count()) > 0)
@@ -226,11 +326,11 @@ void TileFetcher::work()
 
         connect(task,SIGNAL(finished(Task*)),this,SLOT(diskTaskFinished(Task*)));
 
-//        QSet<QThread*>::iterator j = idleDiskThreads.begin();
-//        QThread *thread = *j;
-//        activeDiskThreads.insert(thread);
-//        idleDiskThreads.erase(j);
-//        task->moveToThread(thread);
+        QSet<QThread*>::iterator j = idleDiskThreads.begin();
+        QThread *thread = *j;
+        activeDiskThreads.insert(thread);
+        idleDiskThreads.erase(j);
+        task->moveToThread(thread);
         task->start();
 
         diskWriteRequests.erase(i);
@@ -258,7 +358,6 @@ void TileFetcher::work()
         activeNetworkRequests.insert(r);
     }
 
-    debug("TileFetcher::work");
 }
 
 void TileFetcher::debug(const QString& header)
