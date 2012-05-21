@@ -13,6 +13,11 @@ int qHash(const TileId& key)
                  .arg(key.zoom));
 }
 
+QDebug& operator<<(QDebug& debug, const TileId& tile)
+{
+    debug << "TileId(" << tile.type << tile.x << tile.y << tile.zoom << ")";
+    return debug;
+}
 
 Tile::Tile(QString type, int x, int y, int zoom)
         : _type(type), _x(x), _y(y), _zoom(zoom)

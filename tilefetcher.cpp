@@ -1,7 +1,6 @@
-//#define QT_NO_DEBUG_OUTPUT
+#define QT_NO_DEBUG_OUTPUT
 #include <QtDebug>
 #include <QByteArray>
-//#include <QMutexLocker>
 #include <QApplication>
 
 #include "disktask.h"

@@ -25,8 +25,8 @@ class DiskTask : public Task
 
     private:
         QString getTileFileName(QString type, int x, int y, int zoom);
-        void readMgm();
-        void readSingleFile();
+        QByteArray readMgm();
+        QByteArray readSingleFile();
 
         bool store;
         QByteArray store_data;

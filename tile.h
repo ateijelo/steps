@@ -33,6 +33,8 @@ class TileId
 
 int qHash(const TileId& key);
 
+QDebug& operator<<(QDebug& debug, const TileId& tile);
+
 typedef QPair<int,int> TileCoords;
 
 class Tile : public QGraphicsPixmapItem

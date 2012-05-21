@@ -6,6 +6,17 @@
 
 #include "tile.h"
 
+class TileWrap
+{
+public:
+    TileWrap(const QByteArray &data, const TileId &id);
+    ~TileWrap();
+    static int count;
+    static int total;
+    QByteArray *data;
+    TileId tile;
+};
+
 class MemCache : public QObject
 {
     Q_OBJECT
@@ -24,7 +35,7 @@ class MemCache : public QObject
     public slots:
 
     private:
-        QCache<TileId,QByteArray> cache;
+        QCache<TileId,TileWrap> cache;
     
 };
 
