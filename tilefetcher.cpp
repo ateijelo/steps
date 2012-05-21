@@ -10,7 +10,7 @@
 TileFetcher::TileFetcher(QObject *parent) :
     QObject(parent)
 {
-    for (int i=0; i<2; i++)
+    for (int i=0; i<1; i++)
     {
         QThread *t = new QThread(this);
         idleDiskThreads.insert(t);
@@ -70,8 +70,6 @@ void TileFetcher::fetchTile(const QString &maptype, int x, int y, int zoom)
     }
 
     requests.insert(r);
-
-    wakeUp();
 }
 
 void TileFetcher::forgetRequest(const QString &type, int x, int y, int zoom)
@@ -109,6 +107,7 @@ void TileFetcher::diskTileData(const QString &type, int x, int y, int z,
     {
         emit tileData(type,x,y,z,data);
         memCache.insert(tile,data);
+        diskRequests.remove(tile);
     }
     else
     {
@@ -135,15 +134,15 @@ void TileFetcher::networkTileData(const QString &type, int x, int y, int z,
 
 void TileFetcher::diskTaskFinished(Task *task)
 {
-    QThread* thread = task->thread();
-    QSet<QThread*>::iterator i = activeDiskThreads.find(thread);
-    if (i == activeDiskThreads.end())
-    {
-        qDebug("The thread of the disk task that just finished is not in the active list!");
-        exit(EXIT_FAILURE);
-    }
-    activeDiskThreads.erase(i);
-    idleDiskThreads.insert(thread);
+//    QThread* thread = task->thread();
+//    QSet<QThread*>::iterator i = activeDiskThreads.find(thread);
+//    if (i == activeDiskThreads.end())
+//    {
+//        qDebug("The thread of the disk task that just finished is not in the active list!");
+//        exit(EXIT_FAILURE);
+//    }
+//    activeDiskThreads.erase(i);
+//    idleDiskThreads.insert(thread);
 
     task->deleteLater();
     wakeUp();
@@ -199,11 +198,11 @@ void TileFetcher::work()
                 this,SLOT(diskTileData(QString,int,int,int,QByteArray)));
         connect(task,SIGNAL(finished(Task*)),this,SLOT(diskTaskFinished(Task*)));
 
-        QSet<QThread*>::iterator j = idleDiskThreads.begin();
-        QThread *thread = *j;
-        activeDiskThreads.insert(thread);
-        idleDiskThreads.erase(j);
-        task->moveToThread(thread);
+//        QSet<QThread*>::iterator j = idleDiskThreads.begin();
+//        QThread *thread = *j;
+//        activeDiskThreads.insert(thread);
+//        idleDiskThreads.erase(j);
+//        task->moveToThread(thread);
         task->start();
 
         diskRequests.erase(i);
@@ -219,11 +218,11 @@ void TileFetcher::work()
 
         connect(task,SIGNAL(finished(Task*)),this,SLOT(diskTaskFinished(Task*)));
 
-        QSet<QThread*>::iterator j = idleDiskThreads.begin();
-        QThread *thread = *j;
-        activeDiskThreads.insert(thread);
-        idleDiskThreads.erase(j);
-        task->moveToThread(thread);
+//        QSet<QThread*>::iterator j = idleDiskThreads.begin();
+//        QThread *thread = *j;
+//        activeDiskThreads.insert(thread);
+//        idleDiskThreads.erase(j);
+//        task->moveToThread(thread);
         task->start();
 
         diskWriteRequests.erase(i);

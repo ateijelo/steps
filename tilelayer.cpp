@@ -80,8 +80,11 @@ Tile* TileLayer::newTile(int x, int y)
                     << " z =" << z
                     << " zoom =" << zoom;
             TileId tile(type,qx,qy,z);
-            fetchRequests.insert(tile);
-            emit fetchTile(type,qx,qy,z);
+            if (!fetchRequests.contains(tile))
+            {
+                fetchRequests.insert(tile);
+                emit fetchTile(type,qx,qy,z);
+            }
         }
         else
         {
@@ -226,6 +229,7 @@ void TileLayer::setRegion(const QRect& m, int zoom)
     }
 
     adjustAfterIntersection(n);
+    fetcher.wakeUp();
 
     region = n;
 }
