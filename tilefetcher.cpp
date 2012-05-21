@@ -24,6 +24,7 @@ TileFetcher::TileFetcher(QObject *parent) :
     }
 
     wakeUpEvent = QEvent::Type(QEvent::registerEventType());
+    pendingWakeUp = false;
 }
 
 TileFetcher::~TileFetcher()
@@ -39,13 +40,19 @@ void TileFetcher::customEvent(QEvent *event)
 {
     if (event->type() == wakeUpEvent)
     {
+        pendingWakeUp = false;
         work();
     }
 }
 
 void TileFetcher::wakeUp()
 {
-    qApp->postEvent(this, new QEvent(wakeUpEvent));
+    qDebug() << "TileFetcher::wakeUp()";
+    if (!pendingWakeUp)
+    {
+        pendingWakeUp = true;
+        qApp->postEvent(this, new QEvent(wakeUpEvent));
+    }
 }
 
 void TileFetcher::fetchTile(const QString &maptype, int x, int y, int zoom)
@@ -70,6 +77,7 @@ void TileFetcher::fetchTile(const QString &maptype, int x, int y, int zoom)
     }
 
     requests.insert(r);
+    wakeUp();
 }
 
 void TileFetcher::forgetRequest(const QString &type, int x, int y, int zoom)

@@ -229,7 +229,6 @@ void TileLayer::setRegion(const QRect& m, int zoom)
     }
 
     adjustAfterIntersection(n);
-    fetcher.wakeUp();
 
     region = n;
 }

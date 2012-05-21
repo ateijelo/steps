@@ -44,6 +44,7 @@ class TileFetcher : public QObject
 
     private:
         QEvent::Type wakeUpEvent;
+        bool pendingWakeUp;
 
         void work();
         void debug(const QString& header);
