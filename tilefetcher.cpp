@@ -1,5 +1,6 @@
 //#define QT_NO_DEBUG_OUTPUT
 #include <QApplication>
+#include <QtAlgorithms>
 #include <QByteArray>
 #include <QSettings>
 #include <QtEndian>
@@ -338,7 +339,10 @@ void TileFetcher::work()
 
     while (qMin(idleNetworkThreads.count(),networkRequests.count()) > 0)
     {
-        QSet<TileId>::iterator i = networkRequests.begin();
+        QList<TileId> l = networkRequests.values();
+        qSort(l.begin(),l.end(),fetchOrder);
+
+        QSet<TileId>::iterator i = networkRequests.find(l.at(0));
         TileId r = *i;
         NetworkTask *task = new NetworkTask(r);
 
@@ -358,6 +362,23 @@ void TileFetcher::work()
         activeNetworkRequests.insert(r);
     }
 
+}
+
+bool fetchOrder(const TileId& t1, const TileId& t2)
+{
+    if (t1.zoom < t2.zoom)
+        return true;
+    if (t1.zoom > t2.zoom)
+        return false;
+    if (t1.y < t2.y)
+        return true;
+    if (t1.y > t2.y)
+        return false;
+    if (t1.x < t2.x)
+        return true;
+    if (t1.x > t2.x)
+        return false;
+    return false;
 }
 
 void TileFetcher::debug(const QString& header)

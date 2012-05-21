@@ -68,4 +68,6 @@ class TileFetcher : public QObject
         //QMutex mutex;
 };
 
+bool fetchOrder(const TileId& t1, const TileId& t2);
+
 #endif // TILEFETCHER_H
