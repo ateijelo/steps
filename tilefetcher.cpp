@@ -1,4 +1,3 @@
-#define QT_NO_DEBUG_OUTPUT
 #include <QApplication>
 #include <QByteArray>
 #include <QSettings>
@@ -11,6 +10,7 @@
 #include "networktask.h"
 #include "tilefetcher.h"
 #include "constants.h"
+#include "debug.h"
 
 TileFetcher::TileFetcher(QObject *parent) :
     QObject(parent)
@@ -34,6 +34,12 @@ TileFetcher::TileFetcher(QObject *parent) :
 
 TileFetcher::~TileFetcher()
 {
+    foreach (NetworkTask *n, networkTasks)
+    {
+//        disconnect(this,SLOT(networkTaskFinished(Task*)));
+//        //n->stop();
+//        delete n;
+    }
     foreach (QThread *t, idleDiskThreads+activeDiskThreads+idleNetworkThreads+activeNetworkThreads)
     {
         t->quit();
@@ -52,7 +58,7 @@ void TileFetcher::customEvent(QEvent *event)
 
 void TileFetcher::wakeUp()
 {
-    qDebug() << "TileFetcher::wakeUp()";
+    fDebug(DEBUG_FETCHREQUESTS) << "TileFetcher::wakeUp()";
     if (!pendingWakeUp)
     {
         pendingWakeUp = true;
@@ -62,23 +68,24 @@ void TileFetcher::wakeUp()
 
 void TileFetcher::fetchTile(const QString &maptype, int x, int y, int zoom)
 {
-    qDebug() << "TileFetcher::fetchTile" << maptype << x << y << zoom;
+    fDebug(DEBUG_FETCHREQUESTS) << "TileFetcher::fetchTile" << maptype << x << y << zoom;
 
 //    QMutexLocker l(&mutex);
     TileId r(maptype,x,y,zoom);
     if (requests.contains(r))
     {
-        qDebug() << "  request already queued.";
+        fDebug(DEBUG_FETCHREQUESTS) << "  request already queued.";
         return;
     }
     if (diskRequests.contains(r))
     {
-        qDebug() << "  request already in disk queue.";
+        fDebug(DEBUG_FETCHREQUESTS) << "  request already in disk queue.";
         return;
     }
     if (networkRequests.contains(r))
     {
-        qDebug() << "  request already in network queue.";
+        fDebug(DEBUG_FETCHREQUESTS) << "  request already in network queue.";
+        return;
     }
 
     requests.insert(r);
@@ -87,7 +94,7 @@ void TileFetcher::fetchTile(const QString &maptype, int x, int y, int zoom)
 
 void TileFetcher::forgetRequest(const QString &type, int x, int y, int zoom)
 {
-    qDebug() << "TileFetcher::forgetRequest" << type << x << y << zoom;
+    fDebug(DEBUG_FETCHREQUESTS) << "TileFetcher::forgetRequest" << type << x << y << zoom;
 
 //    QMutexLocker l(&mutex);
     TileId r(type,x,y,zoom);
@@ -112,25 +119,6 @@ void TileFetcher::forgetRequest(const QString &type, int x, int y, int zoom)
     }
 }
 
-void TileFetcher::diskTileData(const QString &type, int x, int y, int z,
-                               const QByteArray &data)
-{
-    TileId tile(type,x,y,z);
-    if (!data.isEmpty())
-    {
-        emit tileData(type,x,y,z,data);
-        memCache.insert(tile,data);
-    }
-    else
-    {
-//        mutex.lock();
-        networkRequests.insert(tile);
-//        mutex.unlock();
-    }
-    diskRequests.remove(tile);
-    wakeUp();
-}
-
 void TileFetcher::networkTileData(const QString &type, int x, int y, int z,
                                   const QByteArray &data)
 {
@@ -151,7 +139,7 @@ void TileFetcher::diskTaskFinished(Task *task)
     QSet<QThread*>::iterator i = activeDiskThreads.find(thread);
     if (i == activeDiskThreads.end())
     {
-        qDebug("The thread of the disk task that just finished is not in the active list!");
+        fDebug(DEBUG_DISK) << "The thread of the disk task that just finished is not in the active list!";
         exit(EXIT_FAILURE);
     }
     activeDiskThreads.erase(i);
@@ -167,7 +155,7 @@ void TileFetcher::networkTaskFinished(Task *task)
     QSet<QThread*>::iterator i = activeNetworkThreads.find(thread);
     if (i == activeNetworkThreads.end())
     {
-        qDebug("The thread of the network task just finished is not in the active list!");
+        fDebug(DEBUG_NETWORK) << "The thread of the network task just finished is not in the active list!";
         exit(EXIT_FAILURE);
     }
     activeNetworkThreads.erase(i);
@@ -175,6 +163,7 @@ void TileFetcher::networkTaskFinished(Task *task)
 
     NetworkTask *n = static_cast<NetworkTask*>(task);
     activeNetworkRequests.remove(n->tileId());
+    networkTasks.remove(n);
 
     task->deleteLater();
     wakeUp();
@@ -191,7 +180,7 @@ void TileFetcher::readMgm(const TileId& tile)
             .arg(tile.zoom)
             .arg(mgm_x)
             .arg(mgm_y);
-    qDebug() << this << "started. Fetching" << tile.x << tile.y << "from" << filename;
+    fDebug(DEBUG_DISK) << this << "started. Fetching" << tile.x << tile.y << "from" << filename;
     QFile mgm(filename);
     QHash<TileId,QPair<quint32,quint32> > mgmTiles;
     if (mgm.open(QIODevice::ReadOnly))
@@ -203,7 +192,7 @@ void TileFetcher::readMgm(const TileId& tile)
         r += mgm.read((char*)(&no_tiles),2);
         if (r != 2)
         {
-            qDebug() << "error reading no_tiles";
+            fDebug(DEBUG_DISK) << "error reading no_tiles";
             no_tiles = 0;
         }
         no_tiles = qFromBigEndian(no_tiles);
@@ -215,7 +204,7 @@ void TileFetcher::readMgm(const TileId& tile)
             r += mgm.read((char*)(&tile_end),4);
             if (r != 6)
             {
-                qDebug() << "error reading tile entry " << i;
+                fDebug(DEBUG_DISK) << "error reading tile entry " << i;
                 break;
             }
             tile_end = qFromBigEndian(tile_end);
@@ -238,7 +227,7 @@ void TileFetcher::readMgm(const TileId& tile)
                              (t.zoom == tile.zoom));
         if (tBelongsHere)
         {
-            qDebug() << "tile" << t << "in queue, in the range of the mgm, but absent.";
+            fDebug(DEBUG_DISK) << "tile" << t << "in queue, in the range of the mgm, but absent.";
             i = diskRequests.erase(i);
             networkRequests.insert(t);
         }
@@ -257,13 +246,13 @@ void TileFetcher::readMgm(const TileId& tile)
         QByteArray data = mgm.read(tile_size);
         if (static_cast<quint32>(data.size()) != tile_size)
         {
-            qDebug() << "error reading tile " << tile.x << "," << tile.y << "data";
+            fDebug(DEBUG_DISK) << "error reading tile " << tile.x << "," << tile.y << "data";
             networkRequests.insert(t);
             continue;
         }
         else
         {
-            qDebug() << "found tile" << t << "in mgm";
+            fDebug(DEBUG_DISK) << "found tile" << t << "in mgm";
             emit tileData(t.type,t.x,t.y,t.zoom,data);
             memCache.insert(t,data);
         }
@@ -275,13 +264,16 @@ bool TileFetcher::readSingleFile(const TileId& tile)
     QSettings settings;
     QDir d(settings.value(SettingsKeys::CachePath,"").toString());
     QFile f(d.absoluteFilePath(QString("cache/%1/%2/%3_%4").arg(tile.type).arg(tile.zoom).arg(tile.x).arg(tile.y)));
-    qDebug() << "opening" << f.fileName();
+    fDebug(DEBUG_DISK) << "opening" << f.fileName();
     if (f.open(QIODevice::ReadOnly))
     {
-        diskTileData(tile.type,tile.x,tile.y,tile.zoom,f.readAll());
+        QByteArray data = f.readAll();
+        emit tileData(tile.type,tile.x,tile.y,tile.zoom,data);
+        memCache.insert(tile,data);
+        diskRequests.remove(tile);
         return true;
     }
-    qDebug() << "   failed";
+    fDebug(DEBUG_DISK) << "   failed";
     return false;
 }
 
@@ -341,6 +333,7 @@ void TileFetcher::work()
         QSet<TileId>::iterator i = networkRequests.begin();
         TileId r = *i;
         NetworkTask *task = new NetworkTask(r);
+        networkTasks.insert(task);
 
         connect(task,SIGNAL(tileData(QString,int,int,int,QByteArray)),
                 this,SLOT(networkTileData(QString,int,int,int,QByteArray)));
@@ -362,22 +355,25 @@ void TileFetcher::work()
 
 void TileFetcher::debug(const QString& header)
 {
-    qDebug() << header;
-//    qDebug() << "  idleDiskThreads:" << idleDiskThreads;
-    
-    qDebug() << "  requests:";
-    foreach (const TileId& r, requests)
-        qDebug() << "   " << r.type << r.x << r.y << r.zoom;
-    
-    qDebug() << "  diskRequests:";
-    foreach (const TileId& r, diskRequests)
-        qDebug() << "   " << r.type << r.x << r.y << r.zoom;
-    
-    qDebug() << "  networkRequests:";
-    foreach (const TileId& r, networkRequests)
-        qDebug() << "   " << r.type << r.x << r.y << r.zoom;
+    if_enabled(DEBUG_FETCHQUEUES)
+    {
+        qDebug() << header;
+    //    qDebug() << "  idleDiskThreads:" << idleDiskThreads;
 
-    qDebug() << "  activeNetworkRequests:";
-    foreach (const TileId& r, activeNetworkRequests)
-        qDebug() << "   " << r.type << r.x << r.y << r.zoom;
+        qDebug() << "  requests:";
+        foreach (const TileId& r, requests)
+            qDebug() << "   " << r.type << r.x << r.y << r.zoom;
+
+        qDebug() << "  diskRequests:";
+        foreach (const TileId& r, diskRequests)
+            qDebug() << "   " << r.type << r.x << r.y << r.zoom;
+
+        qDebug() << "  networkRequests:";
+        foreach (const TileId& r, networkRequests)
+            qDebug() << "   " << r.type << r.x << r.y << r.zoom;
+
+        qDebug() << "  activeNetworkRequests:";
+        foreach (const TileId& r, activeNetworkRequests)
+            qDebug() << "   " << r.type << r.x << r.y << r.zoom;
+    }
 }

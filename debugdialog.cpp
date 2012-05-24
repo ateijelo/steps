@@ -1,3 +1,5 @@
+#include <QSettings>
+
 #include "debugdialog.h"
 #include "ui_debugdialog.h"
 
@@ -8,7 +10,22 @@ DebugDialog::DebugDialog(QWidget *parent) :
     ui(new Ui::DebugDialog)
 {
     ui->setupUi(this);
-    connect(ui->network,SIGNAL(toggled(bool)),this,SLOT(checkBoxClicked(bool)));
+    int i=0;
+    QSettings settings;
+    debugflags = settings.value("DebugFlags",0).toULongLong();
+    while (true)
+    {
+        const char *label = flagLabels[i];
+        if (label == NULL)
+            break;
+        QCheckBox *b = new QCheckBox(label,this);
+        ui->verticalLayout->insertWidget(i+1,b);
+        connect(b,SIGNAL(toggled(bool)),this,SLOT(checkBoxClicked(bool)));
+        boxes.insert(b,Q_UINT64_C(1) << i);
+        if (debugflags & Q_UINT64_C(1) << i)
+            b->setChecked(true);
+        i++;
+    }
 }
 
 DebugDialog::~DebugDialog()
@@ -18,14 +35,11 @@ DebugDialog::~DebugDialog()
 
 void DebugDialog::checkBoxClicked(bool checked)
 {
-    QObject *s = sender();
-    if (s == ui->network)
-        toggleFlag(checked,DEBUG_NETWORK);
-    if (s == ui->disk)
-        toggleFlag(checked,DEBUG_DISK);
+    QCheckBox *b = static_cast<QCheckBox*>(sender());
+    toggleFlag(checked,boxes.value(b));
 }
 
-void DebugDialog::toggleFlag(bool checked, int flag)
+void DebugDialog::toggleFlag(bool checked, quint64 flag)
 {
     if (checked)
     {
@@ -35,6 +49,8 @@ void DebugDialog::toggleFlag(bool checked, int flag)
     {
         debugflags &= ~flag;
     }
+    QSettings settings;
+    settings.setValue("DebugFlags",debugflags);
 }
 
 void DebugDialog::changeEvent(QEvent *e)

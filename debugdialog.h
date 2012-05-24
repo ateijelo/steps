@@ -1,6 +1,7 @@
 #ifndef DEBUGDIALOG_H
 #define DEBUGDIALOG_H
 
+#include <QHash>
 #include <QDialog>
 #include <QCheckBox>
 
@@ -23,8 +24,9 @@ private slots:
     void checkBoxClicked(bool checked);
     
 private:
-    void toggleFlag(bool checked, int flag);
+    void toggleFlag(bool checked, quint64 flag);
     Ui::DebugDialog *ui;
+    QHash<QCheckBox*,quint64> boxes;
 };
 
 #endif // DEBUGDIALOG_H
