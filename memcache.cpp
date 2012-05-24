@@ -5,7 +5,7 @@
 MemCache::MemCache(QObject *parent) :
     QObject(parent)
 {
-    cache.setMaxCost(100*1024*1024);
+    cache.setMaxCost(50*1024*1024);
 }
 
 QByteArray MemCache::getTileData(const QString &type, int x, int y, int zoom) const

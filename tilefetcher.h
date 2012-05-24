@@ -13,6 +13,7 @@
 #include "tile.h"
 #include "task.h"
 #include "memcache.h"
+#include "networktask.h"
 
 class TileFetcher : public QObject
 {
@@ -32,8 +33,6 @@ class TileFetcher : public QObject
         void forgetRequest(const QString& type, int x, int y, int zoom);
 
     private slots:
-        void diskTileData(const QString& type, int x, int y, int z,
-                          const QByteArray& data);
         void diskTaskFinished(Task* task);
         void networkTileData(const QString& type, int x, int y, int z,
                           const QByteArray& data);
@@ -64,6 +63,7 @@ class TileFetcher : public QObject
         QSet<QThread*> activeDiskThreads;
         QSet<QThread*> idleNetworkThreads;
         QSet<QThread*> activeNetworkThreads;
+        QSet<NetworkTask*> networkTasks;
 
         //QMutex mutex;
 };
