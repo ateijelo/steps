@@ -27,7 +27,7 @@ TileLayer::TileLayer()
 void TileLayer::tileData(const QString &type, int x, int y, int z,
                               const QByteArray &bytes)
 {
-    qDebug() << "tileData: type =" << type << " x =" << x
+    fDebug(DEBUG_TILELAYER) << "tileData: type =" << type << " x =" << x
             << " y =" << y << " z =" << z << " zoom =" << zoom;
     TileId tile(type,x,y,z);
     fetchRequests.remove(tile);
@@ -47,7 +47,7 @@ void TileLayer::tileData(const QString &type, int x, int y, int z,
         {
             if (t->isWithin(x,y,z))
             {
-                qDebug() << "    Using it.";
+                fDebug(DEBUG_TILELAYER) << "    Using it.";
                 t->loadPixmap(p,z);
             }
         }
@@ -73,7 +73,7 @@ Tile* TileLayer::newTile(int x, int y)
         int qy = y >> (zoom - z); // y/(2^(zoom-z))
         if (!QPixmapCache::find(Tile::tileKey(type,qx,qy,z),&p))
         {
-            qDebug() << "newTile: pixmap cache miss:"
+            fDebug(DEBUG_TILELAYER) << "newTile: pixmap cache miss:"
                     << " type =" << type
                     << " qx =" << qx
                     << " qy =" << qy
@@ -83,13 +83,13 @@ Tile* TileLayer::newTile(int x, int y)
             if (!fetchRequests.contains(tile))
             {
                 fetchRequests.insert(tile);
-                qDebug() << "TileLayer.fetchRequests" << fetchRequests;
+                fDebug(DEBUG_TILELAYER) << "TileLayer.fetchRequests" << fetchRequests;
                 emit fetchTile(type,qx,qy,z);
             }
         }
         else
         {
-            qDebug() << "newTile: pixmap cache hit:"
+            fDebug(DEBUG_TILELAYER) << "newTile: pixmap cache hit:"
                     << " type =" << type
                     << " qx =" << qx
                     << " qy =" << qy

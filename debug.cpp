@@ -6,5 +6,6 @@ const char *flagLabels[] = {
     "Disk Activity",
     "TileFetcher Queues",
     "TileFetcher Requests",
+    "Tile Layer",
     NULL
 };

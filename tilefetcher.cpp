@@ -16,7 +16,6 @@
 TileFetcher::TileFetcher(QObject *parent) :
     QObject(parent)
 {
-    qDebug() << "TileFetcher::TileFetcher()";
     for (int i=0; i<2; i++)
     {
         QThread *t = new QThread(this);
@@ -51,10 +50,10 @@ TileFetcher::~TileFetcher()
 
 void TileFetcher::customEvent(QEvent *event)
 {
-    qDebug() << "TileFetcher::customEvent()";
+    fDebug(DEBUG_FETCHREQUESTS) << "TileFetcher::customEvent()";
     if (event->type() == wakeUpEvent)
     {
-        qDebug() << "    wakeUpEvent";
+        fDebug(DEBUG_FETCHREQUESTS) << "    wakeUpEvent";
         pendingWakeUp = false;
         work();
     }

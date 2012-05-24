@@ -11,6 +11,7 @@
 
 #include "tile.h"
 #include "tilefetcher.h"
+#include "debug.h"
 
 class TileLayer : public QObject
 {
