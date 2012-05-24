@@ -1,9 +1,9 @@
-#define QT_NO_DEBUG_OUTPUT
 #include <QtDebug>
 #include <QSettings>
 #include <QNetworkReply>
 #include <QNetworkProxy>
 
+#include "debug.h"
 #include "networktask.h"
 
 NetworkTask::NetworkTask(const TileId& tile, QObject *parent) :
@@ -26,7 +26,11 @@ NetworkTask::~NetworkTask()
 
 void NetworkTask::work()
 {
-    qDebug() << "NetworkTask::work()";
+    debugBlock(DEBUG_NETWORK)
+    {
+        qDebug() << "debugflags:" << debugflags;
+        qDebug() << "NetworkTask::work()";
+    }
     QSettings settings;
     QNetworkProxy proxy;
     QNetworkProxy noProxy;
@@ -41,6 +45,7 @@ void NetworkTask::work()
     proxy.setPassword(settings.value("ProxyPass","").toString());
     if (settings.value("UseProxy",false).toBool())
     {
+        debugBlock(DEBUG_NETWORK)
         qDebug() << "using proxy";
         net->setProxy(proxy);
     }
@@ -83,19 +88,26 @@ void NetworkTask::work()
         emit finished(this);
     }
 
+    debugBlock(DEBUG_NETWORK)
     qDebug() << "network request for" << tile.type << tile.x << tile.y << tile.zoom;
 }
 
 void NetworkTask::replyFinished(QNetworkReply *reply)
 {
-    qDebug() << "network reply for" << tile.type << tile.x << tile.y << tile.zoom;
+    debugBlock(DEBUG_NETWORK)
+    {
+        qDebug() << "network reply for" << tile.type << tile.x << tile.y << tile.zoom;
+    }
     if (reply->error() == 0)
     {
         emit tileData(tile.type,tile.x,tile.y,tile.zoom,reply->readAll());
     }
     else
     {
-        qDebug() << "    error code:" << reply->error() << "(" << reply->errorString() << ")";
+        debugBlock(DEBUG_NETWORK)
+        {
+            qDebug() << "    error code:" << reply->error() << "(" << reply->errorString() << ")";
+        }
     }
     reply->deleteLater();
     emit finished(this);
