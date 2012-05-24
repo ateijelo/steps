@@ -217,25 +217,30 @@ void TileFetcher::readMgm(const TileId& tile)
             tile_start = tile_end;
         }
     }
-    QSet<TileId>::iterator i = diskRequests.begin();
-    while (i != diskRequests.end())
+    if (!mgmTiles.contains(tile))
     {
-        TileId t = *i;
-        bool tBelongsHere = ((t.type == tile.type) &&
-                             ((t.x >> 3) == mgm_x) &&
-                             ((t.y >> 3) == mgm_y) &&
-                             (t.zoom == tile.zoom));
-        if (tBelongsHere)
-        {
-            fDebug(DEBUG_DISK) << "tile" << t << "in queue, in the range of the mgm, but absent.";
-            i = diskRequests.erase(i);
-            networkRequests.insert(t);
-        }
-        else
-        {
-            i++;
-        }
+        diskRequests.remove(tile);
+        networkRequests.insert(tile);
     }
+//    QSet<TileId>::iterator i = diskRequests.begin();
+//    while (i != diskRequests.end())
+//    {
+//        TileId t = *i;
+//        bool tBelongsHere = ((t.type == tile.type) &&
+//                             ((t.x >> 3) == mgm_x) &&
+//                             ((t.y >> 3) == mgm_y) &&
+//                             (t.zoom == tile.zoom));
+//        if (tBelongsHere)
+//        {
+//            fDebug(DEBUG_DISK) << "tile" << t << "in queue, in the range of the mgm, but absent.";
+//            i = diskRequests.erase(i);
+//            networkRequests.insert(t);
+//        }
+//        else
+//        {
+//            i++;
+//        }
+//    }
     for (QHash<TileId,QPair<quint32,quint32> >::iterator i = mgmTiles.begin(); i != mgmTiles.end(); i++)
     {
         TileId t = i.key();
