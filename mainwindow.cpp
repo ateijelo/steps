@@ -14,6 +14,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui.setupUi(this);
 
     preferences = new Preferences(this);
+    debugDialog = new DebugDialog(this);
+    debugShortcut = new QShortcut(QKeySequence(tr("Ctrl+Shift+D","Show Debug Dialog")),this);
+    debugShortcut->setContext(Qt::ApplicationShortcut);
+    connect(debugShortcut,SIGNAL(activated()),debugDialog,SLOT(show()));
 
     zoomSlider.setMinimum(0);
     zoomSlider.setMaximum(ui.mapView->maxZoomLevel());

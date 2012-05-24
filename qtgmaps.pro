@@ -23,9 +23,12 @@ HEADERS += mainwindow.h \
     memcache.h \
     task.h \
     disktask.h \
-    networktask.h
+    networktask.h \
+    debug.h \
+    debugdialog.h
 FORMS += mainwindow.ui \
-    preferences.ui
+    preferences.ui \
+    debugdialog.ui
 SOURCES += main.cpp \
     mainwindow.cpp \
     mapview.cpp \
@@ -39,5 +42,7 @@ SOURCES += main.cpp \
     memcache.cpp \
     task.cpp \
     disktask.cpp \
-    networktask.cpp
+    networktask.cpp \
+    debug.cpp \
+    debugdialog.cpp
 RESOURCES += qtgmaps.qrc

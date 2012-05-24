@@ -19,9 +19,10 @@ class NetworkTask : public Task
                       const QByteArray& data);
 
     public slots:
+        void stop();
 
     private slots:
-        void replyFinished(QNetworkReply *reply);
+        void replyFinished(QNetworkReply *r);
 
     protected:
         void work();
@@ -29,6 +30,7 @@ class NetworkTask : public Task
     private:
         TileId tile;
         QNetworkAccessManager *net;
+        QNetworkReply *reply;
     
 };
 
