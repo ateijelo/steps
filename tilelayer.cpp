@@ -21,7 +21,7 @@ TileLayer::TileLayer()
     fetcherThread->start();
 
     tileKeyTemplate = "%1:%2:%3:%4";
-    //QPixmapCache::setCacheLimit(50*1024);
+    QPixmapCache::setCacheLimit(50*1024);
 }
 
 void TileLayer::tileData(const QString &type, int x, int y, int z,
