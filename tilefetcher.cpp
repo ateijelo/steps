@@ -35,12 +35,6 @@ TileFetcher::TileFetcher(QObject *parent) :
 
 TileFetcher::~TileFetcher()
 {
-    foreach (NetworkTask *n, networkTasks)
-    {
-//        disconnect(this,SLOT(networkTaskFinished(Task*)));
-//        //n->stop();
-//        delete n;
-    }
     foreach (QThread *t, idleDiskThreads+activeDiskThreads+idleNetworkThreads+activeNetworkThreads)
     {
         t->quit();
@@ -166,7 +160,6 @@ void TileFetcher::networkTaskFinished(Task *task)
 
     NetworkTask *n = static_cast<NetworkTask*>(task);
     activeNetworkRequests.remove(n->tileId());
-    networkTasks.remove(n);
 
     task->deleteLater();
     wakeUp();
@@ -344,7 +337,6 @@ void TileFetcher::work()
         QSet<TileId>::iterator i = networkRequests.find(l.at(0));
         TileId r = *i;
         NetworkTask *task = new NetworkTask(r);
-        networkTasks.insert(task);
 
         connect(task,SIGNAL(tileData(QString,int,int,int,QByteArray)),
                 this,SLOT(networkTileData(QString,int,int,int,QByteArray)));

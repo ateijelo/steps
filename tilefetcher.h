@@ -63,7 +63,6 @@ class TileFetcher : public QObject
         QSet<QThread*> activeDiskThreads;
         QSet<QThread*> idleNetworkThreads;
         QSet<QThread*> activeNetworkThreads;
-        QSet<NetworkTask*> networkTasks;
 
         //QMutex mutex;
 };
