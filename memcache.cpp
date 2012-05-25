@@ -1,6 +1,5 @@
-#define QT_NO_DEBUG_OUTPUT
-#include <QtDebug>
 #include "memcache.h"
+#include "debug.h"
 
 MemCache::MemCache(QObject *parent) :
     QObject(parent)
@@ -19,10 +18,10 @@ QByteArray MemCache::getTileData(const TileId &id) const
     TileWrap *a = cache.object(id);
     if (a == 0)
     {
-        qDebug() << "MemCache miss" << id;
+        fDebug(DEBUG_MEMCACHE) << "MemCache miss" << id;
         return QByteArray();
     }
-    qDebug() << "MemCache hit" << id;
+    fDebug(DEBUG_MEMCACHE) << "MemCache hit" << id;
     return *(a->data);
 }
 
@@ -49,9 +48,9 @@ void MemCache::insert(const TileId &id, const QByteArray& data)
         return;
     TileWrap *w = new TileWrap(data,id);
     cache.insert(id,w,data.size());
-    qDebug() << "MemCache.cache.count:" << cache.count();
-    qDebug() << "MemCache.cache.maxCost:" << cache.maxCost();
-    qDebug() << "MemCache.cache.totalCost:" << cache.totalCost();
+    fDebug(DEBUG_MEMCACHE) << "MemCache.cache.count:" << cache.count();
+    fDebug(DEBUG_MEMCACHE) << "MemCache.cache.maxCost:" << cache.maxCost();
+    fDebug(DEBUG_MEMCACHE) << "MemCache.cache.totalCost:" << cache.totalCost();
 }
 
 TileWrap::TileWrap(const QByteArray& a, const TileId &id)
@@ -60,14 +59,14 @@ TileWrap::TileWrap(const QByteArray& a, const TileId &id)
     tile = id;
     count++;
     total+=a.size();
-    qDebug() << "MemCache tile inserted:" << tile << "(size:" << data->size() << "count:" << count << "totalsize:" << total << "wrapper:" << this << ")";
+    fDebug(DEBUG_MEMCACHE) << "MemCache tile inserted:" << tile << "(size:" << data->size() << "count:" << count << "totalsize:" << total << "wrapper:" << this << ")";
 }
 
 TileWrap::~TileWrap()
 {
     count--;
     total-=data->size();
-    qDebug() << "MemCache tile evicted" << tile << "(size:" << data->size() << "count:" << count << "totalsize:" << total << "wrapper:" << this << ")";
+    fDebug(DEBUG_MEMCACHE) << "MemCache tile evicted" << tile << "(size:" << data->size() << "count:" << count << "totalsize:" << total << "wrapper:" << this << ")";
     delete data;
 }
 

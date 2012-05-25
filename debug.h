@@ -12,6 +12,8 @@ extern const char *flagLabels[];
 #define DEBUG_FETCHQUEUES       0x00000004
 #define DEBUG_FETCHREQUESTS     0x00000008
 #define DEBUG_TILELAYER         0x00000010
+#define DEBUG_MEMCACHE          0x00000020
+#define DEBUG_PIXMAPCACHE       0x00000040
 
 #define ENABLE_DEBUGGING
 

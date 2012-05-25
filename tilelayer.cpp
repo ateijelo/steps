@@ -47,7 +47,6 @@ void TileLayer::tileData(const QString &type, int x, int y, int z,
         {
             if (t->isWithin(x,y,z))
             {
-                fDebug(DEBUG_TILELAYER) << "    Using it.";
                 t->loadPixmap(p,z);
             }
         }
@@ -73,7 +72,7 @@ Tile* TileLayer::newTile(int x, int y)
         int qy = y >> (zoom - z); // y/(2^(zoom-z))
         if (!QPixmapCache::find(Tile::tileKey(type,qx,qy,z),&p))
         {
-            fDebug(DEBUG_TILELAYER) << "newTile: pixmap cache miss:"
+            fDebug(DEBUG_PIXMAPCACHE) << "newTile: pixmap cache miss:"
                     << " type =" << type
                     << " qx =" << qx
                     << " qy =" << qy
@@ -89,7 +88,7 @@ Tile* TileLayer::newTile(int x, int y)
         }
         else
         {
-            fDebug(DEBUG_TILELAYER) << "newTile: pixmap cache hit:"
+            fDebug(DEBUG_PIXMAPCACHE) << "newTile: pixmap cache hit:"
                     << " type =" << type
                     << " qx =" << qx
                     << " qy =" << qy

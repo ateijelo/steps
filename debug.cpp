@@ -7,5 +7,7 @@ const char *flagLabels[] = {
     "TileFetcher Queues",
     "TileFetcher Requests",
     "Tile Layer",
+    "Memory Cache",
+    "Pixmap Cache",
     NULL
 };
