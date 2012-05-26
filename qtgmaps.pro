@@ -28,7 +28,7 @@ HEADERS += mainwindow.h \
     debugdialog.h
 FORMS += mainwindow.ui \
     preferences.ui \
-    debugdialog.ui
+    debugdialog.ui \
     viewwidgets.ui
 SOURCES += main.cpp \
     mainwindow.cpp \
