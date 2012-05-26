@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QSlider>
 #include <QComboBox>
+#include <QSignalMapper>
 #include <QShortcut>
 
 #include "ui_mainwindow.h"
@@ -26,6 +27,8 @@ class MainWindow : public QMainWindow
 
     private:
         Ui::MainWindow ui;
+        QList<QAction*> recentPaths;
+        QSignalMapper recentsMapper;
         QSlider zoomSlider;
         QCheckBox showLatLonAsToolTip;
         QLabel latLabel;
@@ -37,10 +40,12 @@ class MainWindow : public QMainWindow
 
     private slots:
         void openCacheDirectory();
+        void updateCacheDirectory(QString path);
         void updateLatLonLabels(const QPointF& latLon);
 
     private:
         void updateCacheStyles();
+        void updateRecents(QString top=QString());
 };
 
 #endif
