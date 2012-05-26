@@ -29,6 +29,7 @@ HEADERS += mainwindow.h \
 FORMS += mainwindow.ui \
     preferences.ui \
     debugdialog.ui
+    viewwidgets.ui
 SOURCES += main.cpp \
     mainwindow.cpp \
     mapview.cpp \

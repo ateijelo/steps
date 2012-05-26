@@ -13,6 +13,8 @@
 #include "mainscene.h"
 #include "tilelayer.h"
 
+#include "ui_viewwidgets.h"
+
 class MapView : public QGraphicsView
 {
     Q_OBJECT
@@ -64,6 +66,8 @@ class MapView : public QGraphicsView
         QPoint viewAnchor;
         TileLayer tlayer;
         bool showToolTip;
+        Ui::ViewWidgets ui;
+        QString coordsTemplate;
 };
 
 #endif

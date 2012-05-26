@@ -5,6 +5,9 @@
 #include <QClipboard>
 #include <QSettings>
 #include <QToolTip>
+#include <QHBoxLayout>
+#include <QSlider>
+#include <math.h>
 
 #include "mapview.h"
 #include "constants.h"
@@ -34,6 +37,10 @@ MapView::MapView(QWidget *parent)
     centerOn(gt.LatLon2Meters(QPointF(lon,lat)));
 
     showToolTip = settings.value(SettingsKeys::ShowLatLonAsToolTip, false).toBool();
+
+    coordsTemplate = QString::fromUtf8(" %1°%2'%3\"%4 %5°%6'%7\"%8 ");
+
+    ui.setupUi(this);
 }
 
 bool MapView::canZoomIn()
@@ -48,6 +55,27 @@ bool MapView::canZoomOut()
 
 void MapView::mouseMovedOverScene(const QPointF& scenePos)
 {
+    QPointF c = gt.Meters2LatLon(scenePos);
+
+    double a1 = fabs(c.y());
+    double d1 = floor(a1);
+    double m1 = floor(fmod(a1*60,60));
+    double s1 = fmod(a1*3600,60);
+    char ns = (c.y() > 0)? 'N' : 'S';
+
+    double a2 = fabs(c.x());
+    double d2 = floor(a2);
+    double m2 = floor(fmod(a2*60,60));
+    double s2 = fmod(a2*3600,60);
+    char ew = (c.x() > 0)? 'E' : 'W';
+
+    ui.coordsLabel->setText(coordsTemplate
+        .arg(d1,0,'f',0,' ')
+        .arg(m1,2,'f',0,'0')
+        .arg(s1,5,'f',2,'0').arg(ns)
+        .arg(d2,0,'f',0,' ')
+        .arg(m2,2,'f',0,'0')
+        .arg(s2,5,'f',2,'0').arg(ew));
     emit mouseMoved(gt.Meters2LatLon(scenePos));
 }
 
