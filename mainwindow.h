@@ -39,7 +39,7 @@ class MainWindow : public QMainWindow
 
     private:
         void updateCacheStyles();
-        void updateRecents(QString top=0);
+        void updateRecents(QString top=QString());
 };
 
 #endif
