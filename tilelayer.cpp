@@ -1,33 +1,120 @@
+//#define QT_NO_DEBUG_OUTPUT
 #include <QtDebug>
+#include <QSettings>
+#include <QPixmapCache>
 
+#include "constants.h"
 #include "tilelayer.h"
 
-TileLayer::TileLayer(int zoom, QGraphicsItem *parent)
-        : QGraphicsItem(parent), zoom(zoom)
+TileLayer::TileLayer()
 {
-    // This class considers the boundaries
-    // of the tileRegion rectangle to be inclusive
-    // So, setCoords(0,0,0,0) sets a tile region of one tile.
-    // Note that width and height would be 1 in that
-    // case.
-    tileRegion.setCoords(0,0,-1,-1);
-#if QT_VERSION >= 0x040600
-    setFlag(QGraphicsItem::ItemHasNoContents);
-#endif
+    region.setCoords(0,0,-1,-1);
+
+    fetcherThread = new QThread(this);
+    fetcher.moveToThread(fetcherThread);
+    connect(&fetcher,SIGNAL(tileData(QString,int,int,int,QByteArray)),
+            this,SLOT(tileData(QString,int,int,int,QByteArray)));
+    connect(this,SIGNAL(fetchTile(QString,int,int,int)),
+            &fetcher,SLOT(fetchTile(QString,int,int,int)));
+    connect(this,SIGNAL(forgetTile(QString,int,int,int)),
+            &fetcher,SLOT(forgetRequest(QString,int,int,int)));
+    fetcherThread->start();
+
+    tileKeyTemplate = "%1:%2:%3:%4";
+    QPixmapCache::setCacheLimit(50*1024);
 }
 
-Tile *TileLayer::newTile(int x, int y)
+void TileLayer::tileData(const QString &type, int x, int y, int z,
+                              const QByteArray &bytes)
 {
-    Tile *t = new Tile(x,y,zoom);
-    t->setParentItem(this);
-    double res = gt.resolution(zoom);
-#if QT_VERSION >= 0x040600
-    t->setScale(res);
-#else
-    t->scale(res,res);
-#endif
-    t->setPos(gt.GoogleTile2Meters(x,y,zoom));
+    fDebug(DEBUG_TILELAYER) << "tileData: type =" << type << " x =" << x
+            << " y =" << y << " z =" << z << " zoom =" << zoom;
+    TileId tile(type,x,y,z);
+    fetchRequests.remove(tile);
+    QPixmap p;
+    p.loadFromData(bytes);
+    QPixmapCache::insert(Tile::tileKey(type,x,y,z),p);
+    if (this->type != type)
+        return;
+    if (z > zoom)
+        return;
+    // The tile we've received, which range of tiles does it represent
+    // in our current level?
+    //QRectF c()
+    if (z < zoom)
+    {
+        foreach (Tile *t, tiles)
+        {
+            if (t->isWithin(x,y,z))
+            {
+                t->loadPixmap(p,z);
+            }
+        }
+        return;
+    }
+    if (tiles.contains(TileCoords(x,y)))
+    {
+        Tile *t = tiles.value(TileCoords(x,y));
+        t->loadPixmap(p,z);
+    }
+}
+
+Tile* TileLayer::newTile(int x, int y)
+{
+    Tile *t = new Tile(type,x,y,zoom);
+    tiles.insert(t->coords(),t);
+    emit tileCreated(t,x,y,zoom);
+
+    QPixmap p;
+    for (int z = zoom; z>=0; z--)
+    {
+        int qx = x >> (zoom - z); // x/(2^(zoom-z))
+        int qy = y >> (zoom - z); // y/(2^(zoom-z))
+        if (!QPixmapCache::find(Tile::tileKey(type,qx,qy,z),&p))
+        {
+            fDebug(DEBUG_PIXMAPCACHE) << "newTile: pixmap cache miss:"
+                    << " type =" << type
+                    << " qx =" << qx
+                    << " qy =" << qy
+                    << " z =" << z
+                    << " zoom =" << zoom;
+            TileId tile(type,qx,qy,z);
+            if (!fetchRequests.contains(tile))
+            {
+                fetchRequests.insert(tile);
+                fDebug(DEBUG_TILELAYER) << "TileLayer.fetchRequests" << fetchRequests;
+                emit fetchTile(type,qx,qy,z);
+            }
+        }
+        else
+        {
+            fDebug(DEBUG_PIXMAPCACHE) << "newTile: pixmap cache hit:"
+                    << " type =" << type
+                    << " qx =" << qx
+                    << " qy =" << qy
+                    << " z =" << z
+                    << " zoom =" << zoom;
+            t->loadPixmap(p,z);
+            break;
+        }
+    }
+
     return t;
+}
+
+void TileLayer::deleteTile(Tile *t)
+{
+    tiles.remove(t->coords());
+
+    TileId tile(t->tileType(),t->tileX(),t->tileY(),t->zoom());
+    QSet<TileId>::iterator i = fetchRequests.find(tile);
+    if (i != fetchRequests.end())
+    {
+        fetchRequests.erase(i);
+        emit forgetTile(tile.type,tile.x,tile.y,tile.zoom);
+    }
+
+    delete t;
 }
 
 void TileLayer::deleteColumn(Column *c)
@@ -35,7 +122,7 @@ void TileLayer::deleteColumn(Column *c)
     TilePointer p = c->begin();
     while (p!=c->end())
     {
-        delete (*p);
+        deleteTile(*p);
         p = c->erase(p);
     }
     delete c;
@@ -43,7 +130,7 @@ void TileLayer::deleteColumn(Column *c)
 
 TileLayer::ColumnPointer TileLayer::adjustBeforeIntersection(const QRect& n)
 {
-    QRect& o = tileRegion; // n => new, o => old
+    QRect& o = region; // n => new, o => old
 
     // Columns to be deleted from front
     for (int i=o.left(); i<=qMin(o.right(),n.left()-1); i++)
@@ -69,14 +156,14 @@ TileLayer::ColumnPointer TileLayer::adjustBeforeIntersection(const QRect& n)
 
 void TileLayer::adjustColumn(Column* col, const QRect& n, int x)
 {
-    QRect& o = tileRegion; // n => new, o => old
+    QRect& o = region; // n => new, o => old
     TilePointer p;
 
     // Tiles to be deleted from the beginning of the column
     for (int i=o.top(); i<=qMin(o.bottom(),n.top()-1); i++)
     {
         Tile *t = col->takeFirst();
-        delete t;
+        deleteTile(t);
     }
     // Tiles to be prepended in the beginning of the column
     p = col->begin();
@@ -89,7 +176,7 @@ void TileLayer::adjustColumn(Column* col, const QRect& n, int x)
     for (int i=qMax(n.bottom()+1,o.top()); i<=o.bottom(); i++)
     {
         Tile *t = col->takeLast();
-        delete t;
+        deleteTile(t);
     }
     // Tiles to be appended to the end of the column
     p = col->end();
@@ -101,7 +188,7 @@ void TileLayer::adjustColumn(Column* col, const QRect& n, int x)
 
 void TileLayer::adjustAfterIntersection(const QRect& n)
 {
-    QRect& o = tileRegion; // n => new, o => old
+    QRect& o = region; // n => new, o => old
     for (int i=qMax(o.left(),n.right()+1); i<=o.right(); i++)
     {
         Column *c = columns.takeLast();
@@ -118,23 +205,15 @@ void TileLayer::adjustAfterIntersection(const QRect& n)
     }
 }
 
-bool TileLayer::wouldChangeWithRegion(const QRectF &r)
+void TileLayer::setRegion(const QRect& m, int zoom)
 {
-    return !(topLeftSafeRange.contains(r.topLeft()) &&
-             bottomRightSafeRange.contains(r.bottomRight()));
-}
+    this->zoom = zoom;
+    QSettings settings;
+    type = settings.value(SettingsKeys::MapType, "").toString();
 
-void TileLayer::setRegion(const QRectF& sceneRegion)
-{
-    QRect& o = tileRegion; // n => new, o => old
-    QRect n(gt.Meters2GoogleTile(sceneRegion.topLeft(),zoom),
-            gt.Meters2GoogleTile(sceneRegion.bottomRight(),zoom));
-
-    topLeftSafeRange.setTopLeft(gt.GoogleTile2Meters(tileRegion.topLeft(),zoom));
-    topLeftSafeRange.setBottomRight(gt.GoogleTile2Meters(tileRegion.topLeft() + QPoint(1,1),zoom));
-
-    bottomRightSafeRange.setTopLeft(gt.GoogleTile2Meters(tileRegion.bottomRight(),zoom));
-    bottomRightSafeRange.setBottomRight(gt.GoogleTile2Meters(tileRegion.bottomRight() + QPoint(1,1),zoom));
+    //qDebug() << "setRegion: " << n;
+    QRect n = m.intersected(QRect(0,0,(1 << zoom),(1 << zoom)));
+    QRect& o = region; // n => new, o => old
 
     ColumnPointer p = adjustBeforeIntersection(n);
 
@@ -151,21 +230,17 @@ void TileLayer::setRegion(const QRectF& sceneRegion)
 
     adjustAfterIntersection(n);
 
-    tileRegion = n;
+    region = n;
 }
 
 void TileLayer::clear()
 {
-}
-
-QRectF TileLayer::boundingRect() const
-{
-    return QRectF(topLeftSafeRange.topLeft(),bottomRightSafeRange.bottomRight());
-}
-
-void TileLayer::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    Q_UNUSED(painter);
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
+    setRegion(QRect(0,0,0,0),0);
+    while (!fetchRequests.isEmpty())
+    {
+        QSet<TileId>::iterator i = fetchRequests.begin();
+        TileId tile = *i;
+        fetchRequests.erase(i);
+        emit forgetTile(tile.type,tile.x,tile.y,tile.zoom);
+    }
 }

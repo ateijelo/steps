@@ -1,41 +1,58 @@
-#ifndef TILELAYER_H
-#define TILELAYER_H
+#ifndef TILEMANAGER_H
+#define TILEMANAGER_H
 
-#include <QGraphicsItem>
+#include <QHash>
+#include <QRect>
+#include <QObject>
+#include <QPoint>
+#include <QThread>
+#include <QByteArray>
 #include <QLinkedList>
-#include <QRectF>
 
 #include "tile.h"
-#include "geotools.h"
+#include "tilefetcher.h"
+#include "debug.h"
 
-class TileLayer : public QGraphicsItem
+class TileLayer : public QObject
 {
+    Q_OBJECT
+
     typedef QLinkedList<Tile*> Column;
     typedef Column::iterator TilePointer;
     typedef QLinkedList<Column*>::iterator ColumnPointer;
 
     public:
-        TileLayer(int zoom, QGraphicsItem *parent=NULL);
-        bool wouldChangeWithRegion(const QRectF& r);
-        void setRegion(const QRectF& r);
+        TileLayer();
+        void setRegion(const QRect& r, int zoom);
         void clear();
-        QRectF boundingRect() const;
-        void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget=0);
+
+    signals:
+        void tileCreated(Tile *t,int x, int y, int zoom);
+        void fetchTile(const QString& type, int x, int y, int z);
+        void forgetTile(const QString& type, int x, int y, int z);
+
+    private slots:
+        void tileData(const QString& type, int x, int y, int z,
+                           const QByteArray& bytes);
 
     private:
         ColumnPointer adjustBeforeIntersection(const QRect& n);
         void adjustColumn(Column* col, const QRect& n, int x);
         void adjustAfterIntersection(const QRect& n);
         void deleteColumn(Column* col);
-        Tile *newTile(int x, int y);
+        Tile* newTile(int x, int y);
+        void deleteTile(Tile *t);
 
         int zoom;
+        QString type;
+        QString tileKeyTemplate;
+        QRect region;
+        TileFetcher fetcher;
+        QThread* fetcherThread;
         QLinkedList<Column*> columns;
-        QRect tileRegion;
-        GeoTools gt;
+        QHash<TileCoords,Tile*> tiles; // TileCoords is defined in tile.h
+        QSet<TileId> fetchRequests;
 
-        QRectF topLeftSafeRange;
-        QRectF bottomRightSafeRange;
 };
 
-#endif // TILELAYER_H
+#endif // TILEMANAGER_H

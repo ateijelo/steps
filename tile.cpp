@@ -1,130 +1,110 @@
+#define QT_NO_DEBUG_OUTPUT
 #include <QtDebug>
-#include <QtEndian>
 #include <QGraphicsRectItem>
-#include <QFile>
-#include <QPainter>
-#include <QSettings>
 
 #include "tile.h"
-#include "constants.h"
+#include "debug.h"
 
-Tile::Tile(int x, int y, int zoom)
-        : x(x), y(y), zoom(zoom)
+int qHash(const TileId& key)
 {
-    //setTransformationMode(Qt::SmoothTransformation);
-    //QGraphicsRectItem *r = new QGraphicsRectItem(0,0,256,256);
-    //r->setParentItem(this);
-    //QGraphicsTextItem *t = new QGraphicsTextItem(QString("(%1,%2,%3)").arg(x).arg(y).arg(zoom));
-    //t->setParentItem(this);
-    setAcceptHoverEvents(true);
+    return qHash(QString("%1:%2:%3:%4")
+                 .arg(key.type)
+                 .arg(key.x)
+                 .arg(key.y)
+                 .arg(key.zoom));
+}
 
-    QSettings settings;
-    QString tileStyle = settings.value(SettingsKeys::MapType, "").toString();
-    QPixmap result = loadTile(tileStyle, x, y, zoom);
-    if (tileStyle.endsWith("Hyb") || tileStyle.endsWith("Labels"))
+QDebug& operator<<(QDebug& debug, const TileId& tile)
+{
+    debug << "TileId(" << tile.type << tile.x << tile.y << tile.zoom << ")";
+    return debug;
+}
+
+Tile::Tile(QString type, int x, int y, int zoom)
+        : _type(type), _x(x), _y(y), _zoom(zoom)
+{
+//    setTransformationMode(Qt::SmoothTransformation);
+    if (fEnabled(DEBUG_TILECOORDS))
     {
-        QString satStyle = tileStyle.replace("Hyb", "Sat").replace("Labels", "Sat");
-        QPixmap sat = loadTile(satStyle, x, y, zoom);
-        if (!sat.isNull())
-        {
-            QPainter painter(&sat);
-            painter.drawPixmap(0, 0, result.width(), result.height(), result);
-            painter.end();
-            result = sat;
-        }
+        QGraphicsRectItem *r = new QGraphicsRectItem(0,0,256,256);
+        r->setParentItem(this);
+        QGraphicsTextItem *t = new QGraphicsTextItem(QString("(%1,%2,%3)").arg(x).arg(y).arg(zoom));
+        t->setParentItem(this);
     }
-
-    setPixmap(result);
-    //qDebug() << "Created Tile:" << x << y << zoom;
-    //setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
-    setCacheMode(QGraphicsItem::ItemCoordinateCache);
+    setAcceptHoverEvents(true);
+    _current_zoom = -1;
 }
 
 Tile::~Tile()
 {
-    //qDebug() << "Deleted Tile:" << x << y << zoom;
+    qDebug() << "deleted Tile:" << _type << _x << _y
+            << _zoom << _current_zoom;
 }
 
-QPixmap Tile::loadTile(QString tileStyle, int x, int y, int zoom)
+TileCoords Tile::coords() const
 {
-    int in_x = x & 7;
-    int in_y = y & 7;
-    QFile mgm(getTileFileName(tileStyle, x, y, zoom));
-    if (mgm.open(QIODevice::ReadOnly))
+    return TileCoords(_x,_y);
+}
+
+QString Tile::tileId() const
+{
+    return QString("type=%1 x=%2 y=%3 z=%4 cz=%5")
+            .arg(_type).arg(_x).arg(_y).arg(_zoom).arg(_current_zoom);
+}
+
+QString Tile::tileKey(QString type, int x, int y, int z)
+{
+    return QString("%1:%2:%3:%4").arg(type).arg(x).arg(y).arg(z);
+}
+
+QString Tile::tileType() const
+{
+    return _type;
+}
+
+int Tile::tileX() const
+{
+    return _x;
+}
+
+int Tile::tileY() const
+{
+    return _y;
+}
+
+int Tile::zoom() const
+{
+    return _zoom;
+}
+
+int Tile::currentZoom() const
+{
+    return _current_zoom;
+}
+
+bool Tile::isWithin(int x, int y, int z) const
+{
+    if (z > _zoom) return false;
+    return (x == _x >> (_zoom - z)) && (y == _y >> (_zoom - z));
+}
+
+void Tile::loadPixmap(const QPixmap &pixmap, int z)
+{
+    if (z > _zoom) return;
+    if (z < _current_zoom) return;
+
+    int dz = _zoom - z;
+    int w = 256 >> dz;
+    int rx = _x % (1 << dz);
+    int ry = _y % (1 << dz);
+    if (dz > 8)
     {
-        quint64 r = 0;
-        quint32 tile_start = 64*6 + 2;
-        quint32 tile_end;
-        quint16 no_tiles;
-        r += mgm.read((char*)(&no_tiles),2);
-        if (r != 2)
-        {
-            qDebug() << "error reading no_tiles";
-            return 0;
-        }
-        no_tiles = qFromBigEndian(no_tiles);
-        bool found = false;
-        for (int i=0; i<no_tiles; i++)
-        {
-            quint8 tile_x,tile_y;
-            r = mgm.read((char*)(&tile_x),1);
-            r += mgm.read((char*)(&tile_y),1);
-            r += mgm.read((char*)(&tile_end),4);
-            if (r != 6)
-            {
-                qDebug() << "error reading tile entry " << i;
-                return 0;
-            }
-            tile_end = qFromBigEndian(tile_end);
-            if (tile_x == in_x && tile_y == in_y)
-            {
-                found = true;
-                break;
-            }
-            tile_start = tile_end;
-        }
-        if (found)
-        {
-            quint32 tile_size = tile_end - tile_start;
-            char *data = new char[tile_size];
-            mgm.seek(tile_start);
-            r = mgm.read(data,tile_size);
-            if (r != tile_size)
-            {
-                qDebug() << "error reading tile " << x << "," << y << "data";
-            }
-            else
-            {
-                QPixmap p;
-                p.loadFromData((uchar*)data,(uint)tile_size,0);
-                delete data;
-
-                return p;
-            }
-        }
+        w = 1;
+        rx = rx >> (dz - 8);
+        ry = ry >> (dz - 8);
     }
-    else
-    {
-        //qDebug() << "error opening " << filename << " for reading";
-    }
-    return 0;
-}
 
-QString Tile::getTileFileName(QString tileStyle, int x, int y, int zoom)
-{
-    int mgm_x = x >> 3;
-    int mgm_y = y >> 3;
-    QSettings settings;
-    return QString("%1/%2_%3/%4_%5.mgm")
-            .arg(settings.value(SettingsKeys::CachePath,"").toString())
-            .arg(tileStyle)
-            .arg(zoom)
-            .arg(mgm_x)
-            .arg(mgm_y);
-}
-
-void Tile::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    //qDebug() << "Tile::paint" << zoom;
-    QGraphicsPixmapItem::paint(painter,option,widget);
+    setPixmap(pixmap.copy(rx*w,ry*w,w,w).scaled(256,256));
+    _current_zoom = z;
+    //update();
 }

@@ -7,10 +7,13 @@
 #include <QLabel>
 #include <QSlider>
 #include <QComboBox>
-#include <QSignalMapper>
+#include <QShortcut>
 
 #include "ui_mainwindow.h"
+#include "geotools.h"
+#include "tile.h"
 #include "preferences.h"
+#include "debugdialog.h"
 
 class MainWindow : public QMainWindow
 {
@@ -23,23 +26,21 @@ class MainWindow : public QMainWindow
 
     private:
         Ui::MainWindow ui;
-        QList<QAction*> recentPaths;
-        QSignalMapper recentsMapper;
         QSlider zoomSlider;
         QCheckBox showLatLonAsToolTip;
         QLabel latLabel;
         QLabel lonLabel;
         QComboBox cacheStyles;
         Preferences *preferences;
+        DebugDialog *debugDialog;
+        QShortcut *debugShortcut;
 
     private slots:
         void openCacheDirectory();
-        void updateCacheDirectory(QString path);
         void updateLatLonLabels(const QPointF& latLon);
 
     private:
         void updateCacheStyles();
-        void updateRecents(QString top=QString());
 };
 
 #endif

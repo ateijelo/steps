@@ -11,7 +11,7 @@
 #include "tile.h"
 #include "geotools.h"
 #include "mainscene.h"
-#include "tilepyramid.h"
+#include "tilelayer.h"
 
 class MapView : public QGraphicsView
 {
@@ -29,6 +29,7 @@ class MapView : public QGraphicsView
         bool canZoomIn();
         bool canZoomOut();
         int zoomLevel();
+        int maxZoomLevel();
 
     signals:
         void canZoomIn(bool);
@@ -37,13 +38,14 @@ class MapView : public QGraphicsView
         void mouseMoved(const QPointF& latlon);
 
     public slots:
+        void displayNewTile(Tile *t, int x, int y, int zoom);
         void zoomIn();
         void zoomOut();
         void rotRight();
         void rotLeft();
         void setZoomLevel(int zoom);
         void setCacheStyle(QString cacheStyle);
-        //void setAsCenter(QObject *newCenter);
+        void setAsCenter(QObject *newCenter);
         void showLatLonAsToolTip(bool);
 
     private slots:
@@ -60,9 +62,8 @@ class MapView : public QGraphicsView
         qreal angle;
         QPointF sceneAnchor;
         QPoint viewAnchor;
-        TilePyramid *tp;
+        TileLayer tlayer;
         bool showToolTip;
-
 };
 
 #endif

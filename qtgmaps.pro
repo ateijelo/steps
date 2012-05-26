@@ -5,7 +5,8 @@ TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
 INCLUDEPATH += .
-QT += opengl
+QT += network
+
 CONFIG += debug
 
 # Input
@@ -16,11 +17,18 @@ HEADERS += mainwindow.h \
     tile.h \
     tilelayer.h \
     mainscene.h \
-    tilepyramid.h \
     constants.h \
-    preferences.h
+    preferences.h \
+    tilefetcher.h \
+    memcache.h \
+    task.h \
+    disktask.h \
+    networktask.h \
+    debug.h \
+    debugdialog.h
 FORMS += mainwindow.ui \
-    preferences.ui
+    preferences.ui \
+    debugdialog.ui
 SOURCES += main.cpp \
     mainwindow.cpp \
     mapview.cpp \
@@ -29,6 +37,12 @@ SOURCES += main.cpp \
     tile.cpp \
     tilelayer.cpp \
     mainscene.cpp \
-    tilepyramid.cpp \
-    preferences.cpp
+    preferences.cpp \
+    tilefetcher.cpp \
+    memcache.cpp \
+    task.cpp \
+    disktask.cpp \
+    networktask.cpp \
+    debug.cpp \
+    debugdialog.cpp
 RESOURCES += qtgmaps.qrc
