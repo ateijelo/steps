@@ -3,6 +3,7 @@
 #include <QGraphicsRectItem>
 
 #include "tile.h"
+#include "debug.h"
 
 int qHash(const TileId& key)
 {
@@ -23,10 +24,13 @@ Tile::Tile(QString type, int x, int y, int zoom)
         : _type(type), _x(x), _y(y), _zoom(zoom)
 {
 //    setTransformationMode(Qt::SmoothTransformation);
-//    QGraphicsRectItem *r = new QGraphicsRectItem(0,0,256,256);
-//    r->setParentItem(this);
-//    QGraphicsTextItem *t = new QGraphicsTextItem(QString("(%1,%2,%3)").arg(x).arg(y).arg(zoom));
-//    t->setParentItem(this);
+    if (fEnabled(DEBUG_TILECOORDS))
+    {
+        QGraphicsRectItem *r = new QGraphicsRectItem(0,0,256,256);
+        r->setParentItem(this);
+        QGraphicsTextItem *t = new QGraphicsTextItem(QString("(%1,%2,%3)").arg(x).arg(y).arg(zoom));
+        t->setParentItem(this);
+    }
     setAcceptHoverEvents(true);
     _current_zoom = -1;
 }

@@ -375,7 +375,7 @@ bool fetchOrder(const TileId& t1, const TileId& t2)
 
 void TileFetcher::debug(const QString& header)
 {
-    if_enabled(DEBUG_FETCHQUEUES)
+    if fEnabled(DEBUG_FETCHQUEUES)
     {
         qDebug() << header;
     //    qDebug() << "  idleDiskThreads:" << idleDiskThreads;

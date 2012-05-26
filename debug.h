@@ -14,15 +14,16 @@ extern const char *flagLabels[];
 #define DEBUG_TILELAYER         0x00000010
 #define DEBUG_MEMCACHE          0x00000020
 #define DEBUG_PIXMAPCACHE       0x00000040
+#define DEBUG_TILECOORDS        0x00000080
 
 #define ENABLE_DEBUGGING
 
 #ifdef ENABLE_DEBUGGING
 # define fDebug(FLAG) if(debugflags & (FLAG)) qDebug()
-# define if_enabled(FLAG) if(debugflags & (FLAG))
+# define fEnabled(FLAG) (debugflags & (FLAG))
 #else
 # define fDebug(FLAG) if(false) qDebug()
-# define if_enabled(FLAG) if(false)
+# define fEnabled(FLAG) (false)
 #endif
 
 #endif // DEBUG_H

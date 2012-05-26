@@ -13,13 +13,15 @@ DebugDialog::DebugDialog(QWidget *parent) :
     int i=0;
     QSettings settings;
     debugflags = settings.value("DebugFlags",0).toULongLong();
+    QGridLayout *l = new QGridLayout(this);
+    ui->verticalLayout->insertLayout(1,l);
     while (true)
     {
         const char *label = flagLabels[i];
         if (label == NULL)
             break;
         QCheckBox *b = new QCheckBox(label,this);
-        ui->verticalLayout->insertWidget(i+1,b);
+        l->addWidget(b,i/2,i%2);
         connect(b,SIGNAL(toggled(bool)),this,SLOT(checkBoxClicked(bool)));
         boxes.insert(b,Q_UINT64_C(1) << i);
         if (debugflags & Q_UINT64_C(1) << i)

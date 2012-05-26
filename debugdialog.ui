@@ -11,13 +11,16 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Debug Flags</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetMinimumSize</enum>
+   </property>
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Check the categories of debugging information to be printed to standard error:</string>
+      <string>Check the categories of debugging information to be printed or displayed:</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

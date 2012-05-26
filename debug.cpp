@@ -9,5 +9,6 @@ const char *flagLabels[] = {
     "Tile Layer",
     "Memory Cache",
     "Pixmap Cache",
+    "Tile Coordinates",
     NULL
 };
