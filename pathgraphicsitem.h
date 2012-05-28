@@ -32,14 +32,14 @@ class PathGraphicsItem : public QGraphicsItem
         ~PathGraphicsItem();
         QRectF boundingRect() const;
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+        void addNode(const QPointF& pos);
 
     signals:
 
     public slots:
 
     private:
-        QLinkedList<PathEdge*> edges;
-        QSet<PathNode*> nodes;
+        QLinkedList<PathNode*> nodes;
     
 };
 

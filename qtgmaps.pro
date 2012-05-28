@@ -6,6 +6,7 @@ TARGET =
 DEPENDPATH += .
 INCLUDEPATH += .
 QT += network
+LIBS += -lGeographic
 
 CONFIG += debug
 
