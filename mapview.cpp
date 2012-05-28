@@ -5,9 +5,13 @@
 #include <QClipboard>
 #include <QSettings>
 #include <QToolTip>
+#include <QHBoxLayout>
+#include <QSlider>
+#include <math.h>
 
 #include "mapview.h"
 #include "constants.h"
+#include "pathgraphicsitem.h"
 
 MapView::MapView(QWidget *parent)
     : QGraphicsView(parent)
@@ -18,7 +22,7 @@ MapView::MapView(QWidget *parent)
     setSceneRect(QRectF(gt.Pixels2Meters(QPointF(0,0),0),
                         gt.Pixels2Meters(QPointF(256,256),0)));
 
-    connect(&tm,SIGNAL(tileCreated(Tile*,int,int,int)),this,SLOT(displayNewTile(Tile*,int,int,int)));
+    connect(&tlayer,SIGNAL(tileCreated(Tile*,int,int,int)),this,SLOT(displayNewTile(Tile*,int,int,int)));
     connect(scene,SIGNAL(mouseMoved(QPointF)),this,SLOT(mouseMovedOverScene(QPointF)));
 
     QSettings settings;
@@ -34,11 +38,23 @@ MapView::MapView(QWidget *parent)
     centerOn(gt.LatLon2Meters(QPointF(lon,lat)));
 
     showToolTip = settings.value(SettingsKeys::ShowLatLonAsToolTip, false).toBool();
+
+    coordsTemplate = QString::fromUtf8(" %1°%2'%3\"%4 %5°%6'%7\"%8 ");
+
+    PathGraphicsItem *p = new PathGraphicsItem();
+//    QGraphicsEllipseItem *p = new QGraphicsEllipseItem(0,0,50000,50000);
+//    p->setBrush(QBrush(Qt::black));
+//    p->setFlag(QGraphicsItem::ItemIsMovable);
+    p->setZValue(100);
+    p->setPos(gt.LatLon2Meters(QPointF(-82,23)));
+    scene->addItem(p);
+
+    ui.setupUi(this);
 }
 
 bool MapView::canZoomIn()
 {
-    return (zoom < 18);
+    return (zoom < maxZoomLevel());
 }
 
 bool MapView::canZoomOut()
@@ -48,6 +64,27 @@ bool MapView::canZoomOut()
 
 void MapView::mouseMovedOverScene(const QPointF& scenePos)
 {
+    QPointF c = gt.Meters2LatLon(scenePos);
+
+    double a1 = fabs(c.y());
+    double d1 = floor(a1);
+    double m1 = floor(fmod(a1*60,60));
+    double s1 = fmod(a1*3600,60);
+    char ns = (c.y() > 0)? 'N' : 'S';
+
+    double a2 = fabs(c.x());
+    double d2 = floor(a2);
+    double m2 = floor(fmod(a2*60,60));
+    double s2 = fmod(a2*3600,60);
+    char ew = (c.x() > 0)? 'E' : 'W';
+
+    ui.coordsLabel->setText(coordsTemplate
+        .arg(d1,0,'f',0,' ')
+        .arg(m1,2,'f',0,'0')
+        .arg(s1,5,'f',2,'0').arg(ns)
+        .arg(d2,0,'f',0,' ')
+        .arg(m2,2,'f',0,'0')
+        .arg(s2,5,'f',2,'0').arg(ew));
     emit mouseMoved(gt.Meters2LatLon(scenePos));
 }
 
@@ -77,7 +114,7 @@ void MapView::updateTiles()
     QRectF drawArea = mapToScene(viewport()->rect().adjusted(-20,-20,20,20)).boundingRect();
     QPoint tl = gt.Meters2GoogleTile(drawArea.topLeft(),zoom);
     QPoint br = gt.Meters2GoogleTile(drawArea.bottomRight(),zoom);
-    tm.setRegion(QRect(tl,br),zoom);
+    tlayer.setRegion(QRect(tl,br),zoom);
 }
 
 void MapView::mouseMoveEvent(QMouseEvent *event)
@@ -102,7 +139,7 @@ void MapView::mouseDoubleClickEvent(QMouseEvent *event)
         zoomIn();
     if (event->button() == Qt::RightButton)
         zoomOut();
-    centerOn(sceneAnchor);
+    //centerOn(sceneAnchor);
 }
 
 void MapView::wheelEvent(QWheelEvent *event)
@@ -197,7 +234,7 @@ void MapView::setCacheStyle(QString cacheStyle)
 {
     QSettings settings;
     settings.setValue(SettingsKeys::MapType, cacheStyle);
-    tm.clear();
+    tlayer.clear();
     updateTiles();
 }
 
@@ -225,19 +262,19 @@ void MapView::setZoomLevel(int zoom)
         zoom = 0;
         zo = false;
     }
-    if (zoom >= 18)
+    if (zoom >= maxZoomLevel())
     {
-        zoom = 18;
+        zoom = maxZoomLevel();
         zi = false;
     }
     emit canZoomOut(zo);
     emit canZoomIn(zi);
     this->zoom = zoom;
     QSettings settings;
-    settings.setValue(SettingsKeys::ZoomLevel, zoom);
     emit zoomChanged(zoom);
+    settings.setValue(SettingsKeys::ZoomLevel, zoom);
 
-    tm.clear();
+    tlayer.clear();
 
     double res = gt.resolution(zoom);
     resetTransform();
@@ -267,6 +304,11 @@ void MapView::zoomOut()
 int MapView::zoomLevel()
 {
     return zoom;
+}
+
+int MapView::maxZoomLevel()
+{
+    return 24;
 }
 
 void MapView::rotRight()

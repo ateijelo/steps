@@ -15,11 +15,15 @@ MainWindow::MainWindow(QWidget *parent)
     updateRecents();
 
     preferences = new Preferences(this);
+    debugDialog = new DebugDialog(this);
+    debugShortcut = new QShortcut(QKeySequence(tr("Ctrl+Shift+D","Show Debug Dialog")),this);
+    debugShortcut->setContext(Qt::ApplicationShortcut);
+    connect(debugShortcut,SIGNAL(activated()),debugDialog,SLOT(show()));
 
     zoomSlider.setMinimum(0);
-    zoomSlider.setMaximum(18);
+    zoomSlider.setMaximum(ui.mapView->maxZoomLevel());
     zoomSlider.setOrientation(Qt::Horizontal);
-    zoomSlider.setFixedWidth(30+18*4);
+    zoomSlider.setFixedWidth(30+ui.mapView->maxZoomLevel()*4);
     zoomSlider.setTickInterval(1);
     zoomSlider.setTickPosition(QSlider::TicksBelow);
     zoomSlider.setPageStep(1);
@@ -32,8 +36,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui.toolBar->insertSeparator(0);
     ui.toolBar->insertWidget(0, &cacheStyles);
 
-    connect(&cacheStyles, SIGNAL(currentIndexChanged(QString)), ui.mapView, SLOT(setCacheStyle(QString)));
     updateCacheStyles();
+    connect(&cacheStyles, SIGNAL(currentIndexChanged(QString)), ui.mapView, SLOT(setCacheStyle(QString)));
 
     latLabel.setFixedWidth(90);
     lonLabel.setFixedWidth(100);

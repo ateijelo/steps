@@ -5,6 +5,10 @@ TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
 INCLUDEPATH += .
+QT += network
+LIBS += -lGeographic
+
+CONFIG += debug
 
 # Input
 HEADERS += mainwindow.h \
@@ -12,19 +16,37 @@ HEADERS += mainwindow.h \
     mgmreader.h \
     geotools.h \
     tile.h \
-    tilemanager.h \
+    tilelayer.h \
     mainscene.h \
     constants.h \
-    preferences.h
+    preferences.h \
+    tilefetcher.h \
+    memcache.h \
+    task.h \
+    disktask.h \
+    networktask.h \
+    debug.h \
+    debugdialog.h \
+    pathgraphicsitem.h
 FORMS += mainwindow.ui \
-    preferences.ui
+    preferences.ui \
+    debugdialog.ui \
+    viewwidgets.ui
 SOURCES += main.cpp \
     mainwindow.cpp \
     mapview.cpp \
     mgmreader.cpp \
     geotools.cpp \
     tile.cpp \
-    tilemanager.cpp \
+    tilelayer.cpp \
     mainscene.cpp \
-    preferences.cpp
+    preferences.cpp \
+    tilefetcher.cpp \
+    memcache.cpp \
+    task.cpp \
+    disktask.cpp \
+    networktask.cpp \
+    debug.cpp \
+    debugdialog.cpp \
+    pathgraphicsitem.cpp
 RESOURCES += qtgmaps.qrc

@@ -11,7 +11,9 @@
 #include "tile.h"
 #include "geotools.h"
 #include "mainscene.h"
-#include "tilemanager.h"
+#include "tilelayer.h"
+
+#include "ui_viewwidgets.h"
 
 class MapView : public QGraphicsView
 {
@@ -29,6 +31,7 @@ class MapView : public QGraphicsView
         bool canZoomIn();
         bool canZoomOut();
         int zoomLevel();
+        int maxZoomLevel();
 
     signals:
         void canZoomIn(bool);
@@ -61,8 +64,10 @@ class MapView : public QGraphicsView
         qreal angle;
         QPointF sceneAnchor;
         QPoint viewAnchor;
-        TileManager tm;
+        TileLayer tlayer;
         bool showToolTip;
+        Ui::ViewWidgets ui;
+        QString coordsTemplate;
 };
 
 #endif
