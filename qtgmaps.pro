@@ -25,7 +25,8 @@ HEADERS += mainwindow.h \
     disktask.h \
     networktask.h \
     debug.h \
-    debugdialog.h
+    debugdialog.h \
+    pathgraphicsitem.h
 FORMS += mainwindow.ui \
     preferences.ui \
     debugdialog.ui \
@@ -45,5 +46,6 @@ SOURCES += main.cpp \
     disktask.cpp \
     networktask.cpp \
     debug.cpp \
-    debugdialog.cpp
+    debugdialog.cpp \
+    pathgraphicsitem.cpp
 RESOURCES += qtgmaps.qrc

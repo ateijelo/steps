@@ -13,7 +13,7 @@ DebugDialog::DebugDialog(QWidget *parent) :
     int i=0;
     QSettings settings;
     debugflags = settings.value("DebugFlags",0).toULongLong();
-    QGridLayout *l = new QGridLayout(this);
+    QGridLayout *l = new QGridLayout();
     ui->verticalLayout->insertLayout(1,l);
     while (true)
     {

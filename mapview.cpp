@@ -11,6 +11,7 @@
 
 #include "mapview.h"
 #include "constants.h"
+#include "pathgraphicsitem.h"
 
 MapView::MapView(QWidget *parent)
     : QGraphicsView(parent)
@@ -39,6 +40,14 @@ MapView::MapView(QWidget *parent)
     showToolTip = settings.value(SettingsKeys::ShowLatLonAsToolTip, false).toBool();
 
     coordsTemplate = QString::fromUtf8(" %1°%2'%3\"%4 %5°%6'%7\"%8 ");
+
+    PathGraphicsItem *p = new PathGraphicsItem();
+//    QGraphicsEllipseItem *p = new QGraphicsEllipseItem(0,0,50000,50000);
+//    p->setBrush(QBrush(Qt::black));
+//    p->setFlag(QGraphicsItem::ItemIsMovable);
+    p->setZValue(100);
+    p->setPos(gt.LatLon2Meters(QPointF(-82,23)));
+    scene->addItem(p);
 
     ui.setupUi(this);
 }
