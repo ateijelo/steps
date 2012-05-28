@@ -11,15 +11,21 @@ class PathEdge : public QGraphicsLineItem
         PathEdge(const QPointF& p1, const QPointF& p2, QGraphicsItem *parent = 0);
 
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+        double length() const; 
 };
+
+class PathGraphicsItem;
 
 class PathNode : public QGraphicsEllipseItem
 {
     public:
-        PathNode(QGraphicsItem *parent);
+        PathNode(PathGraphicsItem *parent);
 
         PathEdge *inEdge;
         PathEdge *outEdge;
+        PathNode *inNode;
+        PathNode *outNode;
+        PathGraphicsItem *parent;
 
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
         void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
@@ -33,14 +39,16 @@ class PathGraphicsItem : public QGraphicsItem
         QRectF boundingRect() const;
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
         void addNode(const QPointF& pos);
+        void nodeMoved(PathNode *node);
 
     signals:
 
     public slots:
 
     private:
-        QLinkedList<PathNode*> nodes;
-    
+        PathNode *head;
+        PathNode *tail;
+        double length;
 };
 
 #endif // PATHGRAPHICSITEM_H

@@ -46,7 +46,7 @@ MapView::MapView(QWidget *parent)
 //    p->setBrush(QBrush(Qt::black));
 //    p->setFlag(QGraphicsItem::ItemIsMovable);
     p->setZValue(100);
-    p->setPos(gt.LatLon2Meters(QPointF(-82,23)));
+    //p->setPos(gt.LatLon2Meters(QPointF(-82,23)));
     scene->addItem(p);
 
     ui.setupUi(this);
