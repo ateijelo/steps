@@ -46,12 +46,13 @@
 
 #include "geotools.h"
 
+#define originShift (M_PI * 6378137)
+
 GeoTools::GeoTools(int tileSize)
         : tileSize(tileSize)
 {
     initialResolution = 2 * M_PI * 6378137 / tileSize;
     // original code said: self.originShift = 2 * math.pi * 6378137 / 2.0
-    originShift = M_PI * 6378137;
 }
 
 // This function converts lat/lon to meter coordinates
@@ -60,7 +61,7 @@ GeoTools::GeoTools(int tileSize)
 // like screen coordinates.
 // l.x() is longitude
 // l.y() is latitude
-QPointF GeoTools::LatLon2Meters(const QPointF& l) const
+QPointF GeoTools::LatLon2Meters(const QPointF& l)
 {
     double mx,my;
     mx = l.x() * originShift / 180.0;
@@ -70,7 +71,7 @@ QPointF GeoTools::LatLon2Meters(const QPointF& l) const
 }
 
 // Converts XY point from Spherical Mercator EPSG:900913 to lat/lon in WGS84 Datum
-QPointF GeoTools::Meters2LatLon(const QPointF& m) const
+QPointF GeoTools::Meters2LatLon(const QPointF& m)
 {
     double lat,lon;
     lon =  (m.x() / originShift) * 180.0;

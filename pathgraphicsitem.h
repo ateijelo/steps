@@ -5,13 +5,31 @@
 #include <QLinkedList>
 #include <QSet>
 
-class PathEdge : public QGraphicsLineItem
+class PathEdgeSegment : public QGraphicsLineItem
+{
+    public:
+        PathEdgeSegment(QGraphicsItem *parent = 0);
+        void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+};
+
+class PathEdge : public QGraphicsItem
 {
     public:
         PathEdge(const QPointF& p1, const QPointF& p2, QGraphicsItem *parent = 0);
+        QRectF boundingRect() const;
+        void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
+        double length() const;
+        void setP1(const QPointF& p);
+        void setP2(const QPointF& p);
 
-        void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-        double length() const; 
+    private:
+        void updateSegments();
+        void subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::iterator i,
+                       double lat1, double lon1, double azi1, double s1, double s2);
+
+        QPointF p1;
+        QPointF p2;
+        QLinkedList<PathEdgeSegment*> segments;
 };
 
 class PathGraphicsItem;
@@ -28,7 +46,7 @@ class PathNode : public QGraphicsEllipseItem
         PathGraphicsItem *parent;
 
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-        void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+        QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
 };
 
 class PathGraphicsItem : public QGraphicsItem
@@ -37,9 +55,10 @@ class PathGraphicsItem : public QGraphicsItem
         explicit PathGraphicsItem(QGraphicsItem *parent = 0);
         ~PathGraphicsItem();
         QRectF boundingRect() const;
-        void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+        void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
         void addNode(const QPointF& pos);
         void nodeMoved(PathNode *node);
+        void setPos(const QPointF &pos);
 
     signals:
 

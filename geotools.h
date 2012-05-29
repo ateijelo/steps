@@ -66,8 +66,8 @@ class GeoTools
         GeoTools(int tileSize=256);
 
         double resolution(int zoom) const;
-        QPointF LatLon2Meters(const QPointF& l) const;
-        QPointF Meters2LatLon(const QPointF& m) const;
+        static QPointF LatLon2Meters(const QPointF& l);
+        static QPointF Meters2LatLon(const QPointF& m);
         QPointF Meters2Pixels(const QPointF& m, int zoom) const;
         QPointF Pixels2Meters(const QPointF& p, int zoom) const;
         QPoint Pixels2GoogleTile(const QPointF& p) const;
@@ -83,7 +83,6 @@ class GeoTools
     private:
         int tileSize;
         double initialResolution;
-        double originShift;
 };
 
 #endif // GEOTOOLS_H

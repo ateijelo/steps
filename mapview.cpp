@@ -41,12 +41,15 @@ MapView::MapView(QWidget *parent)
 
     coordsTemplate = QString::fromUtf8(" %1°%2'%3\"%4 %5°%6'%7\"%8 ");
 
-    PathGraphicsItem *p = new PathGraphicsItem();
-//    QGraphicsEllipseItem *p = new QGraphicsEllipseItem(0,0,50000,50000);
-//    p->setBrush(QBrush(Qt::black));
-//    p->setFlag(QGraphicsItem::ItemIsMovable);
+    PathGraphicsItem *p;
+    p = new PathGraphicsItem();
     p->setZValue(100);
-    //p->setPos(gt.LatLon2Meters(QPointF(-82,23)));
+    p->setPos(gt.LatLon2Meters(QPointF(-82,23)));
+    scene->addItem(p);
+
+    p = new PathGraphicsItem();
+    p->setZValue(100);
+    p->setPos(gt.LatLon2Meters(QPointF(-83,23)));
     scene->addItem(p);
 
     ui.setupUi(this);
