@@ -25,7 +25,7 @@ class PathEdge : public QGraphicsItem
     private:
         void updateSegments();
         void subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::iterator i,
-                       double lat1, double lon1, double azi1, double s1, double s2);
+                       double lat1, double lon1, double azi1, double s1, double s2, int depth);
 
         QPointF p1;
         QPointF p2;
