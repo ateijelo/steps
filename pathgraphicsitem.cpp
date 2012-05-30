@@ -12,12 +12,14 @@
 #include "geotools.h"
 
 PathGraphicsItem::PathGraphicsItem(QGraphicsItem *parent)
-    : QGraphicsItem(parent), head(0), tail(0), length(0.0)
+    : QGraphicsItem(parent), head(0), tail(0), length(0.0),
+      tailExtender(this)
 {
 //    this->setFlag(QGraphicsItem::ItemIsMovable);
     this->setFlag(ItemHasNoContents);
     for (int i=0; i<2; i++)
         addNode(QPointF(0,0));
+    tailExtender.setPos(tail->pos());
 }
 
 void PathGraphicsItem::addNode(const QPointF &pos)
@@ -80,6 +82,10 @@ void PathGraphicsItem::nodeMoved(PathNode *node)
         length += node->outEdge->length();
     }
     qDebug() << "    length: " << length;
+    if (node == tail)
+    {
+        tailExtender.setPos(node->pos());
+    }
 }
 
 void PathGraphicsItem::setPos(const QPointF &pos)
@@ -271,5 +277,18 @@ void PathEdgeSegment::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
 PathExtender::PathExtender(PathGraphicsItem *parent)
     : QGraphicsEllipseItem(parent)
 {
-    line = new QGraphicsLineItem
+    qreal x = 30;
+    qreal y = 0;
+    qreal width = 10;
+    line = new QGraphicsLineItem(0,0,x,y,this);
+    line->setFlag(ItemIgnoresTransformations);
+    line->setPen(QPen(QBrush(QColor(255,0,0)),3,Qt::DotLine,Qt::RoundCap));
+    setRect(x,y-width/2,width,width);
+    setPen(QPen(QBrush(QColor(255,0,0)),3));
+    setFlag(ItemIgnoresTransformations);
+}
+
+void PathExtender::setAngle(qreal angle)
+{
+    //setRotation(angle);
 }

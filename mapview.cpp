@@ -22,6 +22,10 @@ MapView::MapView(QWidget *parent)
     setSceneRect(QRectF(gt.Pixels2Meters(QPointF(0,0),0),
                         gt.Pixels2Meters(QPointF(256,256),0)));
 
+#ifdef Q_OS_MAC
+    setViewportUpdateMode(FullViewportUpdate);
+#endif
+
     connect(&tlayer,SIGNAL(tileCreated(Tile*,int,int,int)),this,SLOT(displayNewTile(Tile*,int,int,int)));
     connect(scene,SIGNAL(mouseMoved(QPointF)),this,SLOT(mouseMovedOverScene(QPointF)));
 
