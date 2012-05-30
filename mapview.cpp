@@ -49,7 +49,7 @@ MapView::MapView(QWidget *parent)
 
     p = new PathGraphicsItem();
     p->setZValue(100);
-    p->setPos(gt.LatLon2Meters(QPointF(-83,23)));
+    p->setPos(gt.LatLon2Meters(QPointF(-81.6884,23.1503)));
     scene->addItem(p);
 
     ui.setupUi(this);

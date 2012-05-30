@@ -45,7 +45,6 @@ class PathNode : public QGraphicsEllipseItem
         PathNode *outNode;
         PathGraphicsItem *parent;
 
-        void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
         QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
 };
 

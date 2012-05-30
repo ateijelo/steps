@@ -15,11 +15,8 @@ PathGraphicsItem::PathGraphicsItem(QGraphicsItem *parent)
 {
 //    this->setFlag(QGraphicsItem::ItemIsMovable);
     this->setFlag(ItemHasNoContents);
-    addNode(QPointF(0,0));
-    addNode(QPointF(1000,0));
-//    addNode(QPointF(2000,0));
-//    addNode(QPointF(3000,0));
-//    addNode(QPointF(4000,0));
+    for (int i=0; i<2; i++)
+        addNode(QPointF(0,0));
 }
 
 void PathGraphicsItem::addNode(const QPointF &pos)
@@ -108,17 +105,11 @@ PathNode::PathNode(PathGraphicsItem *parent)
     setFlag(ItemSendsScenePositionChanges);
     setBrush(QBrush(Qt::yellow));
     setFlag(ItemIsMovable);
+    setFlag(ItemIgnoresTransformations);
     setCursor(Qt::ArrowCursor);
-}
-
-void PathNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
     qreal width = 5;
-    qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
-    setRect(-width/lod,-width/lod,2*width/lod,2*width/lod);
-    setPen(QPen(QBrush(Qt::red),3/lod));
-
-    QGraphicsEllipseItem::paint(painter,option,widget);
+    setRect(-width,-width,2*width,2*width);
+    setPen(QPen(QBrush(Qt::red),3));
 }
 
 QVariant PathNode::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
