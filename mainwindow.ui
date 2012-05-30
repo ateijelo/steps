@@ -48,9 +48,6 @@
       <property name="resizeAnchor">
        <enum>QGraphicsView::AnchorViewCenter</enum>
       </property>
-      <property name="viewportUpdateMode">
-       <enum>QGraphicsView::FullViewportUpdate</enum>
-      </property>
      </widget>
     </item>
    </layout>

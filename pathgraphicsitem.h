@@ -12,6 +12,16 @@ class PathEdgeSegment : public QGraphicsLineItem
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 };
 
+class PathExtender : public QGraphicsEllipseItem
+{
+    public:
+        PathExtender(PathGraphicsItem *parent);
+        void setAngle(qreal angle);
+
+    private:
+        QGraphicsLineItem *line;
+};
+
 class PathEdge : public QGraphicsItem
 {
     public:
@@ -30,6 +40,11 @@ class PathEdge : public QGraphicsItem
         QPointF p1;
         QPointF p2;
         QLinkedList<PathEdgeSegment*> segments;
+        QGraphicsLineItem *extenderRightLine;
+        QGraphicsLineItem *extenderLeftLine;
+        QGraphicsEllipseItem *extenderRightNode;
+        QGraphicsEllipseItem *extenderLeftNode;
+
 };
 
 class PathGraphicsItem;

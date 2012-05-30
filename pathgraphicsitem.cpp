@@ -6,6 +6,7 @@
 #include <QStyleOptionGraphicsItem>
 #include <QPainter>
 #include <GeographicLib/GeodesicLine.hpp>
+#include <cstdlib>
 
 #include "pathgraphicsitem.h"
 #include "geotools.h"
@@ -164,7 +165,11 @@ void PathEdge::subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::ite
     QPointF p = *i;
     QPointF r = *(i+1);
     double lat2,lon2;
-    g.Direct(lat1,lon1,azi1,(s1+s2)/2,lat2,lon2);
+//    double s12 = s2 - s1;
+//    double d = (((double)qrand()/RAND_MAX) - 0.5)*s12;
+    double sd = (s1+s2)/2;
+//    qDebug() << s1 << sd << s2;
+    g.Direct(lat1,lon1,azi1,sd,lat2,lon2);
     QPointF q(GeoTools::LatLon2Meters(QPointF(lon2,lat2)));
 
     double ax = q.x()-p.x();
@@ -179,8 +184,8 @@ void PathEdge::subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::ite
     if (cos2 < 0.999)
     {
         points.insert(i+1,q);
-        subdivide(points,i+1,lat1,lon1,azi1,(s1+s2)/2,s2,depth+1);
-        subdivide(points,i,lat1,lon1,azi1,s1,(s1+s2)/2,depth+1);
+        subdivide(points,i+1,lat1,lon1,azi1,sd,s2,depth+1);
+        subdivide(points,i,lat1,lon1,azi1,s1,sd,depth+1);
     }
 }
 
@@ -259,4 +264,12 @@ void PathEdgeSegment::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
     setPen(QPen(QBrush(Qt::red),width/lod,Qt::SolidLine,Qt::RoundCap));
 
     QGraphicsLineItem::paint(painter,option,widget);
+}
+
+// ---------------- PathExtender ----------------
+
+PathExtender::PathExtender(PathGraphicsItem *parent)
+    : QGraphicsEllipseItem(parent)
+{
+    line = new QGraphicsLineItem
 }
