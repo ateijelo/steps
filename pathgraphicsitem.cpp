@@ -111,18 +111,63 @@ void PathGraphicsItem::nodeMoved(PathNode *node)
     if (node == tail)
     {
         qDebug() << "tail node moved";
-        tailExtenderLine.setPos(node->pos());
+        tailExtenderLine.setPos(tail->pos());
         tailExtenderLine.setRotation(-tail->inEdge->angle2());
     }
     if (node->outNode == tail)
         tailExtenderLine.setRotation(-tail->inEdge->angle2());
     if (node == head)
     {
-        headExtenderLine.setPos(node->pos());
+        headExtenderLine.setPos(head->pos());
         headExtenderLine.setRotation(180-head->outEdge->angle1());
     }
     if (node->inNode == head)
         headExtenderLine.setRotation(180-head->outEdge->angle1());
+}
+
+void PathGraphicsItem::removeNode(PathNode *node)
+{
+    if (head == tail)
+        return;
+    if (head->outNode == tail)
+        return;
+    if (tail->inNode == head)
+        return;
+    if (node == head)
+    {
+        head = node->outNode;
+        head->inNode = 0;
+        head->inEdge = 0;
+        length -= node->outEdge->length();
+        headExtenderLine.setPos(head->pos());
+        headExtenderLine.setRotation(180-head->outEdge->angle1());
+        delete node->outEdge;
+        delete node;
+        return;
+    }
+    if (node == tail)
+    {
+        tail = node->inNode;
+        tail->outNode = 0;
+        tail->outEdge = 0;
+        length -= node->inEdge->length();
+        tailExtenderLine.setPos(tail->pos());
+        tailExtenderLine.setRotation(-tail->inEdge->angle2());
+        delete node->inEdge;
+        delete node;
+        return;
+    }
+    length -= node->inEdge->length();
+    PathNode *n = node->inNode;
+    PathNode *m = node->outNode;
+    delete node->inEdge;
+    delete node;
+    n->outEdge = m->inEdge;
+    n->outEdge->setP1(n->pos());
+    n->outNode = m;
+    m->inNode = n;
+    headExtenderLine.setRotation(180-head->outEdge->angle1());
+    tailExtenderLine.setRotation(-tail->inEdge->angle2());
 }
 
 void PathGraphicsItem::setPos(const QPointF &pos)
@@ -228,9 +273,16 @@ void PathNode::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsEllipseItem::mousePressEvent(event);
 
-    if (isExtender)
+    if (event->button() == Qt::LeftButton)
     {
-        parentPath->extenderClicked(this);
+        if (isExtender)
+        {
+            parentPath->extenderClicked(this);
+        }
+    }
+    if (event->button() == Qt::MiddleButton)
+    {
+        parentPath->removeNode(this);
     }
 }
 

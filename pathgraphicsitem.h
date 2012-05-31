@@ -73,6 +73,7 @@ class PathGraphicsItem : public QGraphicsItem
         void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
         void addNode(const QPointF& pos);
         void nodeMoved(PathNode *node);
+        void removeNode(PathNode *node);
         void setPos(const QPointF &pos);
         void extenderClicked(PathNode *node);        
 
