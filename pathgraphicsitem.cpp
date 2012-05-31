@@ -158,12 +158,14 @@ void PathGraphicsItem::removeNode(PathNode *node)
         return;
     }
     length -= node->inEdge->length();
+    length -= node->outEdge->length();
     PathNode *n = node->inNode;
     PathNode *m = node->outNode;
     delete node->inEdge;
     delete node;
     n->outEdge = m->inEdge;
     n->outEdge->setP1(n->pos());
+    length += n->outEdge->length();
     n->outNode = m;
     m->inNode = n;
     headExtenderLine.setRotation(180-head->outEdge->angle1());
