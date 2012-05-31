@@ -1,30 +1,44 @@
 #include <QtDebug>
 #include <QPen>
 #include <QBrush>
+#include <cstdlib>
 #include <QCursor>
+#include <QPainter>
+#include <QGraphicsScene>
+#include <QGraphicsView>
 #include <QGraphicsSceneMouseEvent>
 #include <QStyleOptionGraphicsItem>
-#include <QPainter>
 #include <GeographicLib/GeodesicLine.hpp>
-#include <cstdlib>
 
 #include "pathgraphicsitem.h"
 #include "geotools.h"
 
 PathGraphicsItem::PathGraphicsItem(QGraphicsItem *parent)
     : QGraphicsItem(parent), head(0), tail(0), length(0.0),
-      tailExtender(this)
+      tailExtenderLine(this)
 {
 //    this->setFlag(QGraphicsItem::ItemIsMovable);
     this->setFlag(ItemHasNoContents);
     for (int i=0; i<2; i++)
         addNode(QPointF(0,0));
-    tailExtender.setPos(tail->pos());
+
+    tailExtenderLine.setLine(0,0,40,0);
+    tailExtenderLine.setFlag(ItemIgnoresTransformations);
+    tailExtenderLine.setPen(QPen(QBrush(QColor(255,0,0)),3,Qt::DotLine,Qt::RoundCap));
+    tailExtenderLine.setPos(tail->pos());
+
+    tailExtenderNode = new PathNode(&tailExtenderLine);
+    tailExtenderNode->setZValue(2);
+    tailExtenderNode->setParentPath(this);
+    tailExtenderNode->setExtender(true);
+    tailExtenderNode->setPos(40,0);
 }
 
 void PathGraphicsItem::addNode(const QPointF &pos)
 {
     PathNode *n = new PathNode(this);
+    n->setParentPath(this);
+
     n->setPos(pos);
     n->setZValue(2);
     if (head != 0)
@@ -67,8 +81,6 @@ void PathGraphicsItem::paint(QPainter *, const QStyleOptionGraphicsItem *, QWidg
 
 void PathGraphicsItem::nodeMoved(PathNode *node)
 {
-    qDebug() << "PathGraphicsItem::nodeMoved:";
-    qDebug() << "    length: " << length; 
     if (node->inEdge)
     {
         length -= node->inEdge->length();
@@ -84,8 +96,12 @@ void PathGraphicsItem::nodeMoved(PathNode *node)
     qDebug() << "    length: " << length;
     if (node == tail)
     {
-        tailExtender.setPos(node->pos());
+        qDebug() << "tail node moved";
+        tailExtenderLine.setPos(node->pos());
+        tailExtenderLine.setRotation(-tail->inEdge->angle2());
     }
+    if (node->outNode == tail)
+        tailExtenderLine.setRotation(-tail->inEdge->angle2());
 }
 
 void PathGraphicsItem::setPos(const QPointF &pos)
@@ -104,26 +120,80 @@ void PathGraphicsItem::setPos(const QPointF &pos)
     length = d;
 }
 
+void PathGraphicsItem::extenderClicked(PathNode *node)
+{
+    if (node == tailExtenderNode)
+    {
+        QPointF p;
+        QList<QGraphicsView*> l = scene()->views();
+        if (l.size() > 0)
+        {
+            QGraphicsView *v = l.at(0);
+            QPointF q = node->deviceTransform(v->viewportTransform()).map(QPointF(0,0));
+            p = deviceTransform(v->viewportTransform().inverted()).map(q);
+        }
+        node->setParentItem(this);
+        node->setPos(p);
+        node->setExtender(false);
+        node->inNode = tail;
+        PathEdge *e = new PathEdge(tail->pos(),node->pos(),this);
+        tail->outEdge = e;
+        node->inEdge = e;
+        length += e->length();
+        tail = node;
+
+        tailExtenderNode = new PathNode(&tailExtenderLine);
+        tailExtenderNode->setZValue(2);
+        tailExtenderNode->setParentPath(this);
+        tailExtenderNode->setExtender(true);
+        tailExtenderNode->setPos(40,0);
+
+        tailExtenderLine.setPos(tail->pos());
+        tailExtenderLine.setRotation(-tail->inEdge->angle2());
+    }
+}
+
 // ---------------- PathNode ----------------
 
-PathNode::PathNode(PathGraphicsItem *parent)
-    : QGraphicsEllipseItem(parent), inEdge(0), outEdge(0), inNode(0), outNode(0), parent(parent)
+PathNode::PathNode(QGraphicsItem *parent)
+    : QGraphicsEllipseItem(parent), inEdge(0), outEdge(0),
+      inNode(0), outNode(0), isExtender(false)
 {
     setFlag(ItemSendsScenePositionChanges);
     setBrush(QBrush(Qt::yellow));
     setFlag(ItemIsMovable);
     setFlag(ItemIgnoresTransformations);
     setCursor(Qt::ArrowCursor);
-    qreal width = 5;
-    setRect(-width,-width,2*width,2*width);
+    qreal width = 10;
+    setRect(-width/2,-width/2,width,width);
     setPen(QPen(QBrush(Qt::red),3));
+}
+
+void PathNode::setParentPath(PathGraphicsItem *path)
+{
+    this->parentPath = path;
+}
+
+void PathNode::setExtender(bool b)
+{
+    isExtender = b;
+}
+
+void PathNode::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    QGraphicsEllipseItem::mousePressEvent(event);
+
+    if (isExtender)
+    {
+        parentPath->extenderClicked(this);
+    }
 }
 
 QVariant PathNode::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
     if (change == ItemScenePositionHasChanged)
     {
-        parent->nodeMoved(this);
+        parentPath->nodeMoved(this);
         return QVariant();
     }
     else
@@ -160,6 +230,16 @@ void PathEdge::setP2(const QPointF &p)
 {
     p2 = p;
     updateSegments();
+}
+
+qreal PathEdge::angle1() const
+{
+    return segments.first()->line().angle();
+}
+
+qreal PathEdge::angle2() const
+{
+    return segments.last()->line().angle();
 }
 
 void PathEdge::subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::iterator i,
@@ -280,12 +360,13 @@ PathExtender::PathExtender(PathGraphicsItem *parent)
     qreal x = 30;
     qreal y = 0;
     qreal width = 10;
-    line = new QGraphicsLineItem(0,0,x,y,this);
-    line->setFlag(ItemIgnoresTransformations);
-    line->setPen(QPen(QBrush(QColor(255,0,0)),3,Qt::DotLine,Qt::RoundCap));
+
     setRect(x,y-width/2,width,width);
     setPen(QPen(QBrush(QColor(255,0,0)),3));
+    setBrush(Qt::yellow);
     setFlag(ItemIgnoresTransformations);
+
+    line = new QGraphicsLineItem(0,0,x,y,this);
 }
 
 void PathExtender::setAngle(qreal angle)

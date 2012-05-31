@@ -33,6 +33,8 @@ class PathEdge : public QGraphicsItem
         double length() const;
         void setP1(const QPointF& p);
         void setP2(const QPointF& p);
+        qreal angle1() const;
+        qreal angle2() const;
 
     private:
         void updateSegments();
@@ -47,13 +49,18 @@ class PathEdge : public QGraphicsItem
 class PathNode : public QGraphicsEllipseItem
 {
     public:
-        PathNode(PathGraphicsItem *parent);
+        PathNode(QGraphicsItem *parent);
+        void setParentPath(PathGraphicsItem *path);
+        void setExtender(bool b);
+        void mousePressEvent(QGraphicsSceneMouseEvent *event);
 
         PathEdge *inEdge;
         PathEdge *outEdge;
         PathNode *inNode;
         PathNode *outNode;
-        PathGraphicsItem *parent;
+        PathGraphicsItem *parentPath;
+        bool isExtender;
+        QPointF extenderPos;
 
         QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
 };
@@ -68,6 +75,7 @@ class PathGraphicsItem : public QGraphicsItem
         void addNode(const QPointF& pos);
         void nodeMoved(PathNode *node);
         void setPos(const QPointF &pos);
+        void extenderClicked(PathNode *node);
 
     signals:
 
@@ -77,7 +85,8 @@ class PathGraphicsItem : public QGraphicsItem
         PathNode *head;
         PathNode *tail;
         double length;
-        PathExtender tailExtender;
+        PathNode *tailExtenderNode;
+        QGraphicsLineItem tailExtenderLine;
 };
 
 #endif // PATHGRAPHICSITEM_H
