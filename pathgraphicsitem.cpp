@@ -15,23 +15,36 @@
 
 PathGraphicsItem::PathGraphicsItem(QGraphicsItem *parent)
     : QGraphicsItem(parent), head(0), tail(0), length(0.0),
-      tailExtenderLine(this)
+      tailExtenderLine(this), headExtenderLine(this)
 {
 //    this->setFlag(QGraphicsItem::ItemIsMovable);
     this->setFlag(ItemHasNoContents);
     for (int i=0; i<2; i++)
         addNode(QPointF(0,0));
 
-    tailExtenderLine.setLine(0,0,40,0);
+    tailExtenderLine.setLine(0,0,35,0);
     tailExtenderLine.setFlag(ItemIgnoresTransformations);
-    tailExtenderLine.setPen(QPen(QBrush(QColor(255,0,0)),3,Qt::DotLine,Qt::RoundCap));
+    tailExtenderLine.setPen(QPen(QBrush(QColor(255,0,0)),1.5,Qt::SolidLine,Qt::RoundCap));
     tailExtenderLine.setPos(tail->pos());
 
-    tailExtenderNode = new PathNode(&tailExtenderLine);
-    tailExtenderNode->setZValue(2);
-    tailExtenderNode->setParentPath(this);
-    tailExtenderNode->setExtender(true);
-    tailExtenderNode->setPos(40,0);
+    headExtenderLine.setLine(0,0,35,0);
+    headExtenderLine.setFlag(ItemIgnoresTransformations);
+    headExtenderLine.setPen(QPen(QBrush(QColor(255,0,0)),1.5,Qt::SolidLine,Qt::RoundCap));
+    headExtenderLine.setPos(head->pos());
+
+    tailExtenderNode = newExtenderNode(&tailExtenderLine);
+    headExtenderNode = newExtenderNode(&headExtenderLine);
+}
+
+PathNode *PathGraphicsItem::newExtenderNode(QGraphicsItem *parent)
+{
+    PathNode *n;
+    n = new PathNode(parent);
+    n->setZValue(2);
+    n->setParentPath(this);
+    n->setExtender(true);
+    n->setPos(40,0);
+    return n;
 }
 
 void PathGraphicsItem::addNode(const QPointF &pos)
@@ -81,6 +94,7 @@ void PathGraphicsItem::paint(QPainter *, const QStyleOptionGraphicsItem *, QWidg
 
 void PathGraphicsItem::nodeMoved(PathNode *node)
 {
+    qDebug() << "    length: " << length;
     if (node->inEdge)
     {
         length -= node->inEdge->length();
@@ -102,6 +116,13 @@ void PathGraphicsItem::nodeMoved(PathNode *node)
     }
     if (node->outNode == tail)
         tailExtenderLine.setRotation(-tail->inEdge->angle2());
+    if (node == head)
+    {
+        headExtenderLine.setPos(node->pos());
+        headExtenderLine.setRotation(180-head->outEdge->angle1());
+    }
+    if (node->inNode == head)
+        headExtenderLine.setRotation(180-head->outEdge->angle1());
 }
 
 void PathGraphicsItem::setPos(const QPointF &pos)
@@ -122,34 +143,47 @@ void PathGraphicsItem::setPos(const QPointF &pos)
 
 void PathGraphicsItem::extenderClicked(PathNode *node)
 {
+    QPointF p;
+    QList<QGraphicsView*> l = scene()->views();
+    if (l.size() > 0)
+    {
+        QGraphicsView *v = l.at(0);
+        QPointF q = node->deviceTransform(v->viewportTransform()).map(QPointF(0,0));
+        p = deviceTransform(v->viewportTransform().inverted()).map(q);
+    }
+    node->setParentItem(this);
+    node->setPos(p);
+    node->setExtender(false);
+
     if (node == tailExtenderNode)
     {
-        QPointF p;
-        QList<QGraphicsView*> l = scene()->views();
-        if (l.size() > 0)
-        {
-            QGraphicsView *v = l.at(0);
-            QPointF q = node->deviceTransform(v->viewportTransform()).map(QPointF(0,0));
-            p = deviceTransform(v->viewportTransform().inverted()).map(q);
-        }
-        node->setParentItem(this);
-        node->setPos(p);
-        node->setExtender(false);
         node->inNode = tail;
+        tail->outNode = node;
         PathEdge *e = new PathEdge(tail->pos(),node->pos(),this);
-        tail->outEdge = e;
         node->inEdge = e;
+        tail->outEdge = e;
         length += e->length();
         tail = node;
 
-        tailExtenderNode = new PathNode(&tailExtenderLine);
-        tailExtenderNode->setZValue(2);
-        tailExtenderNode->setParentPath(this);
-        tailExtenderNode->setExtender(true);
-        tailExtenderNode->setPos(40,0);
+        tailExtenderNode = newExtenderNode(&tailExtenderLine);
 
         tailExtenderLine.setPos(tail->pos());
         tailExtenderLine.setRotation(-tail->inEdge->angle2());
+    }
+    if (node == headExtenderNode)
+    {
+        node->outNode = head;
+        head->inNode = node;
+        PathEdge *e = new PathEdge(node->pos(),head->pos(),this);
+        node->outEdge = e;
+        head->inEdge = e;
+        length += e->length();
+        head = node;
+
+        headExtenderNode = newExtenderNode(&headExtenderLine);
+
+        headExtenderLine.setPos(head->pos());
+        headExtenderLine.setRotation(180-head->outEdge->angle1());
     }
 }
 
@@ -157,16 +191,13 @@ void PathGraphicsItem::extenderClicked(PathNode *node)
 
 PathNode::PathNode(QGraphicsItem *parent)
     : QGraphicsEllipseItem(parent), inEdge(0), outEdge(0),
-      inNode(0), outNode(0), isExtender(false)
+      inNode(0), outNode(0)
 {
     setFlag(ItemSendsScenePositionChanges);
-    setBrush(QBrush(Qt::yellow));
     setFlag(ItemIsMovable);
     setFlag(ItemIgnoresTransformations);
     setCursor(Qt::ArrowCursor);
-    qreal width = 10;
-    setRect(-width/2,-width/2,width,width);
-    setPen(QPen(QBrush(Qt::red),3));
+    setExtender(false);
 }
 
 void PathNode::setParentPath(PathGraphicsItem *path)
@@ -177,6 +208,20 @@ void PathNode::setParentPath(PathGraphicsItem *path)
 void PathNode::setExtender(bool b)
 {
     isExtender = b;
+    if (isExtender)
+    {
+        qreal width = 10;
+        setRect(-width/2,-width/2,width,width);
+        setBrush(QBrush());
+        setPen(QPen(QBrush(Qt::red),1.5,Qt::SolidLine));
+    }
+    else
+    {
+        qreal width = 10;
+        setRect(-width/2,-width/2,width,width);
+        setBrush(QBrush(Qt::yellow));
+        setPen(QPen(QBrush(Qt::red),3));
+    }
 }
 
 void PathNode::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -251,10 +296,10 @@ void PathEdge::subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::ite
     QPointF p = *i;
     QPointF r = *(i+1);
     double lat2,lon2;
-//    double s12 = s2 - s1;
-//    double d = (((double)qrand()/RAND_MAX) - 0.5)*s12;
-    double sd = (s1+s2)/2;
-//    qDebug() << s1 << sd << s2;
+    double s12 = s2 - s1;
+    double d = (((double)qrand()/RAND_MAX)*0.2 - 0.1)*s12;
+    double sd = (s1+s2)/2+d;
+    qDebug() << s1 << sd << s2;
     g.Direct(lat1,lon1,azi1,sd,lat2,lon2);
     QPointF q(GeoTools::LatLon2Meters(QPointF(lon2,lat2)));
 

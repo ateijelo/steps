@@ -60,7 +60,6 @@ class PathNode : public QGraphicsEllipseItem
         PathNode *outNode;
         PathGraphicsItem *parentPath;
         bool isExtender;
-        QPointF extenderPos;
 
         QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
 };
@@ -75,18 +74,23 @@ class PathGraphicsItem : public QGraphicsItem
         void addNode(const QPointF& pos);
         void nodeMoved(PathNode *node);
         void setPos(const QPointF &pos);
-        void extenderClicked(PathNode *node);
+        void extenderClicked(PathNode *node);        
 
     signals:
 
     public slots:
 
     private:
+        PathNode *newExtenderNode(QGraphicsItem *parent);
+
         PathNode *head;
         PathNode *tail;
         double length;
         PathNode *tailExtenderNode;
+        PathNode *headExtenderNode;
         QGraphicsLineItem tailExtenderLine;
+        QGraphicsLineItem headExtenderLine;
+
 };
 
 #endif // PATHGRAPHICSITEM_H
