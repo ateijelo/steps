@@ -20,7 +20,7 @@ PathGraphicsItem::PathGraphicsItem(QGraphicsItem *parent)
 //    this->setFlag(QGraphicsItem::ItemIsMovable);
     this->setFlag(ItemHasNoContents);
     for (int i=0; i<2; i++)
-        addNode(QPointF(0,0));
+        addNode(QPointF(i,0));
 
     tailExtenderLine.setLine(0,0,35,0);
     tailExtenderLine.setFlag(ItemIgnoresTransformations);
@@ -216,6 +216,7 @@ void PathGraphicsItem::extenderClicked(PathNode *node)
 
         tailExtenderLine.setPos(tail->pos());
         tailExtenderLine.setRotation(-tail->inEdge->angle2());
+        tailExtenderLine.hide();
     }
     if (node == headExtenderNode)
     {
@@ -231,7 +232,16 @@ void PathGraphicsItem::extenderClicked(PathNode *node)
 
         headExtenderLine.setPos(head->pos());
         headExtenderLine.setRotation(180-head->outEdge->angle1());
+        headExtenderLine.hide();
     }
+}
+
+void PathGraphicsItem::extenderReleased(PathNode *node)
+{
+    if (node == tail)
+        tailExtenderLine.show();
+    if (node == head)
+        headExtenderLine.show();
 }
 
 // ---------------- PathNode ----------------
@@ -275,17 +285,26 @@ void PathNode::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsEllipseItem::mousePressEvent(event);
 
-    if (event->button() == Qt::LeftButton)
+    if (event->button() == Qt::LeftButton && isExtender)
     {
-        if (isExtender)
-        {
-            parentPath->extenderClicked(this);
-        }
+        parentPath->extenderClicked(this);
     }
     if (event->button() == Qt::MiddleButton)
     {
         parentPath->removeNode(this);
     }
+}
+
+void PathNode::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    QGraphicsEllipseItem::mouseReleaseEvent(event);
+    qDebug() << "mouseReleaseEvent";
+
+    if (event->button() == Qt::LeftButton)
+    {
+        parentPath->extenderReleased(this);
+    }
+
 }
 
 QVariant PathNode::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)

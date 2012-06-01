@@ -53,6 +53,7 @@ class PathNode : public QGraphicsEllipseItem
         void setParentPath(PathGraphicsItem *path);
         void setExtender(bool b);
         void mousePressEvent(QGraphicsSceneMouseEvent *event);
+        void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
         PathEdge *inEdge;
         PathEdge *outEdge;
@@ -75,7 +76,8 @@ class PathGraphicsItem : public QGraphicsItem
         void nodeMoved(PathNode *node);
         void removeNode(PathNode *node);
         void setPos(const QPointF &pos);
-        void extenderClicked(PathNode *node);        
+        void extenderClicked(PathNode *node);
+        void extenderReleased(PathNode *node);
 
     signals:
 
