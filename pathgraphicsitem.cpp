@@ -478,25 +478,3 @@ void PathEdgeSegment::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
 
     QGraphicsLineItem::paint(painter,option,widget);
 }
-
-// ---------------- PathExtender ----------------
-
-PathExtender::PathExtender(PathGraphicsItem *parent)
-    : QGraphicsEllipseItem(parent)
-{
-    qreal x = 30;
-    qreal y = 0;
-    qreal width = 10;
-
-    setRect(x,y-width/2,width,width);
-    setPen(QPen(QBrush(QColor(255,0,0)),3));
-    setBrush(Qt::yellow);
-    setFlag(ItemIgnoresTransformations);
-
-    line = new QGraphicsLineItem(0,0,x,y,this);
-}
-
-void PathExtender::setAngle(qreal angle)
-{
-    //setRotation(angle);
-}
