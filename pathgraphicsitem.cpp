@@ -369,8 +369,9 @@ void PathEdge::subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::ite
     QPointF p = *i;
     QPointF r = *(i+1);
     double lat2,lon2;
-    double s12 = s2 - s1;
-    double d = (((double)qrand()/RAND_MAX)*0.2 - 0.1)*s12;
+    //double s12 = s2 - s1;
+    double d = 0;
+    //double d = (((double)qrand()/RAND_MAX)*0.2 - 0.1)*s12;
     double sd = (s1+s2)/2+d;
     qDebug() << s1 << sd << s2;
     g.Direct(lat1,lon1,azi1,sd,lat2,lon2);
@@ -385,7 +386,7 @@ void PathEdge::subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::ite
     double adotb = ax*bx + ay*by;
     double cos2 = adotb * qAbs(adotb) / (d2a * d2b);
 
-    if (cos2 < 0.999)
+    if (cos2 < 0.9999)
     {
         points.insert(i+1,q);
         subdivide(points,i+1,lat1,lon1,azi1,sd,s2,depth+1);
