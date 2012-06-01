@@ -47,11 +47,14 @@
 #include "geotools.h"
 
 #define originShift (M_PI * 6378137)
+#define TILESIZE (256)
+
+double GeoTools::_projWidth = 0;
+double GeoTools::initialResolution = 2 * M_PI * 6378137 / TILESIZE;
 
 GeoTools::GeoTools(int tileSize)
         : tileSize(tileSize)
 {
-    initialResolution = 2 * M_PI * 6378137 / tileSize;
     // original code said: self.originShift = 2 * math.pi * 6378137 / 2.0
 }
 
@@ -80,8 +83,15 @@ QPointF GeoTools::Meters2LatLon(const QPointF& m)
     return QPointF(lon,lat);
 }
 
+double GeoTools::projectionWidth()
+{
+    if (_projWidth == 0)
+        _projWidth = Pixels2Meters(QPointF(256,256),0).x() - Pixels2Meters(QPointF(0,0),0).x();
+    return _projWidth;
+}
+
 // Gives how many projection meters 1 pixel represents at given zoom leven
-double GeoTools::resolution(int zoom) const
+double GeoTools::resolution(int zoom)
 {
     return initialResolution / (1 << zoom);
 }
@@ -94,7 +104,7 @@ QPointF GeoTools::Meters2Pixels(const QPointF& m, int zoom) const
 }
 
 // Converts pixel coordinates to projection meters
-QPointF GeoTools::Pixels2Meters(const QPointF& p, int zoom) const
+QPointF GeoTools::Pixels2Meters(const QPointF& p, int zoom)
 {
     double res = resolution(zoom);
     return QPointF(p.x()*res - originShift, p.y()*res - originShift);
