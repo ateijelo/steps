@@ -10,6 +10,7 @@ class PathEdgeSegment : public QGraphicsLineItem
     public:
         PathEdgeSegment(QGraphicsItem *parent = 0);
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+        void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
 };
 
 class PathEdge : public QGraphicsItem
@@ -64,6 +65,7 @@ class PathGraphicsItem : public QGraphicsItem
         ~PathGraphicsItem();
         QRectF boundingRect() const;
         void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
+        void keyPressEvent(QKeyEvent *event);
         void addNode(const QPointF& pos);
         void nodeMoved(PathNode *node);
         void nodeSelectedChanged(PathNode *node, bool selected);

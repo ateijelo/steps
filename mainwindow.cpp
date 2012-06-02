@@ -71,14 +71,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui.zoomOutAction->setEnabled(ui.mapView->canZoomOut());
     zoomSlider.setValue(ui.mapView->zoomLevel());
 
-    QPoint pos = settings.value(SettingsKeys::WindowPosition, QPoint(100, 100)).toPoint();
-    QSize size = settings.value(SettingsKeys::WindowSize, QSize(400, 400)).toSize();
-    resize(size);
-    move(pos);
-    if (settings.value(SettingsKeys::WindowIsMaximized, false).toBool())
-        showMaximized();
-    else
-        showNormal();
+    restoreGeometry(settings.value(SettingsKeys::WindowGeometry).toByteArray());
+    restoreState(settings.value(SettingsKeys::WindowState).toByteArray());
 
     connect(&recentsMapper, SIGNAL(mapped(QString)), this, SLOT(updateCacheDirectory(QString)));
 }
@@ -227,8 +221,7 @@ void MainWindow::updateLatLonLabels(const QPointF& latLon)
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     QSettings settings;
-    settings.setValue(SettingsKeys::WindowPosition, pos());
-    settings.setValue(SettingsKeys::WindowSize, size());
-    settings.setValue(SettingsKeys::WindowIsMaximized, isMaximized());
+    settings.setValue(SettingsKeys::WindowGeometry, saveGeometry());
+    settings.setValue(SettingsKeys::WindowState, saveState());
     event->accept();
 }

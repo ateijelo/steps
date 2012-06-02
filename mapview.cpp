@@ -218,6 +218,7 @@ void MapView::contextMenuEvent (QContextMenuEvent *event)
 
 void MapView::keyPressEvent(QKeyEvent *event)
 {
+    qDebug() << "MapView::keyPressEvent" << event;
     if (event->key() == Qt::Key_Shift)
     {
         setDragMode(RubberBandDrag);
@@ -225,6 +226,7 @@ void MapView::keyPressEvent(QKeyEvent *event)
         setViewportUpdateMode(FullViewportUpdate);
 #endif
     }
+    QGraphicsView::keyPressEvent(event);
 }
 
 void MapView::keyReleaseEvent(QKeyEvent *event)
