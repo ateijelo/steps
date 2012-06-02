@@ -19,13 +19,14 @@ class PathEdge : public QGraphicsItem
         QRectF boundingRect() const;
         void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
         double length() const;
-        void setP1(const QPointF& p);
-        void setP2(const QPointF& p);
+        void setP1(const QPointF& p, bool update = true);
+        void setP2(const QPointF& p, bool update = true);
         qreal angle1() const;
         qreal angle2() const;
 
     private:
         void updateSegments();
+        void translateSegments(const QPointF &p);
         void subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::iterator i,
                        double lat1, double lon1, double azi1, double s1, double s2, int depth);
 
@@ -44,6 +45,7 @@ class PathNode : public QGraphicsEllipseItem
         void setExtender(bool b);
         void mousePressEvent(QGraphicsSceneMouseEvent *event);
         void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+        void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
         PathEdge *inEdge;
         PathEdge *outEdge;
@@ -64,6 +66,7 @@ class PathGraphicsItem : public QGraphicsItem
         void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
         void addNode(const QPointF& pos);
         void nodeMoved(PathNode *node);
+        void nodeSelectedChanged(PathNode *node, bool selected);
         void removeNode(PathNode *node);
         void setPos(const QPointF &pos);
         void extenderClicked(PathNode *node);

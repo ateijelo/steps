@@ -28,6 +28,8 @@ class MapView : public QGraphicsView
         void leaveEvent(QEvent *event);
         void wheelEvent(QWheelEvent *event);
         void contextMenuEvent (QContextMenuEvent *event);
+        void keyPressEvent(QKeyEvent *event);
+        void keyReleaseEvent(QKeyEvent *event);
         bool canZoomIn();
         bool canZoomOut();
         int zoomLevel();

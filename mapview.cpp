@@ -216,6 +216,28 @@ void MapView::contextMenuEvent (QContextMenuEvent *event)
     }
 }
 
+void MapView::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Shift)
+    {
+        setDragMode(RubberBandDrag);
+#ifndef Q_OS_MAC
+        setViewportUpdateMode(FullViewportUpdate);
+#endif
+    }
+}
+
+void MapView::keyReleaseEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Shift)
+    {
+        setDragMode(ScrollHandDrag);
+#ifndef Q_OS_MAC
+        setViewportUpdateMode(MinimalViewportUpdate);
+#endif
+    }
+}
+
 void MapView::setAsCenter(QObject *newCenter)
 {
     //QPointF viewAnchorScenePos = mapToScene(viewAnchor);
