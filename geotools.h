@@ -63,26 +63,23 @@
 class GeoTools
 {
     public:
-        GeoTools(int tileSize=256);
-
         static double resolution(int zoom);
         static QPointF LatLon2Meters(const QPointF& l);
         static QPointF Meters2LatLon(const QPointF& m);
         static double projectionWidth();
-        QPointF Meters2Pixels(const QPointF& m, int zoom) const;
+        static QPointF Meters2Pixels(const QPointF& m, int zoom);
         static QPointF Pixels2Meters(const QPointF& p, int zoom);
-        QPoint Pixels2GoogleTile(const QPointF& p) const;
-        QPointF GoogleTile2Pixels(int x, int y) const;
-        QPointF GoogleTile2Pixels(const QPoint& g) const;
-        QPoint Meters2GoogleTile(const QPointF& m, int zoom) const;
-        QPointF GoogleTile2Meters(int x, int y, int zoom) const;
-        QPointF GoogleTile2Meters(const QPoint& g, int zoom) const;
+        static QPoint Pixels2GoogleTile(const QPointF& p);
+        static QPointF GoogleTile2Pixels(int x, int y);
+        static QPointF GoogleTile2Pixels(const QPoint& g);
+        static QPoint Meters2GoogleTile(const QPointF& m, int zoom);
+        static QPointF GoogleTile2Meters(int x, int y, int zoom);
+        static QPointF GoogleTile2Meters(const QPoint& g, int zoom);
         double VincentyDistance(const QPointF& from, const QPointF& to) const;
         double HaversineDistance(const QPointF& from, const QPointF& to) const;
         double Distance(const QPointF& from, const QPointF& to) const;
 
     private:
-        int tileSize;
         static double initialResolution;
         static double _projWidth;
 };

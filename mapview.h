@@ -9,7 +9,6 @@
 #include <QSignalMapper>
 
 #include "tile.h"
-#include "geotools.h"
 #include "mainscene.h"
 #include "tilelayer.h"
 
@@ -42,7 +41,6 @@ class MapView : public QGraphicsView
         void mouseMoved(const QPointF& latlon);
 
     public slots:
-        void displayNewTile(Tile *t, int x, int y, int zoom);
         void zoomIn();
         void zoomOut();
         void rotRight();
@@ -61,7 +59,6 @@ class MapView : public QGraphicsView
         void addMenuAction(QSignalMapper *signalMapper, QMenu *menu, QString text);
 
         MainScene *scene;
-        GeoTools gt;
         int zoom;
         qreal angle;
         QPointF sceneAnchor;

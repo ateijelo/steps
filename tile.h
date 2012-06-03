@@ -54,7 +54,7 @@ class Tile : public QGraphicsPixmapItem
 
         QString tileId() const;
         static QString tileKey(QString type, int x, int y, int z);
-        void loadPixmap(const QPixmap &pixmap, int zoom);
+        void loadPixmap(const QPixmap pixmap, int zoom);
 
     private:
         QString _type;

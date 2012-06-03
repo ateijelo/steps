@@ -23,7 +23,7 @@ PathGraphicsItem::PathGraphicsItem(QGraphicsItem *parent)
 //    this->setFlag(QGraphicsItem::ItemIsMovable);
     this->setFlag(ItemHasNoContents);
     this->setFlag(ItemIsFocusable);
-    for (int i=0; i<500; i++)
+    for (int i=0; i<2; i++)
         addNode(QPointF(i*1000,0));
 
     tailExtenderLine.setLine(0,0,35,0);

@@ -3,10 +3,12 @@
 #include <QSettings>
 #include <QPixmapCache>
 
+#include "geotools.h"
 #include "constants.h"
 #include "tilelayer.h"
 
-TileLayer::TileLayer()
+TileLayer::TileLayer(QGraphicsScene *scene)
+    : scene(scene)
 {
     region.setCoords(0,0,-1,-1);
 
@@ -40,36 +42,61 @@ void TileLayer::tileData(const QString &type, int x, int y, int z,
         return;
     // The tile we've received, which range of tiles does it represent
     // in our current level?
-    //QRectF c()
-    if (z < zoom)
+    int dz = zoom - z;
+    int ww = (1 << zoom);
+    QRect c(x << dz,y << dz,1 << dz,1 << dz);
+    QRect r1(modx(region.left()),region.top(),region.width(),region.height());
+    QRect r2(modx(region.left())-ww,region.top(),region.width(),region.height());
+    QRect i1 = r1.intersected(c);
+    QRect i2 = r2.intersected(c);
+    qDebug() << "setTilesInRegion:" << i1 << p.size() << z;
+    qDebug() << "setTilesInRegion:" << i2 << p.size() << z;
+    setTilesInRegion(i1,p,z);
+    setTilesInRegion(i2,p,z);
+}
+
+void TileLayer::setTilesInRegion(const QRect &i, const QPixmap p, int z)
+{
+    int ww = (1 << zoom);
+    for (int rx = i.left(); rx <= i.right(); rx++)
     {
-        foreach (Tile *t, tiles)
+        for (int ry = i.top(); ry <= i.bottom(); ry++)
         {
-            if (t->isWithin(x,y,z))
+            int leftx = rx - ww * ((rx - region.left() + 1) / ww);
+            int rightx = rx + ww * ((region.right() - rx + 1) / ww);
+            for (int sx = leftx; sx <= rightx; sx += ww)
             {
-                t->loadPixmap(p,z);
+                qDebug() << "   sx:" << sx << "ry:" << ry;
+                if (tiles.contains(TileCoords(sx,ry)))
+                {
+                    qDebug() << "    in tiles";
+                    Tile *t = tiles.value(TileCoords(sx,ry));
+                    t->loadPixmap(p,z);
+                }
+                else
+                    qDebug() << "    not in tiles";
             }
         }
-        return;
-    }
-    if (tiles.contains(TileCoords(x,y)))
-    {
-        Tile *t = tiles.value(TileCoords(x,y));
-        t->loadPixmap(p,z);
     }
 }
 
 Tile* TileLayer::newTile(int x, int y)
 {
-    Tile *t = new Tile(type,x,y,zoom);
-    tiles.insert(t->coords(),t);
-    emit tileCreated(t,x,y,zoom);
+    int mx = modx(x);
+    int my = y;
+
+    Tile *t = new Tile(type,mx,my,zoom);
+    tiles.insert(TileCoords(x,y),t);
+    double res = GeoTools::resolution(zoom);
+    t->setScale(res);
+    t->setPos(GeoTools::GoogleTile2Meters(x,y,zoom));
+    scene->addItem(t);
 
     QPixmap p;
     for (int z = zoom; z>=0; z--)
     {
-        int qx = x >> (zoom - z); // x/(2^(zoom-z))
-        int qy = y >> (zoom - z); // y/(2^(zoom-z))
+        int qx = mx >> (zoom - z); // x/(2^(zoom-z))
+        int qy = my >> (zoom - z); // y/(2^(zoom-z))
         if (!QPixmapCache::find(Tile::tileKey(type,qx,qy,z),&p))
         {
             fDebug(DEBUG_PIXMAPCACHE) << "newTile: pixmap cache miss:"
@@ -102,9 +129,22 @@ Tile* TileLayer::newTile(int x, int y)
     return t;
 }
 
+int TileLayer::modx(int x)
+{
+    int ww = (1 << zoom); // world width in tiles
+    // The Fiji feature
+    int mx = x % ww; if (mx < 0) mx += ww;
+    return mx;
+}
+
 void TileLayer::deleteTile(Tile *t)
 {
-    tiles.remove(t->coords());
+    int ww = (1 << zoom);
+    int rx = t->tileX(); int ry = t->tileY();
+    int leftx = rx - ww * ((rx - region.left() + 1) / ww);
+    int rightx = rx + ww * ((region.right() - rx + 1) / ww);
+    for (int sx = leftx; sx <= rightx; sx += ww)
+        tiles.remove(TileCoords(sx,ry));
 
     TileId tile(t->tileType(),t->tileX(),t->tileY(),t->zoom());
     QSet<TileId>::iterator i = fetchRequests.find(tile);
@@ -211,8 +251,8 @@ void TileLayer::setRegion(const QRect& m, int zoom)
     QSettings settings;
     type = settings.value(SettingsKeys::MapType, "").toString();
 
-    fDebug(DEBUG_TILELAYER) << "TileLayer::setRegion: " << m;
-    QRect n = m.intersected(QRect(0,0,(1 << zoom),(1 << zoom)));
+    //fDebug(DEBUG_TILELAYER) << "TileLayer::setRegion: " << m;
+    QRect n = m.intersected(QRect(m.left(),0,m.width(),(1 << zoom)));
     QRect& o = region; // n => new, o => old
 
     ColumnPointer p = adjustBeforeIntersection(n);

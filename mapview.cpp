@@ -12,25 +12,23 @@
 #include "mapview.h"
 #include "constants.h"
 #include "pathgraphicsitem.h"
+#include "geotools.h"
 
 MapView::MapView(QWidget *parent)
-    : QGraphicsView(parent)
+    : QGraphicsView(parent), scene(new MainScene()), tlayer(scene)
 {
     //setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-    scene = new MainScene();
     setScene(scene);
-    setSceneRect(QRectF(gt.Pixels2Meters(QPointF(0,0),0),
-                        gt.Pixels2Meters(QPointF(256,256),0)));
+    setSceneRect(QRectF(GeoTools::Pixels2Meters(QPointF(INT_MIN,0),0),
+                        GeoTools::Pixels2Meters(QPointF(INT_MAX,256),0)));
 
 #ifdef Q_OS_MAC
     setViewportUpdateMode(FullViewportUpdate);
 #endif
 
-    connect(&tlayer,SIGNAL(tileCreated(Tile*,int,int,int)),this,SLOT(displayNewTile(Tile*,int,int,int)));
     connect(scene,SIGNAL(mouseMoved(QPointF)),this,SLOT(mouseMovedOverScene(QPointF)));
 
     QSettings settings;
-    GeoTools gt;
 
     angle = settings.value(SettingsKeys::Angle, 0.0F).toDouble();
 
@@ -39,7 +37,7 @@ MapView::MapView(QWidget *parent)
 
     qreal lat = settings.value(SettingsKeys::Latitude, 0).toDouble();
     qreal lon = settings.value(SettingsKeys::Longitude, 0).toDouble();
-    centerOn(gt.LatLon2Meters(QPointF(lon,lat)));
+    centerOn(GeoTools::LatLon2Meters(QPointF(lon,lat)));
 
     showToolTip = settings.value(SettingsKeys::ShowLatLonAsToolTip, false).toBool();
 
@@ -48,7 +46,7 @@ MapView::MapView(QWidget *parent)
     PathGraphicsItem *p;
     p = new PathGraphicsItem();
     p->setZValue(100);
-    p->setPos(gt.LatLon2Meters(QPointF(0,0)));
+    p->setPos(GeoTools::LatLon2Meters(QPointF(0,0)));
     scene->addItem(p);
 
     //p = new PathGraphicsItem();
@@ -71,7 +69,7 @@ bool MapView::canZoomOut()
 
 void MapView::mouseMovedOverScene(const QPointF& scenePos)
 {
-    QPointF c = gt.Meters2LatLon(scenePos);
+    QPointF c = GeoTools::Meters2LatLon(scenePos);
 
     double a1 = fabs(c.y());
     double d1 = floor(a1);
@@ -92,7 +90,7 @@ void MapView::mouseMovedOverScene(const QPointF& scenePos)
         .arg(d2,0,'f',0,' ')
         .arg(m2,2,'f',0,'0')
         .arg(s2,5,'f',2,'0').arg(ew));
-    emit mouseMoved(gt.Meters2LatLon(scenePos));
+    emit mouseMoved(GeoTools::Meters2LatLon(scenePos));
 }
 
 bool MapView::viewportEvent(QEvent *event)
@@ -102,8 +100,7 @@ bool MapView::viewportEvent(QEvent *event)
         if (showToolTip)
         {
             QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
-            GeoTools gt;
-            QPointF latLon = gt.Meters2LatLon(mapToScene(helpEvent->pos()));
+            QPointF latLon = GeoTools::Meters2LatLon(mapToScene(helpEvent->pos()));
             QToolTip::showText(helpEvent->globalPos(), QString("(%1 ; %2)").arg(latLon.x()).arg(latLon.y()));
         }
         return true;
@@ -119,8 +116,8 @@ bool MapView::viewportEvent(QEvent *event)
 void MapView::updateTiles()
 {
     QRectF drawArea = mapToScene(viewport()->rect().adjusted(-20,-20,20,20)).boundingRect();
-    QPoint tl = gt.Meters2GoogleTile(drawArea.topLeft(),zoom);
-    QPoint br = gt.Meters2GoogleTile(drawArea.bottomRight(),zoom);
+    QPoint tl = GeoTools::Meters2GoogleTile(drawArea.topLeft(),zoom);
+    QPoint br = GeoTools::Meters2GoogleTile(drawArea.bottomRight(),zoom);
     tlayer.setRegion(QRect(tl,br),zoom);
 }
 
@@ -188,7 +185,7 @@ void MapView::contextMenuEvent (QContextMenuEvent *event)
 {
     if (event->modifiers() & Qt::ControlModifier)
     {
-        QPointF latLon = gt.Meters2LatLon(mapToScene(event->pos()));
+        QPointF latLon = GeoTools::Meters2LatLon(mapToScene(event->pos()));
 
         QSignalMapper *signalMapper = new QSignalMapper(this);
 
@@ -268,19 +265,6 @@ void MapView::setCacheStyle(QString cacheStyle)
     updateTiles();
 }
 
-void MapView::displayNewTile(Tile *t, int x, int y, int zoom)
-{
-    t->resetTransform();
-    double res = gt.resolution(zoom);
-#if QT_VERSION >= 0x040600
-    t->setScale(res);
-#else
-    t->scale(res,res);
-#endif
-    t->setPos(gt.GoogleTile2Meters(x,y,zoom));
-    scene->addItem(t);
-}
-
 void MapView::setZoomLevel(int zoom)
 {
     if (this->zoom == zoom)
@@ -306,7 +290,7 @@ void MapView::setZoomLevel(int zoom)
 
     tlayer.clear();
 
-    double res = gt.resolution(zoom);
+    double res = GeoTools::resolution(zoom);
     resetTransform();
     scale(1/res,1/res);
     rotate(angle);
@@ -360,7 +344,7 @@ void MapView::rotLeft()
 MapView::~MapView()
 {
     QSettings settings;
-    QPointF center = gt.Meters2LatLon(mapToScene(rect().center()));
+    QPointF center = GeoTools::Meters2LatLon(mapToScene(rect().center()));
     settings.setValue(SettingsKeys::Latitude, center.y());
     settings.setValue(SettingsKeys::Longitude, center.x());
 }

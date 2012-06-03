@@ -16,7 +16,7 @@ int qHash(const TileId& key)
 
 QDebug& operator<<(QDebug& debug, const TileId& tile)
 {
-    debug << "TileId(" << tile.type << tile.x << tile.y << tile.zoom << ")";
+    debug << "TileId(" << tile.type << "," << tile.x << "," << tile.y << "," << tile.zoom << ")";
     return debug;
 }
 
@@ -88,7 +88,7 @@ bool Tile::isWithin(int x, int y, int z) const
     return (x == _x >> (_zoom - z)) && (y == _y >> (_zoom - z));
 }
 
-void Tile::loadPixmap(const QPixmap &pixmap, int z)
+void Tile::loadPixmap(const QPixmap pixmap, int z)
 {
     if (z > _zoom) return;
     if (z < _current_zoom) return;

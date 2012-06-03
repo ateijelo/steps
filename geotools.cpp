@@ -52,12 +52,6 @@
 double GeoTools::_projWidth = 0;
 double GeoTools::initialResolution = 2 * M_PI * 6378137 / TILESIZE;
 
-GeoTools::GeoTools(int tileSize)
-        : tileSize(tileSize)
-{
-    // original code said: self.originShift = 2 * math.pi * 6378137 / 2.0
-}
-
 // This function converts lat/lon to meter coordinates
 // in the Spherical Mercator EPSG:900913
 // It's modified to make meter coordinates grow right and down
@@ -97,7 +91,7 @@ double GeoTools::resolution(int zoom)
 }
 
 // Converts EPSG:900913 to pyramid pixel coordinates in given zoom level
-QPointF GeoTools::Meters2Pixels(const QPointF& m, int zoom) const
+QPointF GeoTools::Meters2Pixels(const QPointF& m, int zoom)
 {
     double res = resolution(zoom);
     return QPointF((m.x() + originShift) / res,(m.y() + originShift) / res);
@@ -111,34 +105,34 @@ QPointF GeoTools::Pixels2Meters(const QPointF& p, int zoom)
 }
 
 // Returns the Google Tile coordinates that contain the given pixel
-QPoint GeoTools::Pixels2GoogleTile(const QPointF &p) const
+QPoint GeoTools::Pixels2GoogleTile(const QPointF &p)
 {
-    return QPoint(int(ceil(p.x()/tileSize) - 1),int(ceil(p.y()/tileSize) - 1));
+    return QPoint(int(ceil(p.x()/TILESIZE) - 1),int(ceil(p.y()/TILESIZE) - 1));
 }
 
 // Returns the Google Tile that contains the given
 // projection point at the given zoom level
-QPoint GeoTools::Meters2GoogleTile(const QPointF& m, int zoom) const
+QPoint GeoTools::Meters2GoogleTile(const QPointF& m, int zoom)
 {
     return Pixels2GoogleTile(Meters2Pixels(m,zoom));
 }
 
-QPointF GeoTools::GoogleTile2Pixels(int x, int y) const
+QPointF GeoTools::GoogleTile2Pixels(int x, int y)
 {
-    return QPointF(x*tileSize,y*tileSize);
+    return QPointF(x*TILESIZE,y*TILESIZE);
 }
 
-QPointF GeoTools::GoogleTile2Pixels(const QPoint &g) const
+QPointF GeoTools::GoogleTile2Pixels(const QPoint &g)
 {
     return GoogleTile2Pixels(g.x(),g.y());
 }
 
-QPointF GeoTools::GoogleTile2Meters(int x, int y, int zoom) const
+QPointF GeoTools::GoogleTile2Meters(int x, int y, int zoom)
 {
     return Pixels2Meters(GoogleTile2Pixels(x,y),zoom);
 }
 
-QPointF GeoTools::GoogleTile2Meters(const QPoint &g, int zoom) const
+QPointF GeoTools::GoogleTile2Meters(const QPoint &g, int zoom)
 {
     return GoogleTile2Meters(g.x(),g.y(),zoom);
 }

@@ -8,6 +8,7 @@
 #include <QThread>
 #include <QByteArray>
 #include <QLinkedList>
+#include <QGraphicsScene>
 
 #include "tile.h"
 #include "tilefetcher.h"
@@ -22,12 +23,11 @@ class TileLayer : public QObject
     typedef QLinkedList<Column*>::iterator ColumnPointer;
 
     public:
-        TileLayer();
+        TileLayer(QGraphicsScene *scene);
         void setRegion(const QRect& r, int zoom);
         void clear();
 
     signals:
-        void tileCreated(Tile *t,int x, int y, int zoom);
         void fetchTile(const QString& type, int x, int y, int z);
         void forgetTile(const QString& type, int x, int y, int z);
 
@@ -42,6 +42,8 @@ class TileLayer : public QObject
         void deleteColumn(Column* col);
         Tile* newTile(int x, int y);
         void deleteTile(Tile *t);
+        int modx(int x);
+        void setTilesInRegion(const QRect& i, const QPixmap p, int z);
 
         int zoom;
         QString type;
@@ -52,6 +54,7 @@ class TileLayer : public QObject
         QLinkedList<Column*> columns;
         QHash<TileCoords,Tile*> tiles; // TileCoords is defined in tile.h
         QSet<TileId> fetchRequests;
+        QGraphicsScene *scene;
 
 };
 
