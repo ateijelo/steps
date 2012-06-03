@@ -5,12 +5,18 @@
 #include <QLinkedList>
 #include <QSet>
 
+class PathNode;
+
 class PathEdgeSegment : public QGraphicsLineItem
 {
     public:
         PathEdgeSegment(QGraphicsItem *parent = 0);
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
         void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
+        void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+
+    private:
+        QGraphicsEllipseItem *hoverNode;
 };
 
 class PathEdge : public QGraphicsItem
@@ -20,17 +26,17 @@ class PathEdge : public QGraphicsItem
         QRectF boundingRect() const;
         void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
         double length() const;
-        void setP1(const QPointF& p, bool update = true);
-        void setP2(const QPointF& p, bool update = true);
+        void setP1(const QPointF& p, bool fast=false);
+        void setP2(const QPointF& p, bool fast=false);
+        void updateSegments(bool fast=false);
         qreal angle1() const;
         qreal angle2() const;
 
     private:
-        void updateSegments();
-        void translateSegments(const QPointF &p);
         void subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::iterator i,
                        double lat1, double lon1, double azi1, double s1, double s2, int depth);
 
+        bool fastUpdate;
         QPointF p1;
         QPointF p2;
         QLinkedList<PathEdgeSegment*> segments;
@@ -46,7 +52,10 @@ class PathNode : public QGraphicsEllipseItem
         void setExtender(bool b);
         void mousePressEvent(QGraphicsSceneMouseEvent *event);
         void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+        void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
+        void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+        QPainterPath shape() const;
 
         PathEdge *inEdge;
         PathEdge *outEdge;
@@ -54,6 +63,7 @@ class PathNode : public QGraphicsEllipseItem
         PathNode *outNode;
         PathGraphicsItem *parentPath;
         bool isExtender;
+        bool hovered;
 
         QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
 };
@@ -72,7 +82,7 @@ class PathGraphicsItem : public QGraphicsItem
         void removeNode(PathNode *node);
         void setPos(const QPointF &pos);
         void extenderClicked(PathNode *node);
-        void extenderReleased(PathNode *node);
+        void nodeReleased(PathNode *node);
 
     signals:
 
@@ -80,6 +90,7 @@ class PathGraphicsItem : public QGraphicsItem
 
     private:
         PathNode *newExtenderNode(QGraphicsItem *parent);
+        void updateExtenders();
 
         PathNode *head;
         PathNode *tail;

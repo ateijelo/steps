@@ -69,7 +69,7 @@ void NetworkTask::work()
                                       .arg(tile.y)
                                       .arg(tile.zoom)
                                       .arg(galileo)
-                                      .arg(tile.x % 2))));
+                                      .arg(qrand() % 2))));
     }
     else if (tile.type == "OpenStreetMaps")
     {
