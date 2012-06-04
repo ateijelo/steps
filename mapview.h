@@ -67,6 +67,7 @@ class MapView : public QGraphicsView
         bool showToolTip;
         Ui::ViewWidgets ui;
         QString coordsTemplate;
+        QTransform lastViewportTransform;
 };
 
 #endif

@@ -42,6 +42,7 @@
 // and includes the following notice:
 //  Copyright © 2002-2009 Chris Veness
 
+#include <QtDebug>
 #include <math.h>
 
 #include "geotools.h"
@@ -107,6 +108,10 @@ QPointF GeoTools::Pixels2Meters(const QPointF& p, int zoom)
 // Returns the Google Tile coordinates that contain the given pixel
 QPoint GeoTools::Pixels2GoogleTile(const QPointF &p)
 {
+    qDebug() << "Pixels2GoogleTile";
+    qDebug() << "    p:" << p;
+    qDebug() << "    p.x()/TILESIZE" << p.x()/TILESIZE;
+    qDebug() << "    int(ceil(p.x()/TILESIZE-1)):" << int(ceil(p.x()/TILESIZE-1));
     return QPoint(int(ceil(p.x()/TILESIZE) - 1),int(ceil(p.y()/TILESIZE) - 1));
 }
 

@@ -49,8 +49,6 @@ void TileLayer::tileData(const QString &type, int x, int y, int z,
     QRect r2(modx(region.left())-ww,region.top(),region.width(),region.height());
     QRect i1 = r1.intersected(c);
     QRect i2 = r2.intersected(c);
-    qDebug() << "setTilesInRegion:" << i1 << p.size() << z;
-    qDebug() << "setTilesInRegion:" << i2 << p.size() << z;
     setTilesInRegion(i1,p,z);
     setTilesInRegion(i2,p,z);
 }
@@ -66,15 +64,11 @@ void TileLayer::setTilesInRegion(const QRect &i, const QPixmap p, int z)
             int rightx = rx + ww * ((region.right() - rx + 1) / ww);
             for (int sx = leftx; sx <= rightx; sx += ww)
             {
-                qDebug() << "   sx:" << sx << "ry:" << ry;
                 if (tiles.contains(TileCoords(sx,ry)))
                 {
-                    qDebug() << "    in tiles";
                     Tile *t = tiles.value(TileCoords(sx,ry));
                     t->loadPixmap(p,z);
                 }
-                else
-                    qDebug() << "    not in tiles";
             }
         }
     }
