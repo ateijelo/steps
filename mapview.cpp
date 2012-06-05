@@ -226,6 +226,13 @@ void MapView::keyPressEvent(QKeyEvent *event)
         setViewportUpdateMode(FullViewportUpdate);
 #endif
     }
+    else
+    {
+        setDragMode(ScrollHandDrag);
+#ifndef Q_OS_MAC
+        setViewportUpdateMode(MinimalViewportUpdate);
+#endif
+    }
     QGraphicsView::keyPressEvent(event);
 }
 
