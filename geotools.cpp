@@ -110,9 +110,9 @@ QPoint GeoTools::Pixels2GoogleTile(const QPointF &p)
 {
     qDebug() << "Pixels2GoogleTile";
     qDebug() << "    p:" << p;
-    qDebug() << "    p.x()/TILESIZE" << p.x()/TILESIZE;
-    qDebug() << "    int(ceil(p.x()/TILESIZE-1)):" << int(ceil(p.x()/TILESIZE-1));
-    return QPoint(int(ceil(p.x()/TILESIZE) - 1),int(ceil(p.y()/TILESIZE) - 1));
+    QPoint q(int(ceil(p.x()/TILESIZE) - 1),int(ceil(p.y()/TILESIZE) - 1));
+    qDebug() << "    q:" << q;
+    return q;
 }
 
 // Returns the Google Tile that contains the given

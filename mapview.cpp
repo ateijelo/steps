@@ -122,10 +122,6 @@ void MapView::updateTiles()
     QRectF drawArea = mapToScene(viewport()->rect().adjusted(-20,-20,20,20)).boundingRect();
     QPoint tl = GeoTools::Meters2GoogleTile(drawArea.topLeft(),zoom);
     QPoint br = GeoTools::Meters2GoogleTile(drawArea.bottomRight(),zoom);
-    qDebug() << "MapView::updateTiles:";
-    qDebug() << "    drawArea:" << drawArea;
-    qDebug() << "          tl:" << tl;
-    qDebug() << "          br:" << br;
     tlayer.setRegion(QRect(tl,br),zoom);
 }
 
@@ -301,9 +297,6 @@ void MapView::setZoomLevel(int zoom)
     tlayer.clear();
 
     double res = GeoTools::resolution(zoom);
-    qDebug() << "setZoomLevel:";
-    qDebug() << "    zoom:" << zoom;
-    qDebug() << "     res:" << res;
     resetTransform();
     scale(1/res,1/res);
     rotate(angle);
