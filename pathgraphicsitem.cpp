@@ -24,7 +24,7 @@ PathGraphicsItem::PathGraphicsItem(QGraphicsItem *parent)
     this->setFlag(ItemHasNoContents);
     this->setFlag(ItemIsFocusable);
     for (int i=0; i<2; i++)
-        addNode(QPointF(i*1000,0));
+        addNode(QPointF(i*1000000,0));
 
     tailExtenderLine.setLine(0,0,35,0);
     tailExtenderLine.setFlag(ItemIgnoresTransformations);
@@ -286,7 +286,7 @@ void PathGraphicsItem::nodeReleased(PathNode *node)
 
 void PathGraphicsItem::keyPressEvent(QKeyEvent *event)
 {
-    qDebug() << "keyPressEvent" << event;
+    qDebug() << "PathGraphicsItem::keyPressEvent" << event;
     if (event->key() == Qt::Key_Delete)
     {
         PathNode *n = head;
@@ -308,7 +308,7 @@ PathNode::PathNode(QGraphicsItem *parent)
       inNode(0), outNode(0), hovered(false)
 {
     setFlag(ItemSendsScenePositionChanges);
-    setFlag(ItemIsFocusable);
+    //setFlag(ItemIsFocusable);
     setFlag(ItemIsMovable);
     setFlag(ItemIgnoresTransformations);
 
@@ -321,7 +321,7 @@ PathNode::PathNode(QGraphicsItem *parent)
 void PathNode::setParentPath(PathGraphicsItem *path)
 {
     parentPath = path;
-    setFocusProxy(path);
+    //setFocusProxy(path);
 }
 
 void PathNode::setExtender(bool b)
@@ -440,7 +440,7 @@ QVariant PathNode::itemChange(QGraphicsItem::GraphicsItemChange change, const QV
     case ItemSelectedHasChanged:
         {
             if (value.toBool())
-                setFocus();
+                parentPath->setFocus();
             parentPath->nodeSelectedChanged(this,value.toBool());
             return QVariant();
         }
@@ -523,7 +523,7 @@ void PathEdge::subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::ite
     double adotb = ax*bx + ay*by;
     double cos2 = adotb * qAbs(adotb) / (d2a * d2b);
 
-    if (cos2 < 0.9999)
+    if (cos2 < 0.9995)
     {
         points.insert(i+1,q);
         subdivide(points,i+1,lat1,lon1,azi1,sd,s2,depth+1);
@@ -608,23 +608,29 @@ PathEdgeSegment::PathEdgeSegment(QGraphicsItem *parent)
 {
     setAcceptHoverEvents(true);
     setCursor(Qt::ArrowCursor);
+    c.setHsv(qrand() % 256,255,255);
 
     hoverNode = new QGraphicsEllipseItem(this);
     hoverNode->setRect(-5,-5,10,10);
     hoverNode->setFlag(ItemIgnoresTransformations);
-    hoverNode->setFlag(ItemStacksBehindParent);
-    hoverNode->setPen(QPen(QBrush(Qt::red),1.5));
+    //hoverNode->setFlag(ItemStacksBehindParent);
+    hoverNode->setPen(QPen(QBrush(Qt::yellow),1.5));
     hoverNode->hide();
+}
+
+void PathEdgeSegment::setParentPath(PathGraphicsItem *path)
+{
+    parentPath = path;
 }
 
 void PathEdgeSegment::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     qreal width = 20;
     qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
-    setPen(QPen(QBrush(QColor(0,0,0,0)),width/lod,Qt::SolidLine,Qt::FlatCap));
+    setPen(QPen(QBrush(QColor(0,0,0,0)),width/lod,Qt::SolidLine,Qt::RoundCap));
 
     QGraphicsLineItem::paint(painter,option,widget);
-    painter->setPen(QPen(QBrush(Qt::red),3/lod,Qt::SolidLine,Qt::RoundCap));
+    painter->setPen(QPen(QBrush(c),3/lod,Qt::SolidLine,Qt::RoundCap));
     painter->drawLine(line());
 }
 
