@@ -77,6 +77,7 @@ class PathGraphicsItem : public QGraphicsItem
         void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
         void keyPressEvent(QKeyEvent *event);
         void addNode(const QPointF& pos);
+        void addEdge(PathNode *from, PathNode *to);
         void nodeMoved(PathNode *node);
         void nodeSelectedChanged(PathNode *node, bool selected);
         void removeNode(PathNode *node);

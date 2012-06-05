@@ -78,19 +78,25 @@ void PathGraphicsItem::addNode(const QPointF &pos)
     if (head != 0)
     {
         PathNode *m = tail;
-        PathEdge *e = new PathEdge(m->pos(),n->pos(),this);
-        e->setZValue(1);
-        m->outEdge = e;
-        m->outNode = n;
-        n->inEdge = e;
-        n->inNode = m;
-        length += e->length();
+        addEdge(m,n);
     }
     else
     {
         head = n;
     }
     tail = n;
+}
+
+void PathGraphicsItem::addEdge(PathNode *from, PathNode *to)
+{
+    PathEdge *e = new PathEdge(from->pos(),to->pos(),this);
+    e->setParentPath(this);
+    e->setZValue(1);
+    from->outEdge = e;
+    to->inEdge = e;
+    from->outNode = to;
+    to->inNode = from;
+    length += e->length();
 }
 
 PathGraphicsItem::~PathGraphicsItem()
@@ -241,13 +247,7 @@ void PathGraphicsItem::extenderClicked(PathNode *node)
 
     if (node == tailExtenderNode)
     {
-        node->inNode = tail;
-        tail->outNode = node;
-        PathEdge *e = new PathEdge(tail->pos(),node->pos(),this);
-        e->setZValue(1);
-        node->inEdge = e;
-        tail->outEdge = e;
-        length += e->length();
+        addEdge(tail,node);
         tail = node;
 
         tailExtenderNode = newExtenderNode(&tailExtenderLine);
@@ -258,13 +258,7 @@ void PathGraphicsItem::extenderClicked(PathNode *node)
     }
     if (node == headExtenderNode)
     {
-        node->outNode = head;
-        head->inNode = node;
-        PathEdge *e = new PathEdge(node->pos(),head->pos(),this);
-        e->setZValue(1);
-        node->outEdge = e;
-        head->inEdge = e;
-        length += e->length();
+        addEdge(node,head);
         head = node;
 
         headExtenderNode = newExtenderNode(&headExtenderLine);
