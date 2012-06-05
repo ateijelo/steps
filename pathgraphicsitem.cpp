@@ -456,7 +456,12 @@ PathEdge::PathEdge(const QPointF &p1, const QPointF &p2, QGraphicsItem *parent)
     : QGraphicsItem(parent), p1(p1), p2(p2)
 {
     setFlag(ItemHasNoContents);
-    updateSegments();    
+    updateSegments();
+}
+
+void PathEdge::setParentPath(PathGraphicsItem *path)
+{
+    parentPath = path;
 }
 
 QRectF PathEdge::boundingRect() const
