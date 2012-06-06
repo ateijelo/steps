@@ -47,7 +47,7 @@ class MapView : public QGraphicsView
         void rotLeft();
         void setZoomLevel(int zoom);
         void setCacheStyle(QString cacheStyle);
-        void setAsCenter(QObject *newCenter);
+        void setAsCenter(QObject *);
         void showLatLonAsToolTip(bool);
 
     private slots:

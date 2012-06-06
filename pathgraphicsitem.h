@@ -2,79 +2,9 @@
 #define PATHGRAPHICSITEM_H
 
 #include <QGraphicsItem>
-#include <QLinkedList>
-#include <QSet>
 
 class PathNode;
 class PathEdge;
-class PathEdgeSegment;
-class PathGraphicsItem;
-
-class PathEdgeSegment : public QGraphicsLineItem
-{
-    public:
-        PathEdgeSegment(QGraphicsItem *parent = 0);
-        void setParentPath(PathGraphicsItem *path);
-        void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-        void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
-        void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
-
-    private:
-        QGraphicsEllipseItem *hoverNode;
-        PathGraphicsItem *parentPath;
-        QColor c;
-};
-
-class PathEdge : public QGraphicsItem
-{
-    public:
-        PathEdge(const QPointF& p1, const QPointF& p2, QGraphicsItem *parent = 0);
-        void setParentPath(PathGraphicsItem *path);
-        QRectF boundingRect() const;
-        void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
-        double length() const;
-        void setP1(const QPointF& p, bool fast=false);
-        void setP2(const QPointF& p, bool fast=false);
-        void updateSegments(bool fast=false);
-        qreal angle1() const;
-        qreal angle2() const;
-
-    private:
-        void subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::iterator i,
-                       double lat1, double lon1, double azi1, double s1, double s2, int depth);
-
-        bool fastUpdate;
-        PathGraphicsItem *parentPath;
-        QPointF p1;
-        QPointF p2;
-        QLinkedList<PathEdgeSegment*> segments;
-};
-
-class PathGraphicsItem;
-
-class PathNode : public QGraphicsEllipseItem
-{
-    public:
-        PathNode(QGraphicsItem *parent);
-        void setParentPath(PathGraphicsItem *path);
-        void setExtender(bool b);
-        void mousePressEvent(QGraphicsSceneMouseEvent *event);
-        void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-        void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
-        void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
-        void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-        QPainterPath shape() const;
-
-        PathEdge *inEdge;
-        PathEdge *outEdge;
-        PathNode *inNode;
-        PathNode *outNode;
-        PathGraphicsItem *parentPath;
-        bool isExtender;
-        bool hovered;
-
-        QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
-};
 
 class PathGraphicsItem : public QGraphicsItem
 {
@@ -91,7 +21,8 @@ class PathGraphicsItem : public QGraphicsItem
         void removeNode(PathNode *node);
         void setPos(const QPointF &pos);
         void extenderClicked(PathNode *node);
-        void nodeReleased(PathNode *node);
+        void nodeReleased(PathNode *);
+        void edgeHovered(PathEdge *e, const QPointF& pos);
 
     signals:
 
@@ -99,6 +30,7 @@ class PathGraphicsItem : public QGraphicsItem
 
     private:
         PathNode *newExtenderNode(QGraphicsItem *parent);
+        PathNode *newInnerNode(QGraphicsItem *parent);
         void updateExtenders();
 
         PathNode *head;
@@ -106,6 +38,8 @@ class PathGraphicsItem : public QGraphicsItem
         double length;
         PathNode *tailExtenderNode;
         PathNode *headExtenderNode;
+        PathNode *innerNode;
+        PathEdge *innerNodeEdge;
         QGraphicsLineItem tailExtenderLine;
         QGraphicsLineItem headExtenderLine;
 

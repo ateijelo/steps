@@ -52,7 +52,7 @@ MapView::MapView(QWidget *parent)
 
     GeoCircle *c = new GeoCircle();
     c->setZValue(3);
-    c->setPos(GeoTools::LatLon2Meters(QPointF(0,0)));
+    c->setPos(GeoTools::LatLon2Meters(QPointF(-82.4,23)));
     scene->addItem(c);
 
     //p = new PathGraphicsItem();
@@ -253,7 +253,7 @@ void MapView::keyReleaseEvent(QKeyEvent *event)
     }
 }
 
-void MapView::setAsCenter(QObject *newCenter)
+void MapView::setAsCenter(QObject *)
 {
     //QPointF viewAnchorScenePos = mapToScene(viewAnchor);
     //centerOn(mapToScene(rect().center()) + sceneAnchor - viewAnchorScenePos);

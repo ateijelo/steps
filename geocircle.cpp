@@ -77,7 +77,7 @@ GeoCircle::GeoCircle(QGraphicsItem *parent)
         addCardinalPoint(labels[i]);
     }
 
-    target->setPos(1000,0);
+    target->setPos(1000000,0);
     center->setPos(0,0);
     updateSegments();
 }

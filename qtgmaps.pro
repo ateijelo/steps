@@ -28,6 +28,9 @@ HEADERS += mainwindow.h \
     debug.h \
     debugdialog.h \
     pathgraphicsitem.h \
+    pathnode.h \
+    pathedge.h \
+    pathedgesegment.h \
     geocircle.h
 FORMS += mainwindow.ui \
     preferences.ui \
@@ -50,5 +53,8 @@ SOURCES += main.cpp \
     debug.cpp \
     debugdialog.cpp \
     pathgraphicsitem.cpp \
+    pathnode.cpp \
+    pathedge.cpp \
+    pathedgesegment.cpp \
     geocircle.cpp
 RESOURCES += qtgmaps.qrc
