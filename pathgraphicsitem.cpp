@@ -1,4 +1,4 @@
-#define QT_NO_DEBUG_OUTPUT
+//#define QT_NO_DEBUG_OUTPUT
 #include <QtDebug>
 #include <QPen>
 #include <QBrush>
@@ -433,20 +433,20 @@ QVariant PathNode::itemChange(QGraphicsItem::GraphicsItemChange change, const QV
 {
     switch (change)
     {
-    case ItemScenePositionHasChanged:
-        parentPath->nodeMoved(this);
-        return QVariant();
-        break;
-    case ItemSelectedHasChanged:
-        {
-            if (value.toBool())
-                parentPath->setFocus();
-            parentPath->nodeSelectedChanged(this,value.toBool());
+        case ItemScenePositionHasChanged:
+            parentPath->nodeMoved(this);
             return QVariant();
-        }
-        break;
-    default:
-        return value;
+            break;
+        case ItemSelectedHasChanged:
+            {
+                if (value.toBool())
+                    parentPath->setFocus();
+                parentPath->nodeSelectedChanged(this,value.toBool());
+                return QVariant();
+            }
+            break;
+        default:
+            return value;
     }
 }
 

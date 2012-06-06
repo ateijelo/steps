@@ -13,6 +13,7 @@
 #include "constants.h"
 #include "pathgraphicsitem.h"
 #include "geotools.h"
+#include "geocircle.h"
 
 MapView::MapView(QWidget *parent)
     : QGraphicsView(parent), scene(new MainScene()), tlayer(scene)
@@ -45,9 +46,14 @@ MapView::MapView(QWidget *parent)
 
     PathGraphicsItem *p;
     p = new PathGraphicsItem();
-    p->setZValue(100);
+    p->setZValue(2);
     p->setPos(GeoTools::LatLon2Meters(QPointF(0,0)));
     scene->addItem(p);
+
+    GeoCircle *c = new GeoCircle();
+    c->setZValue(3);
+    c->setPos(GeoTools::LatLon2Meters(QPointF(0,0)));
+    scene->addItem(c);
 
     //p = new PathGraphicsItem();
     //p->setZValue(100);

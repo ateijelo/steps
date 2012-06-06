@@ -27,7 +27,8 @@ HEADERS += mainwindow.h \
     networktask.h \
     debug.h \
     debugdialog.h \
-    pathgraphicsitem.h
+    pathgraphicsitem.h \
+    geocircle.h
 FORMS += mainwindow.ui \
     preferences.ui \
     debugdialog.ui \
@@ -48,5 +49,6 @@ SOURCES += main.cpp \
     networktask.cpp \
     debug.cpp \
     debugdialog.cpp \
-    pathgraphicsitem.cpp
+    pathgraphicsitem.cpp \
+    geocircle.cpp
 RESOURCES += qtgmaps.qrc
