@@ -60,6 +60,7 @@ PathNode *PathGraphicsItem::newInnerNode(QGraphicsItem *parent)
     n->setParentPath(this);
     n->setExtender(true);
     n->setAcceptsHoverEvents(false);
+    n->hovered = true;
     n->hide();
     return n;
 }
@@ -268,6 +269,7 @@ void PathGraphicsItem::extenderClicked(PathNode *node)
         PathNode *n = innerNodeEdge->outNode;
         if (m->outEdge == n->inEdge && (m->outEdge != 0))
         {
+            length -= m->outEdge->length();
             delete m->outEdge;
             addEdge(m,node);
             addEdge(node,n);
