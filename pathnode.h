@@ -14,6 +14,7 @@ class PathNode : public QGraphicsEllipseItem
         void setExtender(bool b);
         void mousePressEvent(QGraphicsSceneMouseEvent *event);
         void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+        void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
         void hoverEnterEvent(QGraphicsSceneHoverEvent *);
         void hoverLeaveEvent(QGraphicsSceneHoverEvent *);
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);

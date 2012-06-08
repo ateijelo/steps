@@ -68,6 +68,16 @@ void PathNode::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     }
 }
 
+void PathNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (event->modifiers() & Qt::ShiftModifier)
+    {
+        parentPath->removeNode(this);
+        event->accept();
+        return;
+    }
+}
+
 void PathNode::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 {
     hovered = true;
@@ -123,9 +133,16 @@ void PathNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
             }
         }
     }
+    if (isExtender && hovered)
+    {
+        painter->setPen(QPen(QBrush(Qt::red),1));
+        painter->setBrush(QBrush());
+        painter->drawEllipse(-width/2+1,-width/2+1,width-2,width-2);
+    }
     painter->setPen(pen());
     painter->setBrush(brush());
     painter->drawEllipse(-width/2,-width/2,width,width);
+
 }
 
 QPainterPath PathNode::shape() const

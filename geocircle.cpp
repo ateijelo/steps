@@ -14,6 +14,7 @@ GeoCircleNode::GeoCircleNode(QGraphicsItem *parent)
     setFlag(ItemIsMovable);
     setFlag(ItemSendsScenePositionChanges);
     setFlag(ItemIgnoresTransformations);
+    setFlag(ItemIsSelectable);
     setCursor(Qt::ArrowCursor);
     setRect(-5,-5,10,10);
     setBrush(Qt::white);
