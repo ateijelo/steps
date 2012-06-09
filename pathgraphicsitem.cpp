@@ -1,5 +1,3 @@
-//#define QT_NO_DEBUG_OUTPUT
-#include <QtDebug>
 #include <QPen>
 #include <QBrush>
 #include <QKeyEvent>
@@ -8,6 +6,7 @@
 #include "pathgraphicsitem.h"
 #include "pathnode.h"
 #include "pathedge.h"
+#include "debug.h"
 
 PathGraphicsItem::PathGraphicsItem(QGraphicsItem *parent)
     : QGraphicsItem(parent), head(0), tail(0), length(0.0),
@@ -17,7 +16,7 @@ PathGraphicsItem::PathGraphicsItem(QGraphicsItem *parent)
     this->setFlag(ItemHasNoContents);
     this->setFlag(ItemIsFocusable);
     for (int i=0; i<2; i++)
-        addNode(QPointF(i*1000000,0));
+        addNode(QPointF(i*1000,0));
 
     tailExtenderLine.setLine(0,0,35,0);
     tailExtenderLine.setFlag(ItemIgnoresTransformations);
@@ -132,7 +131,6 @@ void PathGraphicsItem::paint(QPainter *, const QStyleOptionGraphicsItem *, QWidg
 
 void PathGraphicsItem::nodeMoved(PathNode *node)
 {
-    qDebug() << "    length: " << length;
     if (node->inEdge)
     {
         length -= node->inEdge->length();
@@ -151,10 +149,9 @@ void PathGraphicsItem::nodeMoved(PathNode *node)
         node->outEdge->setP1(node->pos(),fast);
         length += node->outEdge->length();
     }
-    qDebug() << "    length: " << length;
+    fDebug(DEBUG_PATHS) << "    length: " << length;
     if (node == tail)
     {
-        qDebug() << "tail node moved";
         tailExtenderLine.setPos(tail->pos());
         tailExtenderLine.setRotation(-tail->inEdge->angle2());
     }
@@ -175,6 +172,7 @@ void PathGraphicsItem::nodeSelectedChanged(PathNode *node, bool selected)
         tailExtenderLine.setVisible(selected);
     if (node == head)
         headExtenderLine.setVisible(selected);
+    fDebug(DEBUG_PATHS) << "    length:" << length;
 }
 
 void PathGraphicsItem::removeNode(PathNode *node)
@@ -254,8 +252,15 @@ void PathGraphicsItem::extenderClicked(PathNode *node)
     if (l.size() > 0)
     {
         QGraphicsView *v = l.at(0);
+        fDebug(DEBUG_PATHS) << "viewportTransform:" << v->viewportTransform();
+        fDebug(DEBUG_PATHS) << "node->deviceTransform:" << node->deviceTransform(v->viewportTransform());
+        fDebug(DEBUG_PATHS) << "  .map:" << node->deviceTransform(v->viewportTransform()).map(QPointF(0,0));
         QPointF q = node->deviceTransform(v->viewportTransform()).map(QPointF(0,0));
-        p = deviceTransform(v->viewportTransform().inverted()).map(q);
+        fDebug(DEBUG_PATHS) << "  deviceTransform.map:" << deviceTransform(v->viewportTransform().inverted()).map(q);
+        //p = deviceTransform(v->viewportTransform().inverted()).map(q);
+        p = mapFromScene(v->mapToScene(q.toPoint()));
+        fDebug(DEBUG_PATHS) << "view.mapToScene:" << v->mapToScene(q.toPoint());
+        fDebug(DEBUG_PATHS) << "this.mapFromScene(view.mapToScene):" << mapFromScene(v->mapToScene(q.toPoint()));
     }
     if (node == innerNode && innerNodeEdge)
     {

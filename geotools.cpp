@@ -42,6 +42,7 @@
 // and includes the following notice:
 //  Copyright © 2002-2009 Chris Veness
 
+#define QT_NO_DEBUG_OUTPUT
 #include <QtDebug>
 #include <math.h>
 
