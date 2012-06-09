@@ -258,7 +258,7 @@ void PathGraphicsItem::extenderClicked(PathNode *node)
         QPointF q = node->deviceTransform(v->viewportTransform()).map(QPointF(0,0));
         fDebug(DEBUG_PATHS) << "  deviceTransform.map:" << deviceTransform(v->viewportTransform().inverted()).map(q);
         //p = deviceTransform(v->viewportTransform().inverted()).map(q);
-        p = mapFromScene(v->mapToScene(q.toPoint()));
+        p = mapFromScene(v->viewportTransform().inverted().map(q));
         fDebug(DEBUG_PATHS) << "view.mapToScene:" << v->mapToScene(q.toPoint());
         fDebug(DEBUG_PATHS) << "this.mapFromScene(view.mapToScene):" << mapFromScene(v->mapToScene(q.toPoint()));
     }
