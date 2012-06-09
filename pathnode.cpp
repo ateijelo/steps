@@ -51,6 +51,8 @@ void PathNode::mousePressEvent(QGraphicsSceneMouseEvent *event)
     {
         parentPath->extenderClicked(this);
     }
+    if (event->button() == Qt::LeftButton && (event->modifiers() & Qt::ShiftModifier))
+        parentPath->removeNode(this);
     if (event->button() == Qt::MiddleButton)
     {
         parentPath->removeNode(this);
