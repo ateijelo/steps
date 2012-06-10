@@ -23,7 +23,6 @@ class PathGraphicsItem : public QGraphicsItem
         void extenderClicked(PathNode *node);
         void nodeReleased(PathNode *);
         void edgeHovered(PathEdge *e, const QPointF& pos);
-        void addToShadow(QGraphicsItem *item);
 
     signals:
 
@@ -43,7 +42,6 @@ class PathGraphicsItem : public QGraphicsItem
         PathEdge *innerNodeEdge;
         QGraphicsLineItem tailExtenderLine;
         QGraphicsLineItem headExtenderLine;
-        QGraphicsEllipseItem *shadow;
 
 };
 

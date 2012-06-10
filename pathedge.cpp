@@ -124,9 +124,6 @@ void PathEdge::updateSegments(bool fast)
             s->setParentEdge(this);
             s->setParentPath(parentPath);
             segments.append(s);
-            PathEdgeSegmentShadow *shadow = new PathEdgeSegmentShadow();
-            parentPath->addToShadow(shadow);
-            shadows.insert(s,shadow);
         }
         //qDebug() << GeoTools::Meters2LatLon(*i) << "->" << GeoTools::Meters2LatLon(*(i+1));
         QPointF t1 = mapFromScene(*i);
@@ -137,12 +134,10 @@ void PathEdge::updateSegments(bool fast)
         else if (qAbs(t2.x() + w - t1.x()) < qAbs(t2.x() - t1.x()))
             t2 = t2 + QPointF(w,0);
         s->setLine(QLineF(t1,t2));
-        shadows.value(s)->setLine(QLineF(t1,t2));
         i++;
     }
     while (si != segments.end())
     {
-        delete shadows.take(*si);
         delete *si;
         si = segments.erase(si);
     }

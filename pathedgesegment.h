@@ -6,15 +6,6 @@
 #include "pathedge.h"
 #include "pathnode.h"
 
-class PathGraphicsItem;
-
-class PathEdgeSegmentShadow : public QGraphicsLineItem
-{
-    public:
-        PathEdgeSegmentShadow(QGraphicsItem *parent = 0);
-        void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-};
-
 class PathEdgeSegment : public QGraphicsLineItem
 {
     public:

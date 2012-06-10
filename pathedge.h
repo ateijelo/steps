@@ -6,7 +6,6 @@
 
 class PathGraphicsItem;
 class PathEdgeSegment;
-class PathEdgeSegmentShadow;
 class PathNode;
 
 class PathEdge : public QGraphicsItem
@@ -34,7 +33,6 @@ class PathEdge : public QGraphicsItem
         QPointF p2;
         PathGraphicsItem *parentPath;
         QLinkedList<PathEdgeSegment*> segments;
-        QHash<PathEdgeSegment*,PathEdgeSegmentShadow*> shadows;
 };
 
 #endif // PATHEDGE_H

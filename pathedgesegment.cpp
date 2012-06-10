@@ -70,22 +70,3 @@ void PathEdgeSegment::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
     //hoverNode->hide();
     parentPath->edgeHovered(0,QPointF());
 }
-
-PathEdgeSegmentShadow::PathEdgeSegmentShadow(QGraphicsItem *parent)
-    : QGraphicsLineItem(parent)
-{
-    //setFlag(ItemStacksBehindParent);
-}
-
-void PathEdgeSegmentShadow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    qreal width = 10;
-    qreal lod = option->levelOfDetailFromTransform(painter->worldTransform());
-    setPen(QPen(QBrush(Qt::transparent),width/lod,Qt::SolidLine,Qt::RoundCap));
-
-    QGraphicsLineItem::paint(painter,option,widget);
-
-    QPointF shift = QPointF(2/lod,2/lod);
-    painter->setPen(QPen(QBrush(Qt::gray),3/lod,Qt::SolidLine,Qt::RoundCap));
-    painter->drawLine(QLineF(line().p1()+shift,line().p2()+shift));
-}
