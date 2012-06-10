@@ -140,6 +140,10 @@ void MapView::mouseMoveEvent(QMouseEvent *event)
 {
     viewAnchor = event->pos();
     sceneAnchor = mapToScene(viewAnchor);
+    if (event->modifiers() & Qt::ShiftModifier)
+        setDragMode(RubberBandDrag);
+    else
+        setDragMode(ScrollHandDrag);
     QGraphicsView::mouseMoveEvent(event);
 }
 
