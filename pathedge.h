@@ -6,13 +6,13 @@
 
 class PathGraphicsItem;
 class PathEdgeSegment;
+class PathEdgeSegmentShadow;
 class PathNode;
 
 class PathEdge : public QGraphicsItem
 {
     public:
-        PathEdge(const QPointF& p1, const QPointF& p2, QGraphicsItem *parent = 0);
-        void setParentPath(PathGraphicsItem *path);
+        PathEdge(const QPointF& p1, const QPointF& p2, PathGraphicsItem *parentPath);
         QRectF boundingRect() const;
         void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
         double length() const;
@@ -30,10 +30,11 @@ class PathEdge : public QGraphicsItem
                        double lat1, double lon1, double azi1, double s1, double s2, int depth);
 
         bool fastUpdate;
-        PathGraphicsItem *parentPath;
         QPointF p1;
         QPointF p2;
+        PathGraphicsItem *parentPath;
         QLinkedList<PathEdgeSegment*> segments;
+        QHash<PathEdgeSegment*,PathEdgeSegmentShadow*> shadows;
 };
 
 #endif // PATHEDGE_H

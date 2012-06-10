@@ -15,6 +15,10 @@ PathGraphicsItem::PathGraphicsItem(QGraphicsItem *parent)
 //    this->setFlag(QGraphicsItem::ItemIsMovable);
     this->setFlag(ItemHasNoContents);
     this->setFlag(ItemIsFocusable);
+
+    shadow = new QGraphicsEllipseItem(this);
+    shadow->setPos(30,30);
+
     for (int i=0; i<2; i++)
         addNode(QPointF(i*1000,0));
 
@@ -98,7 +102,6 @@ void PathGraphicsItem::addNode(const QPointF &pos)
 void PathGraphicsItem::addEdge(PathNode *from, PathNode *to)
 {
     PathEdge *e = new PathEdge(from->pos(),to->pos(),this);
-    e->setParentPath(this);
     e->setZValue(1);
     e->inNode = from;
     e->outNode = to;
@@ -340,6 +343,11 @@ void PathGraphicsItem::edgeHovered(PathEdge *e, const QPointF &pos)
         innerNode->hide();
     }
     innerNodeEdge = e;
+}
+
+void PathGraphicsItem::addToShadow(QGraphicsItem *item)
+{
+    item->setParentItem(shadow);
 }
 
 void PathGraphicsItem::keyPressEvent(QKeyEvent *event)

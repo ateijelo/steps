@@ -3,21 +3,22 @@
 
 #include "pathedge.h"
 #include "pathedgesegment.h"
+#include "pathgraphicsitem.h"
 #include "geotools.h"
 
-PathEdge::PathEdge(const QPointF &p1, const QPointF &p2, QGraphicsItem *parent)
-    : QGraphicsItem(parent), p1(p1), p2(p2)
+PathEdge::PathEdge(const QPointF &p1, const QPointF &p2, PathGraphicsItem *parentPath)
+    : QGraphicsItem(parentPath), p1(p1), p2(p2), parentPath(parentPath)
 {
     setFlag(ItemHasNoContents);
     updateSegments();
 }
 
-void PathEdge::setParentPath(PathGraphicsItem *path)
-{
-    parentPath = path;
-    foreach (PathEdgeSegment *s, segments)
-        s->setParentPath(path);
-}
+//void PathEdge::setParentPath(PathGraphicsItem *path)
+//{
+//    parentPath = path;
+//    foreach (PathEdgeSegment *s, segments)
+//        s->setParentPath(path);
+//}
 
 QRectF PathEdge::boundingRect() const
 {
@@ -123,21 +124,25 @@ void PathEdge::updateSegments(bool fast)
             s->setParentEdge(this);
             s->setParentPath(parentPath);
             segments.append(s);
+            PathEdgeSegmentShadow *shadow = new PathEdgeSegmentShadow();
+            parentPath->addToShadow(shadow);
+            shadows.insert(s,shadow);
         }
         //qDebug() << GeoTools::Meters2LatLon(*i) << "->" << GeoTools::Meters2LatLon(*(i+1));
         QPointF t1 = mapFromScene(*i);
         QPointF t2 = mapFromScene(*(i+1));
         double w = GeoTools::projectionWidth();
         if (qAbs(t2.x() - w - t1.x()) < qAbs(t2.x() - t1.x()))
-            s->setLine(QLineF(t1,t2 - QPointF(w,0)));
+            t2 = t2 - QPointF(w,0);
         else if (qAbs(t2.x() + w - t1.x()) < qAbs(t2.x() - t1.x()))
-            s->setLine(QLineF(t1,t2 + QPointF(w,0)));
-        else
-            s->setLine(QLineF(t1,t2));
+            t2 = t2 + QPointF(w,0);
+        s->setLine(QLineF(t1,t2));
+        shadows.value(s)->setLine(QLineF(t1,t2));
         i++;
     }
     while (si != segments.end())
     {
+        delete shadows.take(*si);
         delete *si;
         si = segments.erase(si);
     }
