@@ -45,6 +45,14 @@ void PathNode::setExtender(bool b)
 
 void PathNode::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    qDebug() << "PathNode::mousePressEvent" << event;
+    qDebug() << "event->buttons():" << event->buttons();
+    if (event->buttons() & Qt::RightButton)
+    {
+        event->ignore();
+        return;
+    }
+    qDebug() << "PathNode::mousePressEvent" << event;
     QGraphicsEllipseItem::mousePressEvent(event);
 
     if (event->button() == Qt::LeftButton && isExtender)
@@ -109,14 +117,14 @@ void PathNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
             if (hovered)
             {
                 setPen(QPen(QBrush(Qt::yellow),1.5));
-                setBrush(QBrush());
-                width = 10;
+                setBrush(QBrush(Qt::red));
+                width = 8;
             }
             else
             {
                 setPen(QPen(QBrush(Qt::red),1.5));
                 setBrush(QBrush());
-                width = 10;
+                width = 8;
             }
         }
         else
@@ -135,16 +143,30 @@ void PathNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidge
             }
         }
     }
-    if (isExtender && hovered)
-    {
-        painter->setPen(QPen(QBrush(Qt::red),1));
-        painter->setBrush(QBrush());
-        painter->drawEllipse(-width/2+1,-width/2+1,width-2,width-2);
-    }
+//    if (isExtender && hovered)
+//    {
+//        setPen
+//        painter->setPen(QPen(QBrush(Qt::red),1));
+//        painter->setBrush(QBrush(Qt::red));
+//        painter->drawEllipse(-width/2+1,-width/2+1,width-2,width-2);
+//    }
     painter->setPen(pen());
     painter->setBrush(brush());
     painter->drawEllipse(-width/2,-width/2,width,width);
-
+//    QLineF l(0,0,width/2+pen().width(),0);
+//    painter->setPen(QPen(QBrush(Qt::red),3,Qt::SolidLine,Qt::FlatCap));
+//    if (inEdge)
+//    {
+//        QTransform t;
+//        t.rotate(180-inEdge->angle2());
+//        painter->drawLine(t.map(l));
+//    }
+//    if (outEdge)
+//    {
+//        QTransform t;
+//        t.rotate(-outEdge->angle1());
+//        painter->drawLine(t.map(l));
+//    }
 }
 
 QPainterPath PathNode::shape() const

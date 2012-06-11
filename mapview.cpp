@@ -147,6 +147,28 @@ void MapView::mouseMoveEvent(QMouseEvent *event)
     QGraphicsView::mouseMoveEvent(event);
 }
 
+void MapView::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::RightButton)
+    {
+        QMouseEvent e(event->type(),event->pos(),Qt::LeftButton,Qt::MouseButtons(Qt::LeftButton|Qt::RightButton),event->modifiers());
+        QGraphicsView::mousePressEvent(&e);
+        return;
+    }
+    QGraphicsView::mousePressEvent(event);
+}
+
+void MapView::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::RightButton)
+    {
+        QMouseEvent e(event->type(),event->pos(),Qt::LeftButton,Qt::MouseButtons(Qt::LeftButton|Qt::RightButton),event->modifiers());
+        QGraphicsView::mouseReleaseEvent(&e);
+        return;
+    }
+    QGraphicsView::mouseReleaseEvent(event);
+}
+
 void MapView::leaveEvent(QEvent *event)
 {
     viewAnchor = rect().center();
