@@ -14,6 +14,7 @@
 #include "pathgraphicsitem.h"
 #include "geotools.h"
 #include "geocircle.h"
+#include "worldwindow.h"
 
 MapView::MapView(QWidget *parent)
     : QGraphicsView(parent), scene(new MainScene()), tlayer(scene)
@@ -47,12 +48,12 @@ MapView::MapView(QWidget *parent)
     PathGraphicsItem *p;
     p = new PathGraphicsItem();
     p->setZValue(2);
-    p->setPos(GeoTools::LatLon2Meters(QPointF(-82.38,23.13)));
+    //p->setPos(GeoTools::LatLon2Meters(QPointF(-82.38,23.13)));
     scene->addItem(p);
 
     p = new PathGraphicsItem();
     p->setZValue(2);
-    p->setPos(GeoTools::LatLon2Meters(QPointF(-82.38,23.13)));
+    //p->setPos(GeoTools::LatLon2Meters(QPointF(-82.38,23.13)));
     scene->addItem(p);
 
 //    GeoCircle *c = new GeoCircle();
@@ -65,6 +66,7 @@ MapView::MapView(QWidget *parent)
     //p->setPos(gt.LatLon2Meters(QPointF(-81.6884,23.1503)));
     //scene->addItem(p);
 
+    worldWindow = new WorldWindow(this);
     ui.setupUi(this);
 }
 
@@ -282,6 +284,12 @@ void MapView::keyReleaseEvent(QKeyEvent *event)
         setViewportUpdateMode(MinimalViewportUpdate);
 #endif
     }
+}
+
+void MapView::resizeEvent(QResizeEvent *event)
+{
+    worldWindow->resize(event->size());
+    QGraphicsView::resizeEvent(event);
 }
 
 void MapView::setAsCenter(QObject *)

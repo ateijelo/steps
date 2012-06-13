@@ -3,6 +3,7 @@
 
 #include <QEvent>
 #include <QMouseEvent>
+#include <QPushButton>
 #include <QWheelEvent>
 #include <QGraphicsView>
 #include <QContextMenuEvent>
@@ -11,6 +12,7 @@
 #include "tile.h"
 #include "mainscene.h"
 #include "tilelayer.h"
+#include "worldwindow.h"
 
 #include "ui_viewwidgets.h"
 
@@ -31,6 +33,7 @@ class MapView : public QGraphicsView
         void contextMenuEvent (QContextMenuEvent *event);
         void keyPressEvent(QKeyEvent *event);
         void keyReleaseEvent(QKeyEvent *event);
+        void resizeEvent(QResizeEvent *event);
         bool canZoomIn();
         bool canZoomOut();
         int zoomLevel();
@@ -70,6 +73,7 @@ class MapView : public QGraphicsView
         Ui::ViewWidgets ui;
         QString coordsTemplate;
         QTransform lastViewportTransform;
+        WorldWindow *worldWindow;
 };
 
 #endif

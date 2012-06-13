@@ -1,3 +1,4 @@
+#include <cmath>
 #include <QtDebug>
 #include <QCursor>
 #include <QBrush>
@@ -8,6 +9,7 @@
 #include "pathnode.h"
 #include "pathedge.h"
 #include "pathgraphicsitem.h"
+#include "geotools.h"
 
 PathNode::PathNode(QGraphicsItem *parent)
     : QGraphicsEllipseItem(parent), inEdge(0), outEdge(0),
@@ -183,6 +185,23 @@ QVariant PathNode::itemChange(QGraphicsItem::GraphicsItemChange change, const QV
         case ItemScenePositionHasChanged:
             parentPath->nodeMoved(this);
             return QVariant();
+            break;
+        case ItemPositionChange:
+            {
+                QPointF p = value.toPointF();
+                qDebug() << "itemChange" << p;
+                qreal pw = GeoTools::projectionWidth();
+                qDebug() << "pw:" << pw;
+                qreal x = p.x();
+                if (x > -pw/2 && x < pw/2)
+                    return value;
+                qreal m = fmod(p.x() + pw/2,pw);
+                if (m < 0)
+                    p.setX(pw/2 + m);
+                else
+                    p.setX(-pw/2 + m);
+                return p;
+            }
             break;
         case ItemSelectedHasChanged:
             {

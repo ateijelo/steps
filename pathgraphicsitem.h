@@ -42,6 +42,7 @@ class PathGraphicsItem : public QGraphicsItem
         PathEdge *innerNodeEdge;
         QGraphicsLineItem tailExtenderLine;
         QGraphicsLineItem headExtenderLine;
+        QList<PathGraphicsItem*> siblings;
 
 };
 
