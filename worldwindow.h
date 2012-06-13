@@ -3,18 +3,20 @@
 
 #include <QWidget>
 
-class MapView;
-
 class WorldWindow : public QWidget
 {
     Q_OBJECT
     public:
-        WorldWindow(MapView *parent = 0);
+        WorldWindow(QWidget *parent = 0);
         void paintEvent(QPaintEvent *);
+        void resize(const QSize& size);
+
+    public slots:
+        void zoomChanged(int z);
 
     private:
-        QRectF _bRect;
-        MapView *view;
+        void updateMask();
+        int z;
 };
 
 #endif // WORLDWINDOW_H

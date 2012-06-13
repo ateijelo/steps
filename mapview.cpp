@@ -68,6 +68,8 @@ MapView::MapView(QWidget *parent)
 
     worldWindow = new WorldWindow(this);
     ui.setupUi(this);
+    connect(this,SIGNAL(zoomChanged(int)),worldWindow,SLOT(zoomChanged(int)));
+    worldWindow->zoomChanged(zoom);
 }
 
 bool MapView::canZoomIn()
@@ -288,6 +290,7 @@ void MapView::keyReleaseEvent(QKeyEvent *event)
 
 void MapView::resizeEvent(QResizeEvent *event)
 {
+    qDebug() << "MapView::resizeEvent:" << event;
     worldWindow->resize(event->size());
     QGraphicsView::resizeEvent(event);
 }
