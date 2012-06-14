@@ -245,8 +245,8 @@ void TileLayer::setRegion(const QRect& m, int zoom)
     QSettings settings;
     type = settings.value(SettingsKeys::MapType, "").toString();
 
-    //fDebug(DEBUG_TILELAYER) << "TileLayer::setRegion: " << m;
-    QRect n = m.intersected(QRect(m.left(),0,m.width(),(1 << zoom)));
+    //fDebug(DEBUG_TILELAYER) << "TileLayer::setRegion: " << m;    
+    QRect n = m.intersected(QRect(-(1 << zoom),0,3*(1 << zoom),(1 << zoom)));
     QRect& o = region; // n => new, o => old
 
     ColumnPointer p = adjustBeforeIntersection(n);

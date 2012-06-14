@@ -108,6 +108,13 @@ void MapView::mouseMovedOverScene(const QPointF& scenePos)
     emit mouseMoved(GeoTools::Meters2LatLon(scenePos));
 }
 
+void MapView::centerScene()
+{
+    QPointF c = mapToScene(rect().center());
+    if (c.x() > GeoTools::projectionWidth() || c.x() < -GeoTools::projectionWidth())
+        centerOn(fmod(c.x(),GeoTools::projectionWidth()),c.y());
+}
+
 bool MapView::viewportEvent(QEvent *event)
 {
     if (event->type() == QEvent::ToolTip)
@@ -127,6 +134,8 @@ bool MapView::viewportEvent(QEvent *event)
         {
             updateTiles();
             lastViewportTransform = viewportTransform();
+
+            centerScene();
         }
     }
     return QGraphicsView::viewportEvent(event);
@@ -148,7 +157,13 @@ void MapView::mouseMoveEvent(QMouseEvent *event)
         setDragMode(RubberBandDrag);
     else
         setDragMode(ScrollHandDrag);
+
     QGraphicsView::mouseMoveEvent(event);
+
+    // Although centerScene is already called in viewportEvent
+    // on paint events, and that's enough to keep the scene
+    // in place, also doing it here reduces flicker.
+    centerScene();
 }
 
 void MapView::mousePressEvent(QMouseEvent *event)
@@ -275,6 +290,8 @@ void MapView::keyPressEvent(QKeyEvent *event)
 #endif
     }
     QGraphicsView::keyPressEvent(event);
+
+    centerScene();
 }
 
 void MapView::keyReleaseEvent(QKeyEvent *event)

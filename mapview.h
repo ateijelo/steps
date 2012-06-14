@@ -38,6 +38,7 @@ class MapView : public QGraphicsView
         bool canZoomOut();
         int zoomLevel();
         int maxZoomLevel();
+        void centerScene();
 
     signals:
         void canZoomIn(bool);
