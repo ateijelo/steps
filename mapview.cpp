@@ -241,6 +241,8 @@ void MapView::wheelEvent(QWheelEvent *event)
         return;
     }
     QGraphicsView::wheelEvent(event);
+
+    centerScene();
 }
 
 void MapView::contextMenuEvent (QContextMenuEvent *event)
