@@ -11,5 +11,6 @@ const char *flagLabels[] = {
     "Pixmap Cache",
     "Tile Coordinates",
     "Paths",
+    "World Window",
     NULL
 };

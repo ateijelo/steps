@@ -111,8 +111,10 @@ void MapView::mouseMovedOverScene(const QPointF& scenePos)
 void MapView::centerScene()
 {
     QPointF c = mapToScene(rect().center());
-    if (c.x() > GeoTools::projectionWidth() || c.x() < -GeoTools::projectionWidth())
-        centerOn(fmod(c.x(),GeoTools::projectionWidth()),c.y());
+    if (c.x() > GeoTools::projectionWidth())
+        centerOn(c.x() - GeoTools::projectionWidth(),c.y());
+    if (c.x() < 0)
+        centerOn(c.x() + GeoTools::projectionWidth(),c.y());
 }
 
 bool MapView::viewportEvent(QEvent *event)
