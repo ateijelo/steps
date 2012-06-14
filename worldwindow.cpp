@@ -62,7 +62,7 @@ void WorldWindow::updateMask()
     int x1 = (width() - worldPixelWidth)/2;
     int x2 = x1 + worldPixelWidth;
     QRegion r(QRect(0,0,x1,height()));
-    r = r.united(QRect(x2-1,0,width(),height()));
+    r = r.united(QRect(x2,0,width(),height()));
 //    QTransform t;
 //    t.translate(width()/2,height()/2);
 //    t.rotate(45);

@@ -128,11 +128,28 @@ void PathEdge::updateSegments(bool fast)
         //qDebug() << GeoTools::Meters2LatLon(*i) << "->" << GeoTools::Meters2LatLon(*(i+1));
         QPointF t1 = mapFromScene(*i);
         QPointF t2 = mapFromScene(*(i+1));
+
         double w = GeoTools::projectionWidth();
+
+        // move the points to the world of this path
+        qreal m;
+        m = fmod(t1.x() + w/2,w);
+        if (m < 0)
+            t1.setX(w/2+m);
+        else
+            t1.setX(-w/2+m);
+
+        m = fmod(t2.x() + w/2,w);
+        if (m < 0)
+            t2.setX(w/2+m);
+        else
+            t2.setX(-w/2+m);
+
         if (qAbs(t2.x() - w - t1.x()) < qAbs(t2.x() - t1.x()))
             t2 = t2 - QPointF(w,0);
         else if (qAbs(t2.x() + w - t1.x()) < qAbs(t2.x() - t1.x()))
             t2 = t2 + QPointF(w,0);
+
         s->setLine(QLineF(t1,t2));
         i++;
     }
