@@ -56,6 +56,11 @@ MapView::MapView(QWidget *parent)
     p->setPos(QPointF(GeoTools::projectionWidth(),0));
     scene->addItem(p);
 
+    p = new PathGraphicsItem();
+    p->setZValue(2);
+    p->setPos(QPointF(-GeoTools::projectionWidth(),0));
+    scene->addItem(p);
+
 //    GeoCircle *c = new GeoCircle();
 //    c->setZValue(3);
 //    c->setPos(GeoTools::LatLon2Meters(QPointF(-82.4,23)));
@@ -111,9 +116,12 @@ void MapView::mouseMovedOverScene(const QPointF& scenePos)
 void MapView::centerScene()
 {
     QPointF c = mapToScene(rect().center());
-    if (c.x() > GeoTools::projectionWidth())
+//    if (c.x() > GeoTools::projectionWidth() || c.x() < -GeoTools::projectionWidth())
+//        centerOn(fmod(c.x(),GeoTools::projectionWidth()),c.y());
+
+    if (c.x() > GeoTools::projectionWidth()/2)
         centerOn(c.x() - GeoTools::projectionWidth(),c.y());
-    if (c.x() < 0)
+    if (c.x() < -GeoTools::projectionWidth()/2)
         centerOn(c.x() + GeoTools::projectionWidth(),c.y());
 }
 
@@ -378,6 +386,7 @@ void MapView::setZoomLevel(int zoom)
     rotate(angle);
     QPointF viewAnchorScenePos = mapToScene(viewAnchor);
     centerOn(mapToScene(rect().center()) + sceneAnchor - viewAnchorScenePos);
+    centerScene();
 }
 
 void MapView::showLatLonAsToolTip(bool really)

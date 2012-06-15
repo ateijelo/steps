@@ -16,8 +16,9 @@ PathGraphicsItem::PathGraphicsItem(QGraphicsItem *parent)
     this->setFlag(ItemHasNoContents);
     this->setFlag(ItemIsFocusable);
 
-    for (int i=0; i<2; i++)
-        addNode(QPointF(i*1000,0));
+    //for (int i=0; i<2; i++)
+    addNode(QPointF(-6.46431e+06, 1.00894e+07));
+    addNode(QPointF(1.52169e+07, 2.88845e+06));
 
     tailExtenderLine.setLine(0,0,35,0);
     tailExtenderLine.setFlag(ItemIgnoresTransformations);
