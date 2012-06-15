@@ -173,7 +173,7 @@ void MapView::mouseMoveEvent(QMouseEvent *event)
     // Although centerScene is already called in viewportEvent
     // on paint events, and that's enough to keep the scene
     // in place, also doing it here reduces flicker.
-    centerScene();
+    //centerScene();
 }
 
 void MapView::mousePressEvent(QMouseEvent *event)
@@ -250,7 +250,7 @@ void MapView::wheelEvent(QWheelEvent *event)
     }
     QGraphicsView::wheelEvent(event);
 
-    centerScene();
+    //centerScene();
 }
 
 void MapView::contextMenuEvent (QContextMenuEvent *event)
@@ -303,7 +303,7 @@ void MapView::keyPressEvent(QKeyEvent *event)
     }
     QGraphicsView::keyPressEvent(event);
 
-    centerScene();
+    //centerScene();
 }
 
 void MapView::keyReleaseEvent(QKeyEvent *event)
@@ -386,7 +386,7 @@ void MapView::setZoomLevel(int zoom)
     rotate(angle);
     QPointF viewAnchorScenePos = mapToScene(viewAnchor);
     centerOn(mapToScene(rect().center()) + sceneAnchor - viewAnchorScenePos);
-    centerScene();
+    //centerScene();
 }
 
 void MapView::showLatLonAsToolTip(bool really)
