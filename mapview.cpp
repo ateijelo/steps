@@ -116,13 +116,18 @@ void MapView::mouseMovedOverScene(const QPointF& scenePos)
 void MapView::centerScene()
 {
     QPointF c = mapToScene(rect().center());
+    qreal pw = GeoTools::projectionWidth();
 //    if (c.x() > GeoTools::projectionWidth() || c.x() < -GeoTools::projectionWidth())
 //        centerOn(fmod(c.x(),GeoTools::projectionWidth()),c.y());
 
-    if (c.x() > GeoTools::projectionWidth()/2)
-        centerOn(c.x() - GeoTools::projectionWidth(),c.y());
-    if (c.x() < -GeoTools::projectionWidth()/2)
-        centerOn(c.x() + GeoTools::projectionWidth(),c.y());
+    if (c.x() < -pw/2 || pw/2 < c.x())
+    {
+        qreal x = fmod(c.x() + pw/2,pw);
+        if (x < 0)
+            centerOn(pw/2 + x,c.y());
+        else
+            centerOn(-pw/2 + x,c.y());
+    }
 }
 
 bool MapView::viewportEvent(QEvent *event)
