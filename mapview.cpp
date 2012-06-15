@@ -122,11 +122,11 @@ void MapView::centerScene()
 
     if (c.x() < -pw/2 || pw/2 < c.x())
     {
-        qreal x = fmod(c.x() + pw/2,pw);
-        if (x < 0)
-            centerOn(pw/2 + x,c.y());
+        qreal m = fmod(c.x() + pw/2,pw);
+        if (m < 0)
+            centerOn(pw/2 + m,c.y());
         else
-            centerOn(-pw/2 + x,c.y());
+            centerOn(-pw/2 + m,c.y());
     }
 }
 
