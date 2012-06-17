@@ -47,14 +47,14 @@ void PathNode::setExtender(bool b)
 
 void PathNode::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug() << "PathNode::mousePressEvent" << event;
-    qDebug() << "event->buttons():" << event->buttons();
+//    qDebug() << "PathNode::mousePressEvent" << event;
+//    qDebug() << "event->buttons():" << event->buttons();
     if (event->buttons() & Qt::RightButton)
     {
         event->ignore();
         return;
     }
-    qDebug() << "PathNode::mousePressEvent" << event;
+//    qDebug() << "PathNode::mousePressEvent" << event;
     QGraphicsEllipseItem::mousePressEvent(event);
 
     if (event->button() == Qt::LeftButton && isExtender)
@@ -72,7 +72,7 @@ void PathNode::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void PathNode::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsEllipseItem::mouseReleaseEvent(event);
-    qDebug() << "mouseReleaseEvent";
+//    qDebug() << "mouseReleaseEvent";
 
     if (event->button() == Qt::LeftButton)
     {
@@ -189,9 +189,9 @@ QVariant PathNode::itemChange(QGraphicsItem::GraphicsItemChange change, const QV
         case ItemPositionChange:
             {
                 QPointF p = value.toPointF();
-                qDebug() << "itemChange" << p;
+//                qDebug() << "itemChange" << p;
                 qreal pw = GeoTools::projectionWidth();
-                qDebug() << "pw:" << pw;
+//                qDebug() << "pw:" << pw;
                 qreal x = p.x();
                 if (x > -pw/2 && x < pw/2)
                     return value;

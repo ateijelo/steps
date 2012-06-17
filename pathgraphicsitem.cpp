@@ -358,4 +358,6 @@ void PathGraphicsItem::keyPressEvent(QKeyEvent *event)
         }
         updateExtenders();
     }
+    else
+        event->ignore();
 }
