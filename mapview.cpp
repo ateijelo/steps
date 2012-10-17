@@ -61,10 +61,10 @@ MapView::MapView(QWidget *parent)
     p->setPos(QPointF(-GeoTools::projectionWidth(),0));
     scene->addItem(p);
 
-//    GeoCircle *c = new GeoCircle();
-//    c->setZValue(3);
-//    c->setPos(GeoTools::LatLon2Meters(QPointF(-82.4,23)));
-//    scene->addItem(c);
+    GeoCircle *c = new GeoCircle();
+    c->setZValue(3);
+    c->setPos(GeoTools::LatLon2Meters(QPointF(-82.4,23)));
+    scene->addItem(c);
 
     //p = new PathGraphicsItem();
     //p->setZValue(100);
