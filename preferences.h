@@ -1,7 +1,7 @@
 #ifndef PREFERENCES_H
 #define PREFERENCES_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 
 namespace Ui {
     class Preferences;

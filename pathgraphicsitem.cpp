@@ -60,7 +60,7 @@ PathNode *PathGraphicsItem::newInnerNode(QGraphicsItem *parent)
     n->setZValue(2);
     n->setParentPath(this);
     n->setExtender(true);
-    n->setAcceptsHoverEvents(false);
+    n->setAcceptHoverEvents(false);
     n->hovered = true;
     n->hide();
     return n;
@@ -267,7 +267,7 @@ void PathGraphicsItem::extenderClicked(PathNode *node)
     {
         node->setPos(p);
         node->setExtender(false);
-        node->setAcceptsHoverEvents(true);
+        node->setAcceptHoverEvents(true);
         scene()->clearSelection();
         node->setSelected(true);
 

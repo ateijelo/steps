@@ -20,7 +20,7 @@ PathNode::PathNode(QGraphicsItem *parent)
     setFlag(ItemIsMovable);
     setFlag(ItemIgnoresTransformations);
 
-    setAcceptsHoverEvents(true);
+    setAcceptHoverEvents(true);
     setCursor(Qt::ArrowCursor);
     setExtender(false);
     setRect(-10,-10,20,20);
