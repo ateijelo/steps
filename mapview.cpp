@@ -51,20 +51,20 @@ MapView::MapView(QWidget *parent)
     p->setPos(QPointF(0,0));
     scene->addItem(p);
 
-    p = new PathGraphicsItem();
-    p->setZValue(2);
-    p->setPos(QPointF(GeoTools::projectionWidth(),0));
-    scene->addItem(p);
+//    p = new PathGraphicsItem();
+//    p->setZValue(2);
+//    p->setPos(QPointF(GeoTools::projectionWidth(),0));
+//    scene->addItem(p);
 
-    p = new PathGraphicsItem();
-    p->setZValue(2);
-    p->setPos(QPointF(-GeoTools::projectionWidth(),0));
-    scene->addItem(p);
+//    p = new PathGraphicsItem();
+//    p->setZValue(2);
+//    p->setPos(QPointF(-GeoTools::projectionWidth(),0));
+//    scene->addItem(p);
 
-    GeoCircle *c = new GeoCircle();
-    c->setZValue(3);
-    c->setPos(GeoTools::LatLon2Meters(QPointF(-82.4,23)));
-    scene->addItem(c);
+//    GeoCircle *c = new GeoCircle();
+//    c->setZValue(3);
+//    c->setPos(GeoTools::LatLon2Meters(QPointF(-82.4,23)));
+//    scene->addItem(c);
 
     //p = new PathGraphicsItem();
     //p->setZValue(100);
@@ -75,6 +75,8 @@ MapView::MapView(QWidget *parent)
     ui.setupUi(this);
     connect(this,SIGNAL(zoomChanged(int)),worldWindow,SLOT(zoomChanged(int)));
     worldWindow->zoomChanged(zoom);
+
+    p->lengthLabel = ui.lengthLabel;
 }
 
 bool MapView::canZoomIn()
