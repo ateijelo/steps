@@ -42,6 +42,7 @@ class MainWindow : public QMainWindow
         void openCacheDirectory();
         void updateCacheDirectory(QString path);
         void updateLatLonLabels(const QPointF& latLon);
+        void aboutDialog();
 
     private:
         void updateCacheStyles();

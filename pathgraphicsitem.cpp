@@ -40,6 +40,8 @@ PathGraphicsItem::PathGraphicsItem(QGraphicsItem *parent)
 
     innerNode = newInnerNode(this);
     innerNodeEdge = 0;
+
+    lengthLabel = 0;
 }
 
 PathNode *PathGraphicsItem::newExtenderNode(QGraphicsItem *parent)
@@ -151,6 +153,7 @@ void PathGraphicsItem::nodeMoved(PathNode *node)
         length += node->outEdge->length();
     }
     fDebug(DEBUG_PATHS) << "    length: " << length;
+    lengthLabel->setText(QString("%1 meters").arg(length,0,'f',2));
     if (node == tail)
     {
         tailExtenderLine.setPos(tail->pos());
@@ -174,6 +177,7 @@ void PathGraphicsItem::nodeSelectedChanged(PathNode *node, bool selected)
     if (node == head)
         headExtenderLine.setVisible(selected);
     fDebug(DEBUG_PATHS) << "    length:" << length;
+    lengthLabel->setText(QString("%1 meters").arg(length,0,'f',2));
 }
 
 void PathGraphicsItem::removeNode(PathNode *node)

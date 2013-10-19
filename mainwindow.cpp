@@ -1,6 +1,7 @@
 #include <QtDebug>
 #include <QFileDialog>
 #include <QSettings>
+#include <QMessageBox>
 #include <QGraphicsPixmapItem>
 
 #include "mainwindow.h"
@@ -60,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui.mapView,SIGNAL(canZoomOut(bool)),ui.zoomOutAction,SLOT(setEnabled(bool)));
     connect(ui.mapView,SIGNAL(zoomChanged(int)),&zoomSlider,SLOT(setValue(int)));
     connect(ui.mapView,SIGNAL(mouseMoved(QPointF)),this,SLOT(updateLatLonLabels(QPointF)));
+    connect(ui.aboutAction,SIGNAL(triggered()),this,SLOT(aboutDialog()));
 
     ui.zoomInAction->setShortcut(QKeySequence::ZoomIn);
     ui.zoomOutAction->setShortcut(QKeySequence::ZoomOut);
@@ -216,6 +218,12 @@ void MainWindow::updateLatLonLabels(const QPointF& latLon)
 {
     latLabel.setText(QString("Lat: %1").arg(latLon.y()));
     lonLabel.setText(QString("Lon: %1").arg(latLon.x()));
+}
+
+void MainWindow::aboutDialog()
+{
+    QMessageBox::about(this,"About QtGMaps","Copyright (C) 2009-2013 Andy Teijelo <ateijelo@gmail.com>\n"
+                            "QtGMaps is licensed under the GPL version 3 or later.");
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
