@@ -11,10 +11,10 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>TingleMaps</string>
+   <string>Steps</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="tinglemaps.qrc">
+   <iconset resource="steps.qrc">
     <normaloff>:/icon.png</normaloff>:/icon.png</iconset>
   </property>
   <property name="unifiedTitleAndToolBarOnMac">
@@ -97,7 +97,7 @@
   </widget>
   <action name="rotRightAction">
    <property name="icon">
-    <iconset resource="tinglemaps.qrc">
+    <iconset resource="steps.qrc">
      <normaloff>:/rotate-right.png</normaloff>:/rotate-right.png</iconset>
    </property>
    <property name="text">
@@ -109,7 +109,7 @@
   </action>
   <action name="rotLeftAction">
    <property name="icon">
-    <iconset resource="tinglemaps.qrc">
+    <iconset resource="steps.qrc">
      <normaloff>:/rotate-left.png</normaloff>:/rotate-left.png</iconset>
    </property>
    <property name="text">
@@ -121,7 +121,7 @@
   </action>
   <action name="zoomInAction">
    <property name="icon">
-    <iconset resource="tinglemaps.qrc">
+    <iconset resource="steps.qrc">
      <normaloff>:/zoom-in.png</normaloff>:/zoom-in.png</iconset>
    </property>
    <property name="text">
@@ -133,7 +133,7 @@
   </action>
   <action name="zoomOutAction">
    <property name="icon">
-    <iconset resource="tinglemaps.qrc">
+    <iconset resource="steps.qrc">
      <normaloff>:/zoom-out.png</normaloff>:/zoom-out.png</iconset>
    </property>
    <property name="text">
@@ -145,7 +145,7 @@
   </action>
   <action name="openAction">
    <property name="icon">
-    <iconset resource="tinglemaps.qrc">
+    <iconset resource="steps.qrc">
      <normaloff>:/open.png</normaloff>:/open.png</iconset>
    </property>
    <property name="text">
@@ -170,7 +170,7 @@
   </action>
   <action name="aboutAction">
    <property name="text">
-    <string>&amp;About TingleMaps</string>
+    <string>&amp;About Steps</string>
    </property>
    <property name="menuRole">
     <enum>QAction::AboutRole</enum>
@@ -185,7 +185,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="tinglemaps.qrc"/>
+  <include location="steps.qrc"/>
  </resources>
  <connections>
   <connection>
