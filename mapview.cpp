@@ -242,20 +242,52 @@ void MapView::wheelEvent(QWheelEvent *event)
     {
         cond = event->modifiers() == Qt::ControlModifier;
     }
+    static int cumulAngleDelta;
+    cumulAngleDelta += event->angleDelta().y();
+    int zoomAngleStep = 30;
     if (cond)
     {
-        if (event->delta() > 0)
+        if (cumulAngleDelta >= zoomAngleStep)
         {
+            cumulAngleDelta = cumulAngleDelta % zoomAngleStep;
             zoomIn();
         }
-        else
+        else if (cumulAngleDelta <= -zoomAngleStep)
         {
+            cumulAngleDelta = -((-cumulAngleDelta) % zoomAngleStep);
             zoomOut();
         }
         event->accept();
         return;
     }
-    QGraphicsView::wheelEvent(event);
+
+    static qreal cdx = 0;
+    static qreal cdy = 0;
+    int delta = 0;
+    qreal scale = 0.25;
+
+    if (event->orientation() == Qt::Vertical)
+    {
+        cdy += event->delta() * scale;
+        if (qAbs(cdy) > 1)
+        {
+            delta = (int)cdy;
+            cdy = cdy - delta;
+        }
+    }
+    if (event->orientation() == Qt::Horizontal)
+    {
+        cdx += event->delta() * scale;
+        if (qAbs(cdx) > 1)
+        {
+            delta = (int)cdx;
+            cdx = cdx - delta;
+        }
+    }
+
+    QWheelEvent *e1 = new QWheelEvent(event->pos(), event->globalPos(), delta, event->buttons(), event->modifiers(), event->orientation());
+    QGraphicsView::wheelEvent(e1);
+    delete e1;
 
     centerScene();
 }

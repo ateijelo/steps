@@ -64,11 +64,12 @@ void NetworkTask::work()
     else if (tile.type == "GoogleSat")
     {
         QString galileo = QString("Galileo").left((tile.x * 3 + tile.y)%8);
-        reply = net->get(QNetworkRequest(QUrl(QString("http://khm%5.google.com/kh/v=115&x=%1&y=%2&z=%3&s=%4")
+        //https://khms0.google.com/kh/v=149&x=5&y=11&z=5
+        reply = net->get(QNetworkRequest(QUrl(QString("http://khm%4.google.com/kh/v=180&x=%1&y=%2&z=%3")
                                       .arg(tile.x)
                                       .arg(tile.y)
                                       .arg(tile.zoom)
-                                      .arg(galileo)
+                                      //.arg(galileo)
                                       .arg(qrand() % 2))));
     }
     else if (tile.type == "OpenStreetMaps")

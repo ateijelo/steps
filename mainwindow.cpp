@@ -51,16 +51,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(&showLatLonAsToolTip, SIGNAL(clicked(bool)), ui.mapView, SLOT(showLatLonAsToolTip(bool)));
 
-    connect(ui.zoomInAction,SIGNAL(triggered()),ui.mapView,SLOT(zoomIn()));
-    connect(ui.zoomOutAction,SIGNAL(triggered()),ui.mapView,SLOT(zoomOut()));
-    connect(ui.rotRightAction,SIGNAL(triggered()),ui.mapView,SLOT(rotRight()));
-    connect(ui.rotLeftAction,SIGNAL(triggered()),ui.mapView,SLOT(rotLeft()));
-    connect(ui.openAction,SIGNAL(triggered()),this,SLOT(openCacheDirectory()));
-    connect(ui.action_Preferences, SIGNAL(triggered()), preferences, SLOT(show()));
+    connect(ui.zoomInAction,&QAction::triggered,ui.mapView,&MapView::zoomIn);
+    connect(ui.zoomOutAction,&QAction::triggered,ui.mapView,&MapView::zoomOut);
+    connect(ui.rotRightAction,&QAction::triggered,ui.mapView,&MapView::rotRight);
+    connect(ui.rotLeftAction,&QAction::triggered,ui.mapView,&MapView::rotLeft);
+    connect(ui.openAction,&QAction::triggered,this,&MainWindow::openCacheDirectory);
+    connect(ui.action_Preferences, &QAction::triggered, preferences, &Preferences::show);
     connect(ui.mapView,SIGNAL(canZoomIn(bool)),ui.zoomInAction,SLOT(setEnabled(bool)));
     connect(ui.mapView,SIGNAL(canZoomOut(bool)),ui.zoomOutAction,SLOT(setEnabled(bool)));
     connect(ui.mapView,SIGNAL(zoomChanged(int)),&zoomSlider,SLOT(setValue(int)));
-    connect(ui.mapView,SIGNAL(mouseMoved(QPointF)),this,SLOT(updateLatLonLabels(QPointF)));
+    connect(ui.mapView,&MapView::mouseMoved,this,&MainWindow::updateLatLonLabels);
     connect(ui.aboutAction,SIGNAL(triggered()),this,SLOT(aboutDialog()));
 
     ui.zoomInAction->setShortcut(QKeySequence::ZoomIn);
@@ -222,8 +222,8 @@ void MainWindow::updateLatLonLabels(const QPointF& latLon)
 
 void MainWindow::aboutDialog()
 {
-    QMessageBox::about(this,"About QtGMaps","Copyright (C) 2009-2013 Andy Teijelo <ateijelo@gmail.com>\n"
-                            "QtGMaps is licensed under the GPL version 3 or later.");
+    QMessageBox::about(this,"About Steps","Copyright (C) 2009-2015 Andy Teijelo <ateijelo@gmail.com>\n"
+                            "Steps is distributed under the terms of the MIT License");
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

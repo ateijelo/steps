@@ -97,6 +97,7 @@ void GeoCircle::addCardinalPoint(const QString &label)
 
 void GeoCircle::nodeMoved(GeoCircleNode *node)
 {
+    Q_UNUSED(node);
     updateSegments();
 }
 
@@ -111,7 +112,7 @@ void GeoCircle::paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *)
 
 void GeoCircle::updateSegments()
 {
-    const GeographicLib::Geodesic& g = GeographicLib::Geodesic::WGS84;
+    const GeographicLib::Geodesic& g = GeographicLib::Geodesic::WGS84();
     QPointF c = GeoTools::Meters2LatLon(center->scenePos());
     QPointF t = GeoTools::Meters2LatLon(target->scenePos());
 

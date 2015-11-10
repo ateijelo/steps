@@ -11,10 +11,10 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>QtGMaps</string>
+   <string>TingleMaps</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="qtgmaps.qrc">
+   <iconset resource="tinglemaps.qrc">
     <normaloff>:/icon.png</normaloff>:/icon.png</iconset>
   </property>
   <property name="unifiedTitleAndToolBarOnMac">
@@ -97,7 +97,7 @@
   </widget>
   <action name="rotRightAction">
    <property name="icon">
-    <iconset resource="qtgmaps.qrc">
+    <iconset resource="tinglemaps.qrc">
      <normaloff>:/rotate-right.png</normaloff>:/rotate-right.png</iconset>
    </property>
    <property name="text">
@@ -109,7 +109,7 @@
   </action>
   <action name="rotLeftAction">
    <property name="icon">
-    <iconset resource="qtgmaps.qrc">
+    <iconset resource="tinglemaps.qrc">
      <normaloff>:/rotate-left.png</normaloff>:/rotate-left.png</iconset>
    </property>
    <property name="text">
@@ -121,7 +121,7 @@
   </action>
   <action name="zoomInAction">
    <property name="icon">
-    <iconset resource="qtgmaps.qrc">
+    <iconset resource="tinglemaps.qrc">
      <normaloff>:/zoom-in.png</normaloff>:/zoom-in.png</iconset>
    </property>
    <property name="text">
@@ -133,7 +133,7 @@
   </action>
   <action name="zoomOutAction">
    <property name="icon">
-    <iconset resource="qtgmaps.qrc">
+    <iconset resource="tinglemaps.qrc">
      <normaloff>:/zoom-out.png</normaloff>:/zoom-out.png</iconset>
    </property>
    <property name="text">
@@ -145,7 +145,7 @@
   </action>
   <action name="openAction">
    <property name="icon">
-    <iconset resource="qtgmaps.qrc">
+    <iconset resource="tinglemaps.qrc">
      <normaloff>:/open.png</normaloff>:/open.png</iconset>
    </property>
    <property name="text">
@@ -170,7 +170,7 @@
   </action>
   <action name="aboutAction">
    <property name="text">
-    <string>&amp;About QtGMaps</string>
+    <string>&amp;About TingleMaps</string>
    </property>
    <property name="menuRole">
     <enum>QAction::AboutRole</enum>
@@ -185,7 +185,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="qtgmaps.qrc"/>
+  <include location="tinglemaps.qrc"/>
  </resources>
  <connections>
   <connection>

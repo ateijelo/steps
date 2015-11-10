@@ -22,7 +22,7 @@ TileFetcher::TileFetcher(QObject *parent) :
         idleDiskThreads.insert(t);
         t->start();
     }
-    for (int i=0; i<4; i++)
+    for (int i=0; i<2; i++)
     {
         QThread *t = new QThread(this);
         idleNetworkThreads.insert(t);

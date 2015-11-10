@@ -54,7 +54,7 @@ qreal PathEdge::angle2() const
 void PathEdge::subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::iterator i,
                          double lat1, double lon1, double azi1, double s1, double s2, int depth)
 {
-    const GeographicLib::Geodesic& g = GeographicLib::Geodesic::WGS84;
+    const GeographicLib::Geodesic& g = GeographicLib::Geodesic::WGS84();
     if (depth > 4)
         return;
     if (fastUpdate)
@@ -90,7 +90,7 @@ void PathEdge::subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::ite
 void PathEdge::updateSegments(bool fast)
 {
     fastUpdate = fast;
-    const GeographicLib::Geodesic& g = GeographicLib::Geodesic::WGS84;
+    const GeographicLib::Geodesic& g = GeographicLib::Geodesic::WGS84();
     GeoTools gt;
     QPointF q1 = mapToScene(p1);
     QPointF q2 = mapToScene(p2);
@@ -168,7 +168,7 @@ double PathEdge::length() const
     GeoTools gt;
     q1 = gt.Meters2LatLon(p1);
     q2 = gt.Meters2LatLon(p2);
-    const GeographicLib::Geodesic& g = GeographicLib::Geodesic::WGS84;
+    const GeographicLib::Geodesic& g = GeographicLib::Geodesic::WGS84();
     double azi1, azi2,s12;
     g.Inverse(q1.y(),q1.x(),q2.y(),q2.x(),s12,azi1,azi2);
 
