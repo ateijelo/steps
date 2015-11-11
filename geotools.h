@@ -35,16 +35,6 @@
 // For more information, visit:
 //  http://www.klokan.cz/projects/gdal2tiles/
 
-// This class also includes an adaptation from the JavaScript implementation
-// of the Vincenty formula for the distance between two lat/lon points
-// found in:
-//  http://www.movable-type.co.uk/scripts/latlong-vincenty.html
-//
-// The code is offered there under the LGPL license
-// (http://creativecommons.org/licenses/LGPL/2.1/)
-// and includes the following notice:
-//  Copyright © 2002-2009 Chris Veness
-
 #include <QPoint>
 #include <QPointF>
 
@@ -75,9 +65,6 @@ class GeoTools
         static QPoint Meters2GoogleTile(const QPointF& m, int zoom);
         static QPointF GoogleTile2Meters(int x, int y, int zoom);
         static QPointF GoogleTile2Meters(const QPoint& g, int zoom);
-        double VincentyDistance(const QPointF& from, const QPointF& to) const;
-        double HaversineDistance(const QPointF& from, const QPointF& to) const;
-        double Distance(const QPointF& from, const QPointF& to) const;
 
     private:
         static double initialResolution;
