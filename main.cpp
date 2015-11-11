@@ -11,6 +11,7 @@ int main(int argc, char *argv[])
     //app.setApplicationVersion("14.02");
 
     MainWindow m;
+    m.setWindowIcon(QIcon(":/img/icon.svg"));
     m.show();
 
     return app.exec();
