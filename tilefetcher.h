@@ -9,6 +9,7 @@
 #include <QList>
 #include <QHash>
 #include <QSet>
+#include <QtSql/QSqlDatabase>
 
 #include "tile.h"
 #include "task.h"
@@ -48,6 +49,7 @@ class TileFetcher : public QObject
         void work();
         void debug(const QString& header);
         void readMgm(const TileId &tile);
+        QByteArray readMBTile(const TileId &tile);
         bool readSingleFile(const TileId &tile);
 
         MemCache memCache;
@@ -63,6 +65,8 @@ class TileFetcher : public QObject
         QSet<QThread*> activeDiskThreads;
         QSet<QThread*> idleNetworkThreads;
         QSet<QThread*> activeNetworkThreads;
+
+        QSqlDatabase db;
 
         //QMutex mutex;
 };

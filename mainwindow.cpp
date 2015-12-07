@@ -63,6 +63,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui.mapView,&MapView::mouseMoved,this,&MainWindow::updateLatLonLabels);
     connect(ui.aboutAction,SIGNAL(triggered()),this,SLOT(aboutDialog()));
 
+    connect(ui.openMBTilesAction,&QAction::triggered, this, &MainWindow::openMBTiles);
+
     ui.zoomInAction->setShortcut(QKeySequence::ZoomIn);
     ui.zoomOutAction->setShortcut(QKeySequence::ZoomOut);
 
@@ -212,6 +214,30 @@ void MainWindow::openCacheDirectory()
     {
         updateCacheDirectory(path);
     }
+}
+
+void MainWindow::openMBTiles()
+{
+    QSettings settings;
+    QString dir = "";
+    QFileInfo fi(settings.value(SettingsKeys::MBTilesPath,"").toString());
+    if (fi.exists())
+        dir = fi.dir().absolutePath();
+    QString path = QFileDialog::getOpenFileName(this,
+                                                "Open MBTiles file",
+                                                dir,
+                                                "*.mbtiles");
+    if (!path.isEmpty())
+    {
+        loadMBTilesFile(path);
+    }
+}
+
+void MainWindow::loadMBTilesFile(const QString &path)
+{
+    QSettings settings;
+    settings.setValue(SettingsKeys::MBTilesPath, path);
+    qDebug() << "loading mbtiles file " << path;
 }
 
 void MainWindow::updateLatLonLabels(const QPointF& latLon)

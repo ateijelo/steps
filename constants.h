@@ -15,6 +15,7 @@ namespace SettingsKeys
     const QString ShowLatLonAsToolTip = "ShowLatLonAsToolTip";
     const QString RecentPaths = "RecentPaths";
     const QString path = "path";
+    const QString MBTilesPath = "MBTilesPath";
 }
 
 namespace WheelOptions

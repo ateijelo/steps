@@ -75,6 +75,7 @@
      <string>&amp;File</string>
     </property>
     <addaction name="openAction"/>
+    <addaction name="openMBTilesAction"/>
     <addaction name="action_Preferences"/>
     <addaction name="separator"/>
     <addaction name="action_Exit"/>
@@ -183,6 +184,14 @@
    </property>
    <property name="menuRole">
     <enum>QAction::AboutRole</enum>
+   </property>
+  </action>
+  <action name="openMBTilesAction">
+   <property name="text">
+    <string>Open &amp;MBTiles...</string>
+   </property>
+   <property name="toolTip">
+    <string>Open MBTiles File</string>
    </property>
   </action>
  </widget>

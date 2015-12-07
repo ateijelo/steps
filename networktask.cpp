@@ -74,7 +74,7 @@ void NetworkTask::work()
     }
     else if (tile.type == "OpenStreetMaps")
     {
-        reply = net->get(QNetworkRequest(QUrl(QString("http://tile.openstreetmap.org/%1/%2/%3.png")
+        reply = net->get(QNetworkRequest(QUrl(QString("http://localhost:8008/ex/%1/%2/%3.png")
                                      .arg(tile.zoom).arg(tile.x).arg(tile.y))));
     }
     else if (tile.type == "UHGoogleMap")

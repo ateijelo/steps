@@ -5,7 +5,7 @@ TEMPLATE = app
 TARGET = steps
 DEPENDPATH += .
 INCLUDEPATH += .
-QT += network core gui widgets
+QT += network core gui widgets sql
 LIBS += -lGeographic
 
 CONFIG += debug

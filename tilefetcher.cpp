@@ -7,6 +7,9 @@
 #include <QFile>
 #include <QDir>
 
+#include <QSqlError>
+#include <QSqlQuery>
+
 #include "disktask.h"
 #include "networktask.h"
 #include "tilefetcher.h"
@@ -22,7 +25,7 @@ TileFetcher::TileFetcher(QObject *parent) :
         idleDiskThreads.insert(t);
         t->start();
     }
-    for (int i=0; i<2; i++)
+    for (int i=0; i<1; i++)
     {
         QThread *t = new QThread(this);
         idleNetworkThreads.insert(t);
@@ -218,25 +221,27 @@ void TileFetcher::readMgm(const TileId& tile)
         diskRequests.remove(tile);
         networkRequests.insert(tile);
     }
-//    QSet<TileId>::iterator i = diskRequests.begin();
-//    while (i != diskRequests.end())
-//    {
-//        TileId t = *i;
-//        bool tBelongsHere = ((t.type == tile.type) &&
-//                             ((t.x >> 3) == mgm_x) &&
-//                             ((t.y >> 3) == mgm_y) &&
-//                             (t.zoom == tile.zoom));
-//        if (tBelongsHere)
-//        {
-//            fDebug(DEBUG_DISK) << "tile" << t << "in queue, in the range of the mgm, but absent.";
-//            i = diskRequests.erase(i);
-//            networkRequests.insert(t);
-//        }
-//        else
-//        {
-//            i++;
-//        }
-//    }
+    /*
+    QSet<TileId>::iterator i = diskRequests.begin();
+    while (i != diskRequests.end())
+    {
+        TileId t = *i;
+        bool tBelongsHere = ((t.type == tile.type) &&
+                             ((t.x >> 3) == mgm_x) &&
+                             ((t.y >> 3) == mgm_y) &&
+                             (t.zoom == tile.zoom));
+        if (tBelongsHere)
+        {
+            fDebug(DEBUG_DISK) << "tile" << t << "in queue, in the range of the mgm, but absent.";
+            i = diskRequests.erase(i);
+            networkRequests.insert(t);
+        }
+        else
+        {
+            i++;
+        }
+    }
+    */
     for (QHash<TileId,QPair<quint32,quint32> >::iterator i = mgmTiles.begin(); i != mgmTiles.end(); i++)
     {
         TileId t = i.key();
@@ -258,6 +263,49 @@ void TileFetcher::readMgm(const TileId& tile)
             memCache.insert(t,data);
         }
     }
+}
+
+QByteArray TileFetcher::readMBTile(const TileId &tile)
+{
+    QByteArray nothing;
+    QSettings settings;
+    QString path = settings.value(SettingsKeys::MBTilesPath,"").toString();
+
+    if (path.isEmpty()) {
+        return nothing;
+    }
+
+//    qDebug() << "db path:" << path;
+
+    if (!db.isValid())
+    {
+        db = QSqlDatabase::addDatabase("QSQLITE");
+        db.setDatabaseName(path);
+        if (!db.open())
+            return nothing;
+    }
+
+//    qDebug() << "db.hostName:" << db.hostName();
+    QSqlQuery q;
+    bool b = q.exec(QString("SELECT tile_data FROM tiles WHERE "
+                            "zoom_level = %1 AND "
+                            "tile_column = %2 AND "
+                            "tile_row = %3 LIMIT 1")
+                    .arg(tile.zoom)
+                    .arg(tile.x)
+                    .arg(tile.y)
+                    );
+//    q.bindValue(":zoom", tile.zoom);
+//    q.bindValue(":col", tile.x);
+//    q.bindValue(":row", tile.y);
+
+    while (q.next())
+    {
+        QByteArray r = q.value(0).toByteArray();
+//        qDebug() << "query returned" << r.size() << "bytes";
+        return r;
+    }
+    return nothing;
 }
 
 bool TileFetcher::readSingleFile(const TileId& tile)
@@ -306,7 +354,20 @@ void TileFetcher::work()
 
         if (readSingleFile(tile))
             continue;
-        readMgm(tile);
+        QByteArray data = readMBTile(tile);
+        diskRequests.remove(tile);
+        if (data.isNull())
+        {
+            //fDebug(DEBUG_DISK) << "error reading tile " << tile.x << "," << tile.y << "data";
+            networkRequests.insert(tile);
+        }
+        else
+        {
+            //fDebug(DEBUG_DISK) << "found tile" << t << "in mgm";
+            emit tileData(tile.type,tile.x,tile.y,tile.zoom,data);
+            memCache.insert(tile,data);
+        }
+        //readMgm(tile);
     }
 
     while (qMin(idleDiskThreads.count(),diskWriteRequests.count()) > 0)

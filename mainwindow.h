@@ -42,9 +42,11 @@ class MainWindow : public QMainWindow
         void openCacheDirectory();
         void updateCacheDirectory(QString path);
         void updateLatLonLabels(const QPointF& latLon);
-        void aboutDialog();
+        void aboutDialog();        
 
     private:
+        void openMBTiles();
+        void loadMBTilesFile(const QString& path);
         void updateCacheStyles();
         void updateRecents(QString top=QString());
 };
