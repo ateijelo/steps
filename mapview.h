@@ -38,7 +38,9 @@ class MapView : public QGraphicsView
         bool canZoomOut();
         int zoomLevel();
         int maxZoomLevel();
+        int minZoomLevel();
         void centerScene();
+        void refresh();
 
     signals:
         void canZoomIn(bool);
@@ -59,6 +61,8 @@ class MapView : public QGraphicsView
     private slots:
         void mouseMovedOverScene(const QPointF& scenePos);
         void copyToClipboard(QString text);
+        void setZoomLevelCentered(int zoom);
+        void setZoomSliderTooltip(int zoom);
 
     private:
         void updateTiles();
@@ -69,7 +73,7 @@ class MapView : public QGraphicsView
         qreal angle;
         QPointF sceneAnchor;
         QPoint viewAnchor;
-        TileLayer tlayer;
+        TileLayer tileLayer;
         bool showToolTip;
         Ui::ViewWidgets ui;
         QString coordsTemplate;

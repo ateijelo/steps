@@ -33,7 +33,8 @@ HEADERS += mainwindow.h \
     pathedgesegment.h \
     geocircle.h \
     worldwindow.h \
-    path.h
+    path.h \
+    tileprovider.h
 FORMS += mainwindow.ui \
     preferences.ui \
     debugdialog.ui \
@@ -60,5 +61,6 @@ SOURCES += main.cpp \
     pathedgesegment.cpp \
     geocircle.cpp \
     worldwindow.cpp \
-    path.cpp
+    path.cpp \
+    tileprovider.cpp
 RESOURCES += steps.qrc

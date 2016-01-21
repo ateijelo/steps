@@ -271,11 +271,13 @@ QByteArray TileFetcher::readMBTile(const TileId &tile)
     QSettings settings;
     QString path = settings.value(SettingsKeys::MBTilesPath,"").toString();
 
+    //qDebug() << "readMBTile: " << tile;
+
     if (path.isEmpty()) {
         return nothing;
     }
 
-//    qDebug() << "db path:" << path;
+    //qDebug() << "db path:" << path;
 
     if (!db.isValid())
     {
@@ -285,7 +287,7 @@ QByteArray TileFetcher::readMBTile(const TileId &tile)
             return nothing;
     }
 
-//    qDebug() << "db.hostName:" << db.hostName();
+    //qDebug() << "db.hostName:" << db.hostName();
     QSqlQuery q;
     bool b = q.exec(QString("SELECT tile_data FROM tiles WHERE "
                             "zoom_level = %1 AND "
@@ -302,9 +304,10 @@ QByteArray TileFetcher::readMBTile(const TileId &tile)
     while (q.next())
     {
         QByteArray r = q.value(0).toByteArray();
-//        qDebug() << "query returned" << r.size() << "bytes";
+        //qDebug() << "query returned" << r.size() << "bytes";
         return r;
     }
+    //qDebug() << "readMBTiles returned nothing";
     return nothing;
 }
 

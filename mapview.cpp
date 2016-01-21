@@ -7,6 +7,7 @@
 #include <QToolTip>
 #include <QHBoxLayout>
 #include <QSlider>
+#include <QPixmapCache>
 #include <math.h>
 
 #include "mapview.h"
@@ -17,7 +18,7 @@
 #include "worldwindow.h"
 
 MapView::MapView(QWidget *parent)
-    : QGraphicsView(parent), scene(new MainScene()), tlayer(scene)
+    : QGraphicsView(parent), scene(new MainScene()), tileLayer(scene)
 {
     //setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     setScene(scene);
@@ -61,10 +62,10 @@ MapView::MapView(QWidget *parent)
 //    p->setPos(QPointF(-GeoTools::projectionWidth(),0));
 //    scene->addItem(p);
 
-//    GeoCircle *c = new GeoCircle();
-//    c->setZValue(3);
-//    c->setPos(GeoTools::LatLon2Meters(QPointF(-82.4,23)));
-//    scene->addItem(c);
+    GeoCircle *c = new GeoCircle();
+    c->setZValue(3);
+    c->setPos(GeoTools::LatLon2Meters(QPointF(-82.4,23)));
+    scene->addItem(c);
 
     //p = new PathGraphicsItem();
     //p->setZValue(100);
@@ -75,6 +76,13 @@ MapView::MapView(QWidget *parent)
     ui.setupUi(this);
     connect(this,SIGNAL(zoomChanged(int)),worldWindow,SLOT(zoomChanged(int)));
     worldWindow->zoomChanged(zoom);
+    ui.zoomSlider->setMinimum(0);
+    ui.zoomSlider->setMaximum(maxZoomLevel());
+    ui.zoomSlider->setValue(zoom);
+    setZoomSliderTooltip(zoom);
+    connect(ui.zoomSlider, &QSlider::valueChanged, this, &MapView::setZoomLevelCentered);
+    connect(this, &MapView::zoomChanged, ui.zoomSlider, &QSlider::setValue);
+    connect(this, &MapView::zoomChanged, this, &MapView::setZoomSliderTooltip);
 
     p->lengthLabel = ui.lengthLabel;
 }
@@ -86,7 +94,7 @@ bool MapView::canZoomIn()
 
 bool MapView::canZoomOut()
 {
-    return (zoom > 0);
+    return (zoom > minZoomLevel());
 }
 
 void MapView::mouseMovedOverScene(const QPointF& scenePos)
@@ -132,6 +140,13 @@ void MapView::centerScene()
     }
 }
 
+void MapView::refresh()
+{
+    tileLayer.clear();
+    QPixmapCache::clear();
+    updateTiles();
+}
+
 bool MapView::viewportEvent(QEvent *event)
 {
     if (event->type() == QEvent::ToolTip)
@@ -163,7 +178,7 @@ void MapView::updateTiles()
     QRectF drawArea = mapToScene(viewport()->rect().adjusted(-20,-20,20,20)).boundingRect();
     QPoint tl = GeoTools::Meters2GoogleTile(drawArea.topLeft(),zoom);
     QPoint br = GeoTools::Meters2GoogleTile(drawArea.bottomRight(),zoom);
-    tlayer.setRegion(QRect(tl,br),zoom);
+    tileLayer.setRegion(QRect(tl,br),zoom);
 }
 
 void MapView::mouseMoveEvent(QMouseEvent *event)
@@ -384,12 +399,27 @@ void MapView::copyToClipboard(QString text)
     QApplication::clipboard()->setText(text);
 }
 
+void MapView::setZoomLevelCentered(int zoom)
+{
+    QPoint oldViewAnchor = viewAnchor;
+    QPointF oldSceneAnchor = sceneAnchor;
+    viewAnchor = rect().center();
+    sceneAnchor = mapToScene(viewAnchor);
+    setZoomLevel(zoom);
+    viewAnchor = oldViewAnchor;
+    sceneAnchor = oldSceneAnchor;
+}
+
+void MapView::setZoomSliderTooltip(int zoom)
+{
+    ui.zoomSlider->setToolTip(QString("%1").arg(zoom));
+}
+
 void MapView::setCacheStyle(QString cacheStyle)
 {
     QSettings settings;
     settings.setValue(SettingsKeys::MapType, cacheStyle);
-    tlayer.clear();
-    updateTiles();
+    refresh();
 }
 
 void MapView::setZoomLevel(int zoom)
@@ -417,7 +447,7 @@ void MapView::setZoomLevel(int zoom)
     emit zoomChanged(zoom);
     settings.setValue(SettingsKeys::ZoomLevel, zoom);
 
-    tlayer.clear();
+    tileLayer.clear();
 
     double res = GeoTools::resolution(zoom);
     resetTransform();
@@ -452,7 +482,12 @@ int MapView::zoomLevel()
 
 int MapView::maxZoomLevel()
 {
-    return 24;
+    return 18;
+}
+
+int MapView::minZoomLevel()
+{
+    return 0;
 }
 
 void MapView::rotRight()

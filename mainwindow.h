@@ -29,25 +29,25 @@ class MainWindow : public QMainWindow
         Ui::MainWindow ui;
         QList<QAction*> recentPaths;
         QSignalMapper recentsMapper;
-        QSlider zoomSlider;
-        QCheckBox showLatLonAsToolTip;
-        QLabel latLabel;
-        QLabel lonLabel;
-        QComboBox cacheStyles;
+//        QSlider zoomSlider;
+//        QCheckBox showLatLonAsToolTip;
+//        QLabel latLabel;
+//        QLabel lonLabel;
+//        QComboBox cacheStyles;
         Preferences *preferences;
         DebugDialog *debugDialog;
         QShortcut *debugShortcut;
 
     private slots:
-        void openCacheDirectory();
-        void updateCacheDirectory(QString path);
-        void updateLatLonLabels(const QPointF& latLon);
+//        void openCacheDirectory();
+//        void updateCacheDirectory(QString path);
+//        void updateLatLonLabels(const QPointF& latLon);
         void aboutDialog();        
 
     private:
         void openMBTiles();
         void loadMBTilesFile(const QString& path);
-        void updateCacheStyles();
+//        void updateCacheStyles();
         void updateRecents(QString top=QString());
 };
 
