@@ -15,6 +15,7 @@
 #include "tile.h"
 #include "preferences.h"
 #include "debugdialog.h"
+#include "pathsdockmodel.h"
 
 class MainWindow : public QMainWindow
 {
@@ -37,6 +38,7 @@ class MainWindow : public QMainWindow
         Preferences *preferences;
         DebugDialog *debugDialog;
         QShortcut *debugShortcut;
+        PathsDockModel *pathsModel;
 
     private slots:
 //        void openCacheDirectory();

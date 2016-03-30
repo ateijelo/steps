@@ -12,7 +12,7 @@
 
 #include "mapview.h"
 #include "constants.h"
-#include "pathgraphicsitem.h"
+#include "path.h"
 #include "geotools.h"
 #include "geocircle.h"
 #include "worldwindow.h"
@@ -25,9 +25,9 @@ MapView::MapView(QWidget *parent)
     setSceneRect(QRectF(GeoTools::Pixels2Meters(QPointF(INT_MIN,0),0),
                         GeoTools::Pixels2Meters(QPointF(INT_MAX,256),0)));
 
-#ifdef Q_OS_MAC
-    setViewportUpdateMode(FullViewportUpdate);
-#endif
+//#ifdef Q_OS_MAC
+//    setViewportUpdateMode(FullViewportUpdate);
+//#endif
 
     connect(scene,SIGNAL(mouseMoved(QPointF)),this,SLOT(mouseMovedOverScene(QPointF)));
 
@@ -46,11 +46,6 @@ MapView::MapView(QWidget *parent)
 
     coordsTemplate = QString::fromUtf8(" %1°%2'%3\"%4 %5°%6'%7\"%8 ");
 
-    PathGraphicsItem *p;
-    p = new PathGraphicsItem();
-    p->setZValue(2);
-    p->setPos(QPointF(0,0));
-    scene->addItem(p);
 
 //    p = new PathGraphicsItem();
 //    p->setZValue(2);
@@ -62,10 +57,10 @@ MapView::MapView(QWidget *parent)
 //    p->setPos(QPointF(-GeoTools::projectionWidth(),0));
 //    scene->addItem(p);
 
-    GeoCircle *c = new GeoCircle();
-    c->setZValue(3);
-    c->setPos(GeoTools::LatLon2Meters(QPointF(-82.4,23)));
-    scene->addItem(c);
+//    GeoCircle *c = new GeoCircle();
+//    c->setZValue(3);
+//    c->setPos(GeoTools::LatLon2Meters(QPointF(-82.4,23)));
+//    scene->addItem(c);
 
     //p = new PathGraphicsItem();
     //p->setZValue(100);
@@ -84,7 +79,7 @@ MapView::MapView(QWidget *parent)
     connect(this, &MapView::zoomChanged, ui.zoomSlider, &QSlider::setValue);
     connect(this, &MapView::zoomChanged, this, &MapView::setZoomSliderTooltip);
 
-    p->lengthLabel = ui.lengthLabel;
+    //p->lengthLabel = ui.lengthLabel;
 }
 
 bool MapView::canZoomIn()
@@ -145,6 +140,13 @@ void MapView::refresh()
     tileLayer.clear();
     QPixmapCache::clear();
     updateTiles();
+}
+
+void MapView::addPath(const Path* p)
+{
+    p->centerItem()->setZValue(2);
+    p->centerItem()->setPos(QPointF(0,0));
+    scene->addItem(p->centerItem());
 }
 
 bool MapView::viewportEvent(QEvent *event)

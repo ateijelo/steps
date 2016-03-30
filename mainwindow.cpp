@@ -3,11 +3,13 @@
 #include <QSettings>
 #include <QMessageBox>
 #include <QGraphicsPixmapItem>
+#include <QFileSystemModel>
 
 #include "mainwindow.h"
 #include "mgmreader.h"
 #include "mainscene.h"
 #include "constants.h"
+#include "pathsdockmodel.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -77,6 +79,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     restoreGeometry(settings.value(SettingsKeys::WindowGeometry).toByteArray());
     restoreState(settings.value(SettingsKeys::WindowState).toByteArray());
+
+    pathsModel = new PathsDockModel();
+    auto path = new Path();
+    pathsModel->addPath(path);
+    ui.mapView->addPath(path);
+    ui.pathsTreeView->setModel(pathsModel);
 
     //connect(&recentsMapper, SIGNAL(mapped(QString)), this, SLOT(updateCacheDirectory(QString)));
 }

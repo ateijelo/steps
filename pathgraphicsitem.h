@@ -2,8 +2,8 @@
 #define PATHGRAPHICSITEM_H
 
 #include <QGraphicsItem>
-#include <QLabel>
 
+class Path;
 class PathNode;
 class PathEdge;
 
@@ -24,7 +24,7 @@ class PathGraphicsItem : public QGraphicsItem
         void extenderClicked(PathNode *node);
         void nodeReleased(PathNode *);
         void edgeHovered(PathEdge *e, const QPointF& pos);
-        QLabel *lengthLabel;
+        void setPath(Path *path);
 
     signals:
 
@@ -45,6 +45,8 @@ class PathGraphicsItem : public QGraphicsItem
         QGraphicsLineItem tailExtenderLine;
         QGraphicsLineItem headExtenderLine;
         QList<PathGraphicsItem*> siblings;
+
+        Path *path;
 
 };
 

@@ -13,6 +13,7 @@
 #include "mainscene.h"
 #include "tilelayer.h"
 #include "worldwindow.h"
+#include "path.h"
 
 #include "ui_viewwidgets.h"
 
@@ -41,6 +42,7 @@ class MapView : public QGraphicsView
         int minZoomLevel();
         void centerScene();
         void refresh();
+        void addPath(const Path *p);
 
     signals:
         void canZoomIn(bool);

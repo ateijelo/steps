@@ -8,7 +8,13 @@ INCLUDEPATH += .
 QT += network core gui widgets sql
 LIBS += -lGeographic
 
+unix:INCLUDEPATH += /usr/local/include
+unix:LIBS += -L/usr/local/lib
+
 CONFIG += debug
+
+QMAKE_CXXFLAGS += -std=c++11 -stdlib=libc++
+
 
 # Input
 HEADERS += mainwindow.h \
@@ -34,7 +40,8 @@ HEADERS += mainwindow.h \
     geocircle.h \
     worldwindow.h \
     path.h \
-    tileprovider.h
+    tileprovider.h \
+    pathsdockmodel.h
 FORMS += mainwindow.ui \
     preferences.ui \
     debugdialog.ui \
@@ -62,5 +69,6 @@ SOURCES += main.cpp \
     geocircle.cpp \
     worldwindow.cpp \
     path.cpp \
-    tileprovider.cpp
+    tileprovider.cpp \
+    pathsdockmodel.cpp
 RESOURCES += steps.qrc
