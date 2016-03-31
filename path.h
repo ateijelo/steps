@@ -9,7 +9,9 @@ class Path : public QObject
 {
     Q_OBJECT
 public:
-    explicit Path(QObject *parent = 0);    
+    explicit Path(const QPointF& from,
+                  const QPointF& to,
+                  QObject *parent = 0);
 
     PathGraphicsItem *leftItem() const { return left; }
     PathGraphicsItem *centerItem() const { return center; }
@@ -22,12 +24,12 @@ public:
     void setVisible(bool visible);
 
     double length() const { return _length; }
-    void setLength(double l) { _length = l; }
+    void setLength(double l);
 
-    
 signals:
     void nameChanged(const QString&);
     void visibleChanged(bool);
+    void lengthChanged(double length);
 
 public slots:
     

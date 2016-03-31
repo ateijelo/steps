@@ -13,7 +13,8 @@ unix:LIBS += -L/usr/local/lib
 
 CONFIG += debug
 
-QMAKE_CXXFLAGS += -std=c++11 -stdlib=libc++
+QMAKE_CXXFLAGS += -std=c++11
+macx:QMAKE_CXXFLAGS += -stdlib=libc++
 
 
 # Input

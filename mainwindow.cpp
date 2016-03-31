@@ -67,6 +67,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui.openMBTilesAction,&QAction::triggered, this, &MainWindow::openMBTiles);
 
+    connect(ui.newPathAction, &QAction::triggered, this, &MainWindow::newPath);
+
     ui.zoomInAction->setShortcut(QKeySequence::ZoomIn);
     ui.zoomOutAction->setShortcut(QKeySequence::ZoomOut);
 
@@ -81,9 +83,7 @@ MainWindow::MainWindow(QWidget *parent)
     restoreState(settings.value(SettingsKeys::WindowState).toByteArray());
 
     pathsModel = new PathsDockModel();
-    auto path = new Path();
-    pathsModel->addPath(path);
-    ui.mapView->addPath(path);
+
     ui.pathsTreeView->setModel(pathsModel);
 
     //connect(&recentsMapper, SIGNAL(mapped(QString)), this, SLOT(updateCacheDirectory(QString)));
@@ -259,7 +259,23 @@ void MainWindow::loadMBTilesFile(const QString &path)
 void MainWindow::aboutDialog()
 {
     QMessageBox::about(this,"About Steps","Copyright (C) 2009-2015 Andy Teijelo <ateijelo@gmail.com>\n"
-                            "Steps is distributed under the terms of the MIT License");
+                                          "Steps is distributed under the terms of the MIT License");
+}
+
+void MainWindow::newPath()
+{
+    auto r = ui.mapView->rect();
+    int m = qMin(r.width(), r.height()) / 2;
+    QPoint from(r.center().x() - m/2, r.center().y() + m/2);
+    QPoint to(r.center().x() + m/2, r.center().y() - m/2);
+
+    auto sfrom = ui.mapView->mapToScene(from);
+    auto sto = ui.mapView->mapToScene(to);
+
+    qDebug() << "mapView visible world region:" << ui.mapView->sceneRect();
+    auto path = new Path(sfrom, sto);
+    pathsModel->addPath(path);
+    ui.mapView->addPath(path);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

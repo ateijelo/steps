@@ -67,7 +67,7 @@
      <x>0</x>
      <y>0</y>
      <width>560</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -104,10 +104,12 @@
    <addaction name="separator"/>
    <addaction name="zoomOutAction"/>
    <addaction name="zoomInAction"/>
+   <addaction name="separator"/>
+   <addaction name="newPathAction"/>
   </widget>
   <widget class="QDockWidget" name="pathsDock">
    <property name="windowTitle">
-    <string>Paths</string>
+    <string>&amp;Paths</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
@@ -229,6 +231,18 @@
    </property>
    <property name="toolTip">
     <string>Open MBTiles File</string>
+   </property>
+  </action>
+  <action name="newPathAction">
+   <property name="icon">
+    <iconset resource="steps.qrc">
+     <normaloff>:/img/path.png</normaloff>:/img/path.png</iconset>
+   </property>
+   <property name="text">
+    <string>newPath</string>
+   </property>
+   <property name="toolTip">
+    <string>New Path</string>
    </property>
   </action>
  </widget>

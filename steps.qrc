@@ -6,5 +6,6 @@
         <file alias="rotate-left.png">img/rotate-left.png</file>
         <file alias="rotate-right.png">img/rotate-right.png</file>
         <file alias="icon.svg">img/icon.svg</file>
+        <file>img/path.png</file>
     </qresource>
 </RCC>

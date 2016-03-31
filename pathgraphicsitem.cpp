@@ -9,8 +9,11 @@
 #include "debug.h"
 #include "path.h"
 
-PathGraphicsItem::PathGraphicsItem(QGraphicsItem *parent)
-    : QGraphicsItem(parent), head(0), tail(0), length(0.0),
+PathGraphicsItem::PathGraphicsItem(
+        const QPointF &from,
+        const QPointF &to,
+        QGraphicsItem *parent)
+    : QGraphicsItem(parent), head(0), tail(0), _length(0.0),
       tailExtenderLine(this), headExtenderLine(this)
 {
 //    this->setFlag(QGraphicsItem::ItemIsMovable);
@@ -18,8 +21,8 @@ PathGraphicsItem::PathGraphicsItem(QGraphicsItem *parent)
     this->setFlag(ItemIsFocusable);
 
     //for (int i=0; i<2; i++)
-    addNode(QPointF(-6.46431e+06, 1.00894e+07));
-    addNode(QPointF(1.52169e+07, 2.88845e+06));
+    addNode(from);
+    addNode(to);
 
     tailExtenderLine.setLine(0,0,35,0);
     tailExtenderLine.setFlag(ItemIgnoresTransformations);
@@ -108,7 +111,7 @@ void PathGraphicsItem::addEdge(PathNode *from, PathNode *to)
     to->inEdge = e;
     from->outNode = to;
     to->inNode = from;
-    length += e->length();
+    _length += e->length();
 }
 
 PathGraphicsItem::~PathGraphicsItem()
@@ -135,25 +138,25 @@ void PathGraphicsItem::nodeMoved(PathNode *node)
 {
     if (node->inEdge)
     {
-        length -= node->inEdge->length();
+        _length -= node->inEdge->length();
         bool fast = false;
         if (node->inNode->isSelected())
             fast = true;
         node->inEdge->setP2(node->pos(),fast);
-        length += node->inEdge->length();
+        _length += node->inEdge->length();
     }
     if (node->outEdge)
     {
-        length -= node->outEdge->length();
+        _length -= node->outEdge->length();
         bool fast = false;
         if (node->outNode->isSelected())
             fast = true;
         node->outEdge->setP1(node->pos(),fast);
-        length += node->outEdge->length();
+        _length += node->outEdge->length();
     }
-    fDebug(DEBUG_PATHS) << "    length: " << length;
+    fDebug(DEBUG_PATHS) << "    length: " << _length;
     //lengthLabel->setText(QString("%1 meters").arg(length,0,'f',2));
-    path->setLength(length);
+    path->setLength(_length);
     if (node == tail)
     {
         tailExtenderLine.setPos(tail->pos());
@@ -176,9 +179,9 @@ void PathGraphicsItem::nodeSelectedChanged(PathNode *node, bool selected)
         tailExtenderLine.setVisible(selected);
     if (node == head)
         headExtenderLine.setVisible(selected);
-    fDebug(DEBUG_PATHS) << "    length:" << length;
+    fDebug(DEBUG_PATHS) << "    length:" << _length;
     //lengthLabel->setText(QString("%1 meters").arg(length,0,'f',2));
-    path->setLength(length);
+    path->setLength(_length);
 }
 
 void PathGraphicsItem::removeNode(PathNode *node)
@@ -200,7 +203,7 @@ void PathGraphicsItem::removeNode(PathNode *node)
         head = node->outNode;
         head->inNode = 0;
         head->inEdge = 0;
-        length -= node->outEdge->length();
+        _length -= node->outEdge->length();
         headExtenderLine.setPos(head->pos());
         headExtenderLine.setRotation(180-head->outEdge->angle1());
         delete node->outEdge;
@@ -212,22 +215,22 @@ void PathGraphicsItem::removeNode(PathNode *node)
         tail = node->inNode;
         tail->outNode = 0;
         tail->outEdge = 0;
-        length -= node->inEdge->length();
+        _length -= node->inEdge->length();
         tailExtenderLine.setPos(tail->pos());
         tailExtenderLine.setRotation(-tail->inEdge->angle2());
         delete node->inEdge;
         delete node;
         return;
     }
-    length -= node->inEdge->length();
-    length -= node->outEdge->length();
+    _length -= node->inEdge->length();
+    _length -= node->outEdge->length();
     PathNode *n = node->inNode;
     PathNode *m = node->outNode;
     delete node->inEdge;
     delete node;
     n->outEdge = m->inEdge;
     n->outEdge->setP1(n->pos());
-    length += n->outEdge->length();
+    _length += n->outEdge->length();
     n->outNode = m;
     m->inNode = n;
     n->outEdge->inNode = n;
@@ -248,7 +251,7 @@ void PathGraphicsItem::setPos(const QPointF &pos)
         }
         p = p->outNode;
     }
-    length = d;
+    _length = d;
 }
 
 void PathGraphicsItem::extenderClicked(PathNode *node)
@@ -280,7 +283,7 @@ void PathGraphicsItem::extenderClicked(PathNode *node)
         PathNode *n = innerNodeEdge->outNode;
         if (m->outEdge == n->inEdge && (m->outEdge != 0))
         {
-            length -= m->outEdge->length();
+            _length -= m->outEdge->length();
             delete m->outEdge;
             addEdge(m,node);
             addEdge(node,n);
@@ -353,7 +356,10 @@ void PathGraphicsItem::setPath(Path *path)
     this->path = path;
 }
 
-
+double PathGraphicsItem::length()
+{
+    return _length;
+}
 
 void PathGraphicsItem::keyPressEvent(QKeyEvent *event)
 {
