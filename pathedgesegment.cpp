@@ -3,6 +3,7 @@
 #include <QGraphicsSceneHoverEvent>
 #include <QStyleOptionGraphicsItem>
 
+#include "debug.h"
 #include "pathgraphicsitem.h"
 #include "pathedgesegment.h"
 
@@ -13,7 +14,7 @@ PathEdgeSegment::PathEdgeSegment(QGraphicsItem *parent)
     setCursor(Qt::ArrowCursor);
     setFlag(ItemIsFocusable);
     c = Qt::red;
-    //c.setHsv(qrand() % 256,255,255);
+    randomColor.setHsv(qrand() % 256,255,255);
 
     //hoverNode = new QGraphicsEllipseItem(this);
     //hoverNode->setRect(-5,-5,10,10);
@@ -40,7 +41,7 @@ void PathEdgeSegment::paint(QPainter *painter, const QStyleOptionGraphicsItem *o
     setPen(QPen(QBrush(QColor(0,0,0,0)),width/lod,Qt::SolidLine,Qt::RoundCap));
 
     QGraphicsLineItem::paint(painter,option,widget);
-    painter->setPen(QPen(QBrush(c),3/lod,Qt::SolidLine,Qt::RoundCap));
+    painter->setPen(QPen(QBrush(fEnabled(DEBUG_PATHS) ? randomColor: c),3/lod,Qt::SolidLine,Qt::RoundCap));
     painter->drawLine(line());
 //    painter->setPen(QPen(QBrush(Qt::yellow),10/lod,Qt::SolidLine,Qt::RoundCap));
 //    painter->drawLine(line());

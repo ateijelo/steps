@@ -156,7 +156,7 @@ void PathGraphicsItem::nodeMoved(PathNode *node)
     }
     fDebug(DEBUG_PATHS) << "    length: " << _length;
     //lengthLabel->setText(QString("%1 meters").arg(length,0,'f',2));
-    path->setLength(_length);
+    if (path) path->setLength(_length);
     if (node == tail)
     {
         tailExtenderLine.setPos(tail->pos());
@@ -181,7 +181,7 @@ void PathGraphicsItem::nodeSelectedChanged(PathNode *node, bool selected)
         headExtenderLine.setVisible(selected);
     fDebug(DEBUG_PATHS) << "    length:" << _length;
     //lengthLabel->setText(QString("%1 meters").arg(length,0,'f',2));
-    path->setLength(_length);
+    if (path) path->setLength(_length);
 }
 
 void PathGraphicsItem::removeNode(PathNode *node)

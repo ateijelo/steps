@@ -142,11 +142,12 @@ void MapView::refresh()
     updateTiles();
 }
 
-void MapView::addPath(const Path* p)
+void MapView::addPath(Path* p)
 {
-    p->centerItem()->setZValue(2);
-    p->centerItem()->setPos(QPointF(0,0));
-    scene->addItem(p->centerItem());
+    p->addToScene(scene);
+//    p->centerItem()->setZValue(2);
+//    p->centerItem()->setPos(QPointF(0,0));
+//    scene->addItem(p->centerItem());
 }
 
 bool MapView::viewportEvent(QEvent *event)

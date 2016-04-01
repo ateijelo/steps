@@ -47,7 +47,7 @@ class PathGraphicsItem : public QGraphicsItem
         QGraphicsLineItem headExtenderLine;
         QList<PathGraphicsItem*> siblings;
 
-        Path *path;
+        Path *path = nullptr;
 
 };
 

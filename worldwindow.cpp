@@ -53,7 +53,8 @@ void WorldWindow::updateMask()
     qDebug() << "    zoom:" << z;
 
     int worldPixelWidth = 256 * (1 << qBound(0,z,20));
-    if (worldPixelWidth > width())
+    int worldPixelHeight = worldPixelWidth;
+    if (worldPixelWidth > width() && worldPixelHeight > height())
     {
         hide();
         return;
@@ -61,8 +62,13 @@ void WorldWindow::updateMask()
     show();
     int x1 = (width() - worldPixelWidth)/2;
     int x2 = x1 + worldPixelWidth;
+    int y1 = (height() - worldPixelHeight)/2;
+    int y2 = y1 + worldPixelHeight;
+
     QRegion r(QRect(0,0,x1,height()));
     r = r.united(QRect(x2,0,width(),height()));
+    r = r.united(QRect(x1,0,worldPixelWidth,y1));
+    r = r.united(QRect(x1,y2,worldPixelWidth,height() - y2));
 //    QTransform t;
 //    t.translate(width()/2,height()/2);
 //    t.rotate(45);

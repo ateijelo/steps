@@ -2,6 +2,7 @@
 #define PATH_H
 
 #include <QObject>
+#include <QGraphicsScene>
 
 #include "pathgraphicsitem.h"
 
@@ -13,9 +14,7 @@ public:
                   const QPointF& to,
                   QObject *parent = 0);
 
-    PathGraphicsItem *leftItem() const { return left; }
-    PathGraphicsItem *centerItem() const { return center; }
-    PathGraphicsItem *rightItem() const { return right; }
+    void addToScene(QGraphicsScene *scene);
 
     QString name() const { return _name; }
     void setName(const QString& name);

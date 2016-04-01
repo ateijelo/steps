@@ -42,7 +42,7 @@ class MapView : public QGraphicsView
         int minZoomLevel();
         void centerScene();
         void refresh();
-        void addPath(const Path *p);
+        void addPath(Path *p);
 
     signals:
         void canZoomIn(bool);

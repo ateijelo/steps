@@ -21,6 +21,7 @@ class PathEdgeSegment : public QGraphicsLineItem
         PathGraphicsItem *parentPath;
         PathEdge *parentEdge;
         QColor c;
+        QColor randomColor;
 };
 
 

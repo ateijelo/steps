@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
     {
         QSettings settings;
         settings.setValue(SettingsKeys::MBTilesPath, app.arguments().at(1));
+        settings.sync();
     }
 
     MainWindow m;

@@ -70,16 +70,16 @@ void PathEdge::subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::ite
     g.Direct(lat1,lon1,azi1,sd,lat2,lon2);
     QPointF q(GeoTools::LatLon2Meters(QPointF(lon2,lat2)));
 
-    double ax = q.x()-p.x();
-    double ay = q.y()-p.y();
-    double d2a = ax*ax + ay*ay;
-    double bx = r.x()-q.x();
-    double by = r.y()-q.y();
-    double d2b = bx*bx + by*by;
-    double adotb = ax*bx + ay*by;
-    double cos2 = adotb * qAbs(adotb) / (d2a * d2b);
+//    double ax = q.x()-p.x();
+//    double ay = q.y()-p.y();
+//    double d2a = ax*ax + ay*ay;
+//    double bx = r.x()-q.x();
+//    double by = r.y()-q.y();
+//    double d2b = bx*bx + by*by;
+//    double adotb = ax*bx + ay*by;
+//    double cos2 = adotb * qAbs(adotb) / (d2a * d2b);
 
-    if (cos2 < 0.9995)
+//    if (cos2 < 0.9995)
     {
         points.insert(i+1,q);
         subdivide(points,i+1,lat1,lon1,azi1,sd,s2,depth+1);
