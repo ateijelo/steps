@@ -55,20 +55,78 @@ void PathEdge::subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::ite
                          double lat1, double lon1, double azi1, double s1, double s2, int depth)
 {
     const GeographicLib::Geodesic& g = GeographicLib::Geodesic::WGS84();
-    if (depth > 4)
+
+    if (depth >= 3)
         return;
     if (fastUpdate)
         return;
-    QPointF p = *i;
-    QPointF r = *(i+1);
+//    if ((s2 - s1) < 1000000)
+//        return;
+
+//    QPointF p = *i;
+//    QPointF r = *(i+1);
+
     double lat2,lon2;
     //double s12 = s2 - s1;
-    double d = 0;
-    //double d = (((double)qrand()/RAND_MAX)*0.2 - 0.1)*s12;
-    double sd = (s1+s2)/2+d;
+    //double d = 0;
+    //double sd = (s1+s2)/2+d;
+
+    int subpoints = 3;
+    double step = 1.0 / (subpoints + 1);
+
+    QPointF qs[subpoints + 2];
+    bool subdiv[subpoints+1];
+
+    qs[0] = *i;
+    qs[subpoints+1] = *(i+1);
+    for (int k=0; k<subpoints; k++)
+    {
+        double sd = s1 + ((k+1)*step) * (s2 - s1);
+        //sd += (((double)qrand()/RAND_MAX)*0.2 - 0.1) * (s2 - s1);
+        g.Direct(lat1,lon1,azi1,sd,lat2,lon2);
+        qs[k+1] = GeoTools::LatLon2Meters(QPointF(lon2,lat2));
+    }
+
+    for (int k=1; k<=subpoints; k++)
+    {
+        QPointF p = qs[k-1];
+        QPointF q = qs[k];
+        QPointF r = qs[k+1];
+
+        double ax = q.x()-p.x();
+        double ay = q.y()-p.y();
+        double d2a = ax*ax + ay*ay;
+        double bx = r.x()-q.x();
+        double by = r.y()-q.y();
+        double d2b = bx*bx + by*by;
+        double adotb = ax*bx + ay*by;
+        double cos2 = adotb * qAbs(adotb) / (d2a * d2b);
+
+        if (cos2 < (1 - 0.002))
+        {
+            subdiv[k-1] = true;
+            subdiv[k] = true;
+        }
+    }
+
+    for (int k=subpoints; k>=0; k--)
+    {
+        if (!subdiv[k]) continue;
+        double sa = s1 + ((k)*step) * (s2 - s1);
+        double sb = s1 + ((k+1)*step) * (s2 - s1);
+        if (k > 0)
+        {
+            points.insert(i+1,qs[k]);
+            subdivide(points,i+1,lat1,lon1,azi1,sa,sb,depth+1);
+        } else {
+            subdivide(points,i,lat1,lon1,azi1,sa,sb,depth+1);
+        }
+    //            subdivide(points,i+1,lat1,lon1,azi1,sd,s2,depth+1);
+    }
+
     //qDebug() << s1 << sd << s2;
-    g.Direct(lat1,lon1,azi1,sd,lat2,lon2);
-    QPointF q(GeoTools::LatLon2Meters(QPointF(lon2,lat2)));
+//    g.Direct(lat1,lon1,azi1,sd,lat2,lon2);
+//    QPointF q(GeoTools::LatLon2Meters(QPointF(lon2,lat2)));
 
 //    double ax = q.x()-p.x();
 //    double ay = q.y()-p.y();
@@ -79,33 +137,18 @@ void PathEdge::subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::ite
 //    double adotb = ax*bx + ay*by;
 //    double cos2 = adotb * qAbs(adotb) / (d2a * d2b);
 
-//    if (cos2 < 0.9995)
-    {
-        points.insert(i+1,q);
-        subdivide(points,i+1,lat1,lon1,azi1,sd,s2,depth+1);
-        subdivide(points,i,lat1,lon1,azi1,s1,sd,depth+1);
-    }
+//    if (depth < 1 || cos2 < 0.99995)
+//    {
+//        points.insert(i+1,q);
+//        subdivide(points,i+1,lat1,lon1,azi1,sd,s2,depth+1);
+//        subdivide(points,i,lat1,lon1,azi1,s1,sd,depth+1);
+//    }
 }
 
-void PathEdge::updateSegments(bool fast)
+void PathEdge::replaceSegments(const QLinkedList<QPointF>& points)
 {
-    fastUpdate = fast;
-    const GeographicLib::Geodesic& g = GeographicLib::Geodesic::WGS84();
-    GeoTools gt;
-    QPointF q1 = mapToScene(p1);
-    QPointF q2 = mapToScene(p2);
-    QPointF r1 = gt.Meters2LatLon(q1);
-    QPointF r2 = gt.Meters2LatLon(q2);
-    double azi1, azi2, s12;
-    g.Inverse(r1.y(),r1.x(),r2.y(),r2.x(),s12,azi1,azi2);
-
-    QLinkedList<QPointF> points;
-    points.append(q1);
-    points.append(q2);
-    subdivide(points,points.begin(),r1.y(),r1.x(),azi1,0,s12,0);
-
+    QLinkedList<QPointF>::const_iterator i = points.begin();
     QLinkedList<PathEdgeSegment*>::iterator si = segments.begin();
-    QLinkedList<QPointF>::iterator i = points.begin();
     while (true)
     {
         if (i == points.end())
@@ -157,6 +200,34 @@ void PathEdge::updateSegments(bool fast)
     {
         delete *si;
         si = segments.erase(si);
+    }
+}
+
+void PathEdge::addSibling(PathEdge *e)
+{
+    siblings.append(e);
+}
+
+void PathEdge::updateSegments(bool fast)
+{
+    fastUpdate = fast;
+    const GeographicLib::Geodesic& g = GeographicLib::Geodesic::WGS84();
+    GeoTools gt;
+    QPointF q1 = mapToScene(p1);
+    QPointF q2 = mapToScene(p2);
+    QPointF r1 = gt.Meters2LatLon(q1);
+    QPointF r2 = gt.Meters2LatLon(q2);
+    double azi1, azi2, s12;
+    g.Inverse(r1.y(),r1.x(),r2.y(),r2.x(),s12,azi1,azi2);
+
+    QLinkedList<QPointF> points;
+    points.append(q1);
+    points.append(q2);
+    subdivide(points,points.begin(),r1.y(),r1.x(),azi1,0,s12,0);
+
+    replaceSegments(points);
+    for (auto e: siblings) {
+        e->replaceSegments(points);
     }
     qDebug() << "segments.size:" << segments.size();
 }

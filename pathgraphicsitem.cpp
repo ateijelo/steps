@@ -356,6 +356,7 @@ void PathGraphicsItem::setPath(Path *path)
     this->path = path;
 }
 
+
 double PathGraphicsItem::length()
 {
     return _length;

@@ -25,6 +25,7 @@ class PathGraphicsItem : public QGraphicsItem
         void nodeReleased(PathNode *);
         void edgeHovered(PathEdge *e, const QPointF& pos);
         void setPath(Path *path);
+//        void addSibling(PathGraphicsItem *p);
         double length();
 
     signals:
@@ -45,7 +46,7 @@ class PathGraphicsItem : public QGraphicsItem
         PathEdge *innerNodeEdge;
         QGraphicsLineItem tailExtenderLine;
         QGraphicsLineItem headExtenderLine;
-        QList<PathGraphicsItem*> siblings;
+//        QList<PathGraphicsItem*> siblings;
 
         Path *path = nullptr;
 

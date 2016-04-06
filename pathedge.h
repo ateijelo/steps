@@ -18,11 +18,14 @@ class PathEdge : public QGraphicsItem
         void setP1(const QPointF& p, bool fast=false);
         void setP2(const QPointF& p, bool fast=false);
         void updateSegments(bool fast=false);
+        void replaceSegments(const QLinkedList<QPointF> &points);
+        void addSibling(PathEdge *e);
         qreal angle1() const;
         qreal angle2() const;
 
         PathNode *inNode;
         PathNode *outNode;
+
 
     private:
         void subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::iterator i,
@@ -33,6 +36,7 @@ class PathEdge : public QGraphicsItem
         QPointF p2;
         PathGraphicsItem *parentPath;
         QLinkedList<PathEdgeSegment*> segments;
+        QList<PathEdge*> siblings;
 };
 
 #endif // PATHEDGE_H
