@@ -60,8 +60,8 @@ void PathEdge::subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::ite
         return;
     if (fastUpdate)
         return;
-//    if ((s2 - s1) < 1000000)
-//        return;
+    if ((s2 - s1) < 200000)
+        return;
 
 //    QPointF p = *i;
 //    QPointF r = *(i+1);

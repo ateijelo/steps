@@ -10,8 +10,8 @@ Path::Path(const QPointF &from, const QPointF &to, QObject *parent) :
     right = new PathGraphicsItem(from, to);
 
     center->setPath(this);
-    center->addSibling(left);
-    center->addSibling(right);
+    //center->addSibling(left);
+    //center->addSibling(right);
 
     _length = center->length();
     _name = "";
