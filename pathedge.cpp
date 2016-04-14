@@ -102,7 +102,7 @@ void PathEdge::subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::ite
         double adotb = ax*bx + ay*by;
         double cos2 = adotb * qAbs(adotb) / (d2a * d2b);
 
-        if (cos2 < (1 - 0.002))
+        if (cos2 < (1 - 0.001))
         {
             subdiv[k-1] = true;
             subdiv[k] = true;
