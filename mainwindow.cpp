@@ -272,6 +272,14 @@ void MainWindow::newPath()
     auto sfrom = ui.mapView->mapToScene(from);
     auto sto = ui.mapView->mapToScene(to);
 
+    qreal pw = GeoTools::projectionWidth();
+    auto a = ui.mapView->mapToScene(r.bottomLeft());
+    auto b = ui.mapView->mapToScene(r.topRight());
+    if (qAbs(a.x() - b.x()) > pw) {
+        sto = GeoTools::LatLon2Meters({-85,-65});
+        sfrom = GeoTools::LatLon2Meters({85,65});
+    }
+
     qDebug() << "mapView visible world region:" << ui.mapView->sceneRect();
     auto path = new Path(sfrom, sto);
     pathsModel->addPath(path);

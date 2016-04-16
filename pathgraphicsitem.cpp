@@ -12,8 +12,9 @@
 PathGraphicsItem::PathGraphicsItem(
         const QPointF &from,
         const QPointF &to,
+        Path *path,
         QGraphicsItem *parent)
-    : QGraphicsItem(parent), head(0), tail(0), _length(0.0),
+    : QGraphicsItem(parent), path(path), head(0), tail(0), _length(0.0),
       tailExtenderLine(this), headExtenderLine(this)
 {
 //    this->setFlag(QGraphicsItem::ItemIsMovable);
@@ -42,27 +43,25 @@ PathGraphicsItem::PathGraphicsItem(
     tailExtenderLine.hide();
     headExtenderLine.hide();
 
-    innerNode = newInnerNode(this);
-    innerNodeEdge = 0;
+    innerNode = newInnerNode();
+    innerNodeEdge = nullptr;
 }
 
 PathNode *PathGraphicsItem::newExtenderNode(QGraphicsItem *parent)
 {
     PathNode *n;
-    n = new PathNode(parent);
+    n = new PathNode(path, parent);
     n->setZValue(2);
-    n->setParentPath(this);
     n->setExtender(true);
     n->setPos(40,0);
     return n;
 }
 
-PathNode *PathGraphicsItem::newInnerNode(QGraphicsItem *parent)
+PathNode *PathGraphicsItem::newInnerNode()
 {
     PathNode *n;
-    n = new PathNode(parent);
+    n = new PathNode(path, this);
     n->setZValue(2);
-    n->setParentPath(this);
     n->setExtender(true);
     n->setAcceptHoverEvents(false);
     n->hovered = true;
@@ -84,8 +83,7 @@ void PathGraphicsItem::updateExtenders()
 
 void PathGraphicsItem::addNode(const QPointF &pos)
 {
-    PathNode *n = new PathNode(this);
-    n->setParentPath(this);
+    PathNode *n = new PathNode(path, this);
 
     n->setPos(pos);
     n->setZValue(2);
@@ -156,7 +154,7 @@ void PathGraphicsItem::nodeMoved(PathNode *node)
     }
     fDebug(DEBUG_PATHS) << "    length: " << _length;
     //lengthLabel->setText(QString("%1 meters").arg(length,0,'f',2));
-    if (path) path->setLength(_length);
+    path->setLength(_length);
     if (node == tail)
     {
         tailExtenderLine.setPos(tail->pos());
@@ -181,7 +179,7 @@ void PathGraphicsItem::nodeSelectedChanged(PathNode *node, bool selected)
         headExtenderLine.setVisible(selected);
     fDebug(DEBUG_PATHS) << "    length:" << _length;
     //lengthLabel->setText(QString("%1 meters").arg(length,0,'f',2));
-    if (path) path->setLength(_length);
+    path->setLength(_length);
 }
 
 void PathGraphicsItem::removeNode(PathNode *node)
@@ -288,7 +286,7 @@ void PathGraphicsItem::extenderClicked(PathNode *node)
             addEdge(m,node);
             addEdge(node,n);
         }
-        innerNode = newInnerNode(this);
+        innerNode = newInnerNode();
         innerNodeEdge = 0;
         return;
     }
@@ -351,12 +349,6 @@ void PathGraphicsItem::edgeHovered(PathEdge *e, const QPointF &pos)
     innerNodeEdge = e;
 }
 
-void PathGraphicsItem::setPath(Path *path)
-{
-    this->path = path;
-}
-
-
 double PathGraphicsItem::length()
 {
     return _length;
@@ -365,7 +357,7 @@ double PathGraphicsItem::length()
 void PathGraphicsItem::keyPressEvent(QKeyEvent *event)
 {
     qDebug() << "PathGraphicsItem::keyPressEvent" << event;
-    if (event->key() == Qt::Key_Delete)
+    if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace)
     {
         PathNode *n = head;
         while (n)
