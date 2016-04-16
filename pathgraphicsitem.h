@@ -10,7 +10,7 @@ class PathEdge;
 class PathGraphicsItem : public QGraphicsItem
 {
     public:
-        explicit PathGraphicsItem(const QPointF &from, const QPointF &to, QGraphicsItem *parent = 0);
+        explicit PathGraphicsItem(const QPointF &from, const QPointF &to, Path *path, QGraphicsItem *parent = 0);
         ~PathGraphicsItem();
         QRectF boundingRect() const;
         void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
@@ -24,7 +24,6 @@ class PathGraphicsItem : public QGraphicsItem
         void extenderClicked(PathNode *node);
         void nodeReleased(PathNode *);
         void edgeHovered(PathEdge *e, const QPointF& pos);
-        void setPath(Path *path);
 //        void addSibling(PathGraphicsItem *p);
         double length();
 
@@ -34,9 +33,10 @@ class PathGraphicsItem : public QGraphicsItem
 
     private:
         PathNode *newExtenderNode(QGraphicsItem *parent);
-        PathNode *newInnerNode(QGraphicsItem *parent);
+        PathNode *newInnerNode();
         void updateExtenders();
 
+        Path *path;
         PathNode *head;
         PathNode *tail;
         double _length;
@@ -48,7 +48,6 @@ class PathGraphicsItem : public QGraphicsItem
         QGraphicsLineItem headExtenderLine;
 //        QList<PathGraphicsItem*> siblings;
 
-        Path *path = nullptr;
 
 };
 

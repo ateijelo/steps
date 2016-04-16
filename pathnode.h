@@ -5,12 +5,12 @@
 
 class PathGraphicsItem;
 class PathEdge;
+class Path;
 
 class PathNode : public QGraphicsEllipseItem
 {
     public:
-        PathNode(QGraphicsItem *parent);
-        void setParentPath(PathGraphicsItem *path);
+        PathNode(Path *path, QGraphicsItem *parent);
         void setExtender(bool b);
         void mousePressEvent(QGraphicsSceneMouseEvent *event);
         void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
@@ -20,11 +20,11 @@ class PathNode : public QGraphicsEllipseItem
         void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         QPainterPath shape() const;
 
+        Path *path;
         PathEdge *inEdge;
         PathEdge *outEdge;
         PathNode *inNode;
         PathNode *outNode;
-        PathGraphicsItem *parentPath;
         bool isExtender;
         bool hovered;
 

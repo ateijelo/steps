@@ -6,13 +6,14 @@
 #include <QPainter>
 #include <QGraphicsSceneMouseEvent>
 
+#include "path.h"
 #include "pathnode.h"
 #include "pathedge.h"
 #include "pathgraphicsitem.h"
 #include "geotools.h"
 
-PathNode::PathNode(QGraphicsItem *parent)
-    : QGraphicsEllipseItem(parent), inEdge(0), outEdge(0),
+PathNode::PathNode(Path *path, QGraphicsItem *parent)
+    : QGraphicsEllipseItem(parent), path(path), inEdge(0), outEdge(0),
       inNode(0), outNode(0), hovered(false)
 {
     setFlag(ItemSendsScenePositionChanges);
@@ -26,11 +27,11 @@ PathNode::PathNode(QGraphicsItem *parent)
     setRect(-10,-10,20,20);
 }
 
-void PathNode::setParentPath(PathGraphicsItem *path)
-{
-    parentPath = path;
-    //setFocusProxy(path);
-}
+//void PathNode::setParentPath(Path *path)
+//{
+//    parentPath = path;
+//    //setFocusProxy(path);
+//}
 
 void PathNode::setExtender(bool b)
 {
@@ -59,13 +60,13 @@ void PathNode::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
     if (event->button() == Qt::LeftButton && isExtender)
     {
-        parentPath->extenderClicked(this);
+        path->extenderClicked(this);
     }
     if (event->button() == Qt::LeftButton && (event->modifiers() & Qt::ShiftModifier))
         parentPath->removeNode(this);
     if (event->button() == Qt::MiddleButton)
     {
-        parentPath->removeNode(this);
+        path->removeNode(this);
     }
 }
 
@@ -76,7 +77,7 @@ void PathNode::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
     if (event->button() == Qt::LeftButton)
     {
-        parentPath->nodeReleased(this);
+        path->nodeReleased(this);
     }
 }
 
@@ -84,7 +85,7 @@ void PathNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     if (event->modifiers() & Qt::ShiftModifier)
     {
-        parentPath->removeNode(this);
+        path->removeNode(this);
         event->accept();
         return;
     }
@@ -183,7 +184,7 @@ QVariant PathNode::itemChange(QGraphicsItem::GraphicsItemChange change, const QV
     switch (change)
     {
         case ItemScenePositionHasChanged:
-            parentPath->nodeMoved(this);
+            path->nodeMoved(this);
             return QVariant();
             break;
         case ItemPositionChange:
@@ -206,8 +207,8 @@ QVariant PathNode::itemChange(QGraphicsItem::GraphicsItemChange change, const QV
         case ItemSelectedHasChanged:
             {
                 if (value.toBool())
-                    parentPath->setFocus();
-                parentPath->nodeSelectedChanged(this,value.toBool());
+                    path->setFocus();
+                path->nodeSelectedChanged(this,value.toBool());
                 return QVariant();
             }
             break;
