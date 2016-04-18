@@ -1,27 +1,26 @@
 #ifndef PATHEDGESEGMENT_H
 #define PATHEDGESEGMENT_H
 
-#include <QGraphicsItem>
-
+#include "path.h"
 #include "pathedge.h"
-#include "pathnode.h"
 
-class PathEdgeSegment : public QGraphicsLineItem
+class PathEdgeSegmentGraphicsItem;
+
+class PathEdgeSegment
 {
     public:
-        PathEdgeSegment(QGraphicsItem *parent = 0);
-        void setParentPath(PathGraphicsItem *path);
-        void setParentEdge(PathEdge *edge);
-        void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-        void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
-        void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+        PathEdgeSegment(PathEdge *edge);
+        ~PathEdgeSegment();
+        QColor color;
+        QColor randomColor;
+        qreal angle();
+        void hoverMove(const QPointF& p) const;
+        void hoverLeave() const;
+        void setLine(const QLineF &l);
 
     private:
-        QGraphicsEllipseItem *hoverNode;
-        PathGraphicsItem *parentPath;
-        PathEdge *parentEdge;
-        QColor c;
-        QColor randomColor;
+        PathEdge *edge;
+        QList<PathEdgeSegmentGraphicsItem*> items;
 };
 
 

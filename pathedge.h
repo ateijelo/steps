@@ -7,21 +7,25 @@
 class PathGraphicsItem;
 class PathEdgeSegment;
 class PathNode;
+class Path;
 
-class PathEdge : public QGraphicsItem
+class PathEdge
 {
     public:
-        PathEdge(const QPointF& p1, const QPointF& p2, PathGraphicsItem *parentPath);
-        QRectF boundingRect() const;
-        void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
+        PathEdge(const QPointF& p1, const QPointF& p2, Path *path);
+//        QRectF boundingRect() const;
+//        void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
         double length() const;
         void setP1(const QPointF& p, bool fast=false);
         void setP2(const QPointF& p, bool fast=false);
         void updateSegments(bool fast=false);
         void replaceSegments(const QLinkedList<QPointF> &points);
         void addSibling(PathEdge *e);
+        const QList<PathGraphicsItem*>& pathGraphicsItems() const;
         qreal angle1() const;
         qreal angle2() const;
+        void hoverMove(const QPointF& p);
+        void hoverLeave();
 
         PathNode *inNode;
         PathNode *outNode;
@@ -32,11 +36,10 @@ class PathEdge : public QGraphicsItem
                        double lat1, double lon1, double azi1, double s1, double s2, int depth);
 
         bool fastUpdate;
+        Path *path;
         QPointF p1;
         QPointF p2;
-        PathGraphicsItem *parentPath;
         QLinkedList<PathEdgeSegment*> segments;
-        QList<PathEdge*> siblings;
 };
 
 #endif // PATHEDGE_H

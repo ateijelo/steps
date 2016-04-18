@@ -1,15 +1,16 @@
 #include <QtDebug>
 #include <GeographicLib/GeodesicLine.hpp>
 
+#include "path.h"
 #include "pathedge.h"
 #include "pathedgesegment.h"
 #include "pathgraphicsitem.h"
 #include "geotools.h"
 
-PathEdge::PathEdge(const QPointF &p1, const QPointF &p2, PathGraphicsItem *parentPath)
-    : QGraphicsItem(parentPath), p1(p1), p2(p2), parentPath(parentPath)
+PathEdge::PathEdge(const QPointF &p1, const QPointF &p2, Path *path)
+    : path(path), p1(p1), p2(p2)
 {
-    setFlag(ItemHasNoContents);
+    //setFlag(ItemHasNoContents);
     updateSegments();
 }
 
@@ -20,14 +21,14 @@ PathEdge::PathEdge(const QPointF &p1, const QPointF &p2, PathGraphicsItem *paren
 //        s->setParentPath(path);
 //}
 
-QRectF PathEdge::boundingRect() const
-{
-    return QRectF();
-}
+//QRectF PathEdge::boundingRect() const
+//{
+//    return QRectF();
+//}
 
-void PathEdge::paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *)
-{
-}
+//void PathEdge::paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *)
+//{
+//}
 
 void PathEdge::setP1(const QPointF &p, bool fast)
 {
@@ -43,12 +44,22 @@ void PathEdge::setP2(const QPointF &p, bool fast)
 
 qreal PathEdge::angle1() const
 {
-    return segments.first()->line().angle();
+    return segments.first()->angle();
 }
 
 qreal PathEdge::angle2() const
 {
-    return segments.last()->line().angle();
+    return segments.last()->angle();
+}
+
+void PathEdge::hoverMove(const QPointF &p)
+{
+    path->edgeHovered(this, p);
+}
+
+void PathEdge::hoverLeave()
+{
+    path->edgeHovered(0, QPointF());
 }
 
 void PathEdge::subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::iterator i,
@@ -164,13 +175,11 @@ void PathEdge::replaceSegments(const QLinkedList<QPointF>& points)
         else
         {
             s = new PathEdgeSegment(this);
-            s->setParentEdge(this);
-            s->setParentPath(parentPath);
             segments.append(s);
         }
         //qDebug() << GeoTools::Meters2LatLon(*i) << "->" << GeoTools::Meters2LatLon(*(i+1));
-        QPointF t1 = mapFromScene(*i);
-        QPointF t2 = mapFromScene(*(i+1));
+        QPointF t1 = path->mapFromScene(*i);
+        QPointF t2 = path->mapFromScene(*(i+1));
 
         double w = GeoTools::projectionWidth();
 
@@ -203,9 +212,9 @@ void PathEdge::replaceSegments(const QLinkedList<QPointF>& points)
     }
 }
 
-void PathEdge::addSibling(PathEdge *e)
+const QList<PathGraphicsItem*>& PathEdge::pathGraphicsItems() const
 {
-    siblings.append(e);
+    return path->graphicItems();
 }
 
 void PathEdge::updateSegments(bool fast)
@@ -213,8 +222,8 @@ void PathEdge::updateSegments(bool fast)
     fastUpdate = fast;
     const GeographicLib::Geodesic& g = GeographicLib::Geodesic::WGS84();
     GeoTools gt;
-    QPointF q1 = mapToScene(p1);
-    QPointF q2 = mapToScene(p2);
+    QPointF q1 = path->mapToScene(p1);
+    QPointF q2 = path->mapToScene(p2);
     QPointF r1 = gt.Meters2LatLon(q1);
     QPointF r2 = gt.Meters2LatLon(q2);
     double azi1, azi2, s12;
@@ -226,16 +235,13 @@ void PathEdge::updateSegments(bool fast)
     subdivide(points,points.begin(),r1.y(),r1.x(),azi1,0,s12,0);
 
     replaceSegments(points);
-    for (auto e: siblings) {
-        e->replaceSegments(points);
-    }
     qDebug() << "segments.size:" << segments.size();
 }
 
 double PathEdge::length() const
 {
-    QPointF q1 = mapToScene(p1);
-    QPointF q2 = mapToScene(p2);
+    QPointF q1 = path->mapToScene(p1);
+    QPointF q2 = path->mapToScene(p2);
     GeoTools gt;
     q1 = gt.Meters2LatLon(p1);
     q2 = gt.Meters2LatLon(p2);

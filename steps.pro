@@ -42,7 +42,9 @@ HEADERS += mainwindow.h \
     worldwindow.h \
     path.h \
     tileprovider.h \
-    pathsdockmodel.h
+    pathsdockmodel.h \
+    pathnodegraphicsitem.h \
+    pathedgesegmentgraphicsitem.h
 FORMS += mainwindow.ui \
     preferences.ui \
     debugdialog.ui \
@@ -71,5 +73,7 @@ SOURCES += main.cpp \
     worldwindow.cpp \
     path.cpp \
     tileprovider.cpp \
-    pathsdockmodel.cpp
+    pathsdockmodel.cpp \
+    pathnodegraphicsitem.cpp \
+    pathedgesegmentgraphicsitem.cpp
 RESOURCES += steps.qrc

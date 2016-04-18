@@ -1,30 +1,19 @@
-#include <cmath>
-#include <QtDebug>
-#include <QCursor>
-#include <QBrush>
-#include <QPen>
-#include <QPainter>
-#include <QGraphicsSceneMouseEvent>
-
+#include "pathnode.h"
 #include "path.h"
 #include "pathnode.h"
 #include "pathedge.h"
 #include "pathgraphicsitem.h"
-#include "geotools.h"
 
-PathNode::PathNode(Path *path, QGraphicsItem *parent)
-    : QGraphicsEllipseItem(parent), path(path), inEdge(0), outEdge(0),
-      inNode(0), outNode(0), hovered(false)
+//#include "geotools.h"
+
+PathNode::PathNode(Path *path)
+    : path(path)
 {
-    setFlag(ItemSendsScenePositionChanges);
-    //setFlag(ItemIsFocusable);
-    setFlag(ItemIsMovable);
-    setFlag(ItemIgnoresTransformations);
-
-    setAcceptHoverEvents(true);
-    setCursor(Qt::ArrowCursor);
     setExtender(false);
-    setRect(-10,-10,20,20);
+    items.reserve(3);
+    for (auto& p: path->graphicItems()) {
+        items.append(new PathNodeGraphicsItem(this, p));
+    }
 }
 
 //void PathNode::setParentPath(Path *path)
@@ -33,186 +22,98 @@ PathNode::PathNode(Path *path, QGraphicsItem *parent)
 //    //setFocusProxy(path);
 //}
 
+PathNode::~PathNode()
+{
+//    for (auto& i: items) {
+//        delete i;
+//    }
+}
+
+QPointF PathNode::pos() const
+{
+    return items.at(0)->pos();
+}
+
+void PathNode::setPos(const QPointF &p)
+{
+    setPos(p.x(), p.y());
+}
+
+void PathNode::setPos(qreal x, qreal y)
+{
+    for (auto& i: items) {
+        i->setPos(x,y);
+    }
+}
+
+void PathNode::show()
+{
+    for (auto& i: items) { i->show(); }
+}
+
+void PathNode::hide()
+{
+    for (auto& i: items) { i->hide(); }
+}
+
+bool PathNode::hovered() const
+{
+    return _hovered;
+}
+
+bool PathNode::setHovered(bool h)
+{
+    _hovered = h;
+    for (auto& i: items) { i->update(); }
+}
+
+bool PathNode::isExtender() const
+{
+    return _isExtender;
+}
+
 void PathNode::setExtender(bool b)
 {
-    isExtender = b;
-    if (isExtender)
-    {
-        setFlag(ItemIsSelectable,false);
-    }
-    else
-    {
-        setFlag(ItemIsSelectable);
+    _isExtender = b;
+    for (auto& item: items) {
+        item->setFlag(item->ItemIsSelectable, !_isExtender);
     }
 }
 
-void PathNode::mousePressEvent(QGraphicsSceneMouseEvent *event)
+void PathNode::setAcceptHoverEvents(bool b)
 {
-//    qDebug() << "PathNode::mousePressEvent" << event;
-//    qDebug() << "event->buttons():" << event->buttons();
-    if (event->buttons() & Qt::RightButton)
-    {
-        event->ignore();
-        return;
-    }
-//    qDebug() << "PathNode::mousePressEvent" << event;
-    QGraphicsEllipseItem::mousePressEvent(event);
-
-    if (event->button() == Qt::LeftButton && isExtender)
-    {
-        path->extenderClicked(this);
-    }
-    if (event->button() == Qt::LeftButton && (event->modifiers() & Qt::ShiftModifier))
-        parentPath->removeNode(this);
-    if (event->button() == Qt::MiddleButton)
-    {
-        path->removeNode(this);
+    for (auto& item: items) {
+        item->setAcceptHoverEvents(b);
     }
 }
 
-void PathNode::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+void PathNode::moved(PathNodeGraphicsItem *item)
 {
-    QGraphicsEllipseItem::mouseReleaseEvent(event);
-//    qDebug() << "mouseReleaseEvent";
-
-    if (event->button() == Qt::LeftButton)
-    {
-        path->nodeReleased(this);
-    }
-}
-
-void PathNode::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
-{
-    if (event->modifiers() & Qt::ShiftModifier)
-    {
-        path->removeNode(this);
-        event->accept();
-        return;
-    }
-}
-
-void PathNode::hoverEnterEvent(QGraphicsSceneHoverEvent *)
-{
-    hovered = true;
-    update();
-}
-
-void PathNode::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
-{
-    hovered = false;
-    update();
-}
-
-void PathNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
-{
-    qreal width;
-
-    if (isSelected())
-    {
-        setPen(QPen(QBrush(Qt::yellow),3));
-        setBrush(Qt::red);
-        width = 10;
-    }
-    else
-    {
-        if (isExtender)
-        {
-            if (hovered)
-            {
-                setPen(QPen(QBrush(Qt::yellow),1.5));
-                setBrush(QBrush(Qt::red));
-                width = 8;
-            }
-            else
-            {
-                setPen(QPen(QBrush(Qt::red),1.5));
-                setBrush(QBrush());
-                width = 8;
-            }
-        }
-        else
-        {
-            if (hovered)
-            {
-                setPen(QPen(QBrush(Qt::yellow),2));
-                setBrush(Qt::red);
-                width = 8;
-            }
-            else
-            {
-                setPen(QPen(QBrush(Qt::red),3));
-                setBrush(Qt::red);
-                width = 6.5;
-            }
+    if (!updates_enabled) return;
+    updates_enabled = false;
+    for (auto& i: items) {
+        if (i != item) {
+            i->setPos(item->pos());
         }
     }
-//    if (isExtender && hovered)
-//    {
-//        setPen
-//        painter->setPen(QPen(QBrush(Qt::red),1));
-//        painter->setBrush(QBrush(Qt::red));
-//        painter->drawEllipse(-width/2+1,-width/2+1,width-2,width-2);
-//    }
-    painter->setPen(pen());
-    painter->setBrush(brush());
-    painter->drawEllipse(-width/2,-width/2,width,width);
-//    QLineF l(0,0,width/2+pen().width(),0);
-//    painter->setPen(QPen(QBrush(Qt::red),3,Qt::SolidLine,Qt::FlatCap));
-//    if (inEdge)
-//    {
-//        QTransform t;
-//        t.rotate(180-inEdge->angle2());
-//        painter->drawLine(t.map(l));
-//    }
-//    if (outEdge)
-//    {
-//        QTransform t;
-//        t.rotate(-outEdge->angle1());
-//        painter->drawLine(t.map(l));
-//    }
+    path->nodeMoved(this);
+    updates_enabled = true;
 }
 
-QPainterPath PathNode::shape() const
+void PathNode::selectedChanged(PathNodeGraphicsItem *item, bool selected)
 {
-    QPainterPath path;
-    path.addEllipse(-10,-10,20,20);
-    return path;
-}
-
-QVariant PathNode::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
-{
-    switch (change)
-    {
-        case ItemScenePositionHasChanged:
-            path->nodeMoved(this);
-            return QVariant();
-            break;
-        case ItemPositionChange:
-            {
-                QPointF p = value.toPointF();
-//                qDebug() << "itemChange" << p;
-                qreal pw = GeoTools::projectionWidth();
-//                qDebug() << "pw:" << pw;
-                qreal x = p.x();
-                if (x > -pw/2 && x < pw/2)
-                    return value;
-                qreal m = fmod(p.x() + pw/2,pw);
-                if (m < 0)
-                    p.setX(pw/2 + m);
-                else
-                    p.setX(-pw/2 + m);
-                return p;
-            }
-            break;
-        case ItemSelectedHasChanged:
-            {
-                if (value.toBool())
-                    path->setFocus();
-                path->nodeSelectedChanged(this,value.toBool());
-                return QVariant();
-            }
-            break;
-        default:
-            return value;
+    if (!updates_enabled) return;
+    updates_enabled = false;
+    for (auto& i: items) {
+        if (i != item) {
+            i->setSelected(selected);
+        }
     }
+    updates_enabled = true;
 }
+
+bool PathNode::isSelected() const
+{
+    return items.at(0)->isSelected();
+}
+
