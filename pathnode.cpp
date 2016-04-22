@@ -123,32 +123,35 @@ void PathNode::moved(PathNodeGraphicsItem *item)
 
 void PathNode::selectedChanged(PathNodeGraphicsItem *item, bool selected)
 {
-    qDebug() << "PathNode::selectedChanged(" << item << ", " << selected << ")";
-    if (!updates_enabled) return;
-    updates_enabled = false;
+//    if (!updates_enabled) return;
+    qDebug() << "PathNode::selectedChanged(" << item->scenePos() << ", " << selected << ")";
+//    updates_enabled = false;
+    setSelected(selected);
     for (auto& i: items) {
         if (i != item) {
-            i->setSelected(selected);
+            //i->setSelected(selected);
+            i->update();
         }
     }
     if (!_isExtender) {
         path->nodeSelectedChanged(this, selected);
     }
-    updates_enabled = true;
+//    updates_enabled = true;
 }
 
 void PathNode::setSelected(bool b)
 {
-    updates_enabled = false;
-    for (auto& i: items) {
-        i->setSelected(b);
-    }
-    updates_enabled = true;
+//    updates_enabled = false;
+    _selected = b;
+//    for (auto& i: items) {
+//        i->setSelected(b);
+//    }
+//    updates_enabled = true;
 }
 
 bool PathNode::isSelected() const
 {
-    return items.at(0)->isSelected();
+    return _selected;
 }
 
 void PathNode::clicked(Qt::MouseButton button, Qt::KeyboardModifiers modifiers)

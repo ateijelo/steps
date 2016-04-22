@@ -75,13 +75,13 @@ void Path::extenderClicked(PathNode *node)
         fDebug(DEBUG_PATHS) << "this.mapFromScene(view.mapToScene):" << items.at(0)->mapFromScene(v->mapToScene(q.toPoint()));
     }
 
-    node->setExtender(false);
-    items.at(0)->scene()->clearSelection();
-    node->setSelected(true);
-    node->setPos(p);
     if (node == hoverNode && hoverEdge != nullptr)
     {
+        node->setPos(p);
+        node->setExtender(false);
         node->setAcceptHoverEvents(true);
+        items.at(0)->scene()->clearSelection();
+        node->setSelected(true);
 
         PathNode *m = hoverEdge->inNode;
         PathNode *n = hoverEdge->outNode;
@@ -97,14 +97,16 @@ void Path::extenderClicked(PathNode *node)
         return;
     }
     //node->setParentItem(this);
-    //node->setPos(p);
+    node->setParents(items);
+    node->setPos(p);
+    node->setExtender(false);
+    items.at(0)->scene()->clearSelection();
+    node->setSelected(true);
 
     if (node == tailExtenderNode)
     {
         addEdge(tail,node);
-        node->setParents(items);
         tail = node;
-
         tailExtenderNode = newExtenderNode(tailExtenderLines);
 //        tailExtenderLine.setPos(tail->pos());
 //        tailExtenderLine.setRotation(-tail->inEdge->angle2());
@@ -113,7 +115,6 @@ void Path::extenderClicked(PathNode *node)
     if (node == headExtenderNode)
     {
         addEdge(node,head);
-        node->setParents(items);
         head = node;
         headExtenderNode = newExtenderNode(headExtenderLines);
 //        headExtenderLine.setPos(head->pos());

@@ -48,6 +48,7 @@ class PathNode
     private:
         bool _isExtender = false;
         bool _hovered = false;
+        bool _selected = false;
         bool updates_enabled = true;
         // child objects, it's my responsibility to delete them
         QList<PathNodeGraphicsItem*> items;

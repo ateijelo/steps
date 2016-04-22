@@ -75,7 +75,7 @@ void PathNodeGraphicsItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
 {
     qreal width;
 
-    if (isSelected())
+    if (node->isSelected())
     {
         setPen(QPen(QBrush(Qt::yellow),3));
         setBrush(Qt::red);
@@ -174,9 +174,9 @@ QVariant PathNodeGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange chan
             break;
         case ItemSelectedHasChanged:
             {
-                qDebug() << "ItemSelectedHasChanged(" << value.toBool() << ")";
-                if (value.toBool())
-                    parentItem()->setFocus();
+                qDebug() << "ItemSelectedHasChanged(" << scenePos() << "," << value.toBool() << ")";
+                //if (value.toBool())
+                //    parentItem()->setFocus();
                 node->selectedChanged(this,value.toBool());
                 update();
                 return QVariant();
