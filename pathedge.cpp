@@ -14,6 +14,13 @@ PathEdge::PathEdge(const QPointF &p1, const QPointF &p2, Path *path)
     updateSegments();
 }
 
+PathEdge::~PathEdge()
+{
+    foreach (PathEdgeSegment *s, segments) {
+        delete s;
+    }
+}
+
 //void PathEdge::setParentPath(PathGraphicsItem *path)
 //{
 //    parentPath = path;
@@ -59,7 +66,7 @@ void PathEdge::hoverMove(const QPointF &p)
 
 void PathEdge::hoverLeave()
 {
-    path->edgeHovered(0, QPointF());
+    path->edgeHovered(nullptr, QPointF());
 }
 
 void PathEdge::subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::iterator i,

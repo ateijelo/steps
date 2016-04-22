@@ -29,12 +29,12 @@ public:
 
     void addEdge(PathNode *from, PathNode *to);
 
-    void extenderClicked(PathNode *node) { /*TODO*/ }
+    void extenderClicked(PathNode *node);
     void removeNode(PathNode *node) { /*TODO*/ }
     void nodeReleased(PathNode *node) { /*TODO*/ }
     void nodeMoved(PathNode *node);
     void setFocus() { /*TODO*/ }
-    void nodeSelectedChanged(PathNode *node, bool selected) { /*TODO*/ }
+    void nodeSelectedChanged(PathNode *node, bool selected);
 
     void edgeHovered(PathEdge *e, const QPointF& pos);
 
@@ -57,11 +57,10 @@ public slots:
     
 private:
 
-    PathNode *newExtenderNode(QGraphicsItem *parent);
-    void createHoverNode();
+    PathNode *newExtenderNode(const QList<QGraphicsLineItem *> &parents);
+    PathNode *newHoverNode();
     void updateExtenderLines();
 
-    QList<PathGraphicsItem*> items;
     QString _name;
     bool _visible;
     double _length;
@@ -71,7 +70,11 @@ private:
     PathNode *tailExtenderNode;
     PathNode *headExtenderNode;
     PathNode *hoverNode;
-    PathEdge *hoverEdge;
+    PathEdge *hoverEdge = nullptr;
+
+    QList<PathGraphicsItem*> items;
+    QList<QGraphicsLineItem*> tailExtenderLines;
+    QList<QGraphicsLineItem*> headExtenderLines;
 };
 
 #endif // PATH_H

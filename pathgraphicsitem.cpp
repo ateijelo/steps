@@ -10,30 +10,29 @@
 #include "path.h"
 
 PathGraphicsItem::PathGraphicsItem(Path *path, QGraphicsItem *parent)
-    : QGraphicsItem(parent), path(path),
-      tailExtenderLine(this), headExtenderLine(this)
+    : QGraphicsItem(parent), path(path)
 {
 //    this->setFlag(QGraphicsItem::ItemIsMovable);
     this->setFlag(ItemHasNoContents);
     this->setFlag(ItemIsFocusable);
 
-    tailExtenderLine.setLine(0,0,35,0);
-    tailExtenderLine.setFlag(ItemIgnoresTransformations);
-    tailExtenderLine.setPen(QPen(QBrush(QColor(255,0,0)),1.5,Qt::SolidLine,Qt::RoundCap));
+//    tailExtenderLine.setLine(0,0,35,0);
+//    tailExtenderLine.setFlag(ItemIgnoresTransformations);
+//    tailExtenderLine.setPen(QPen(QBrush(QColor(255,0,0)),1.5,Qt::SolidLine,Qt::RoundCap));
 //    tailExtenderLine.setPos(path->tailPos());
 //    tailExtenderLine.setRotation(path->tailAngle());
 
-    headExtenderLine.setLine(0,0,35,0);
-    headExtenderLine.setFlag(ItemIgnoresTransformations);
-    headExtenderLine.setPen(QPen(QBrush(QColor(255,0,0)),1.5,Qt::SolidLine,Qt::RoundCap));
+//    headExtenderLine.setLine(0,0,35,0);
+//    headExtenderLine.setFlag(ItemIgnoresTransformations);
+//    headExtenderLine.setPen(QPen(QBrush(QColor(255,0,0)),1.5,Qt::SolidLine,Qt::RoundCap));
 //    headExtenderLine.setPos(path->headPos());
 //    headExtenderLine.setRotation(path->headAngle());
 
 //    tailExtenderNode = newExtenderNode(&tailExtenderLine);
 //    headExtenderNode = newExtenderNode(&headExtenderLine);
 
-    tailExtenderLine.hide();
-    headExtenderLine.hide();
+//    tailExtenderLine.hide();
+//    headExtenderLine.hide();
 
 //    innerNode = newInnerNode();
 //    innerNodeEdge = nullptr;
@@ -116,13 +115,7 @@ void PathGraphicsItem::paint(QPainter *, const QStyleOptionGraphicsItem *, QWidg
 
 //void PathGraphicsItem::nodeSelectedChanged(PathNode *node, bool selected)
 //{
-//    if (node == tail)
-//        tailExtenderLine.setVisible(selected);
-//    if (node == head)
-//        headExtenderLine.setVisible(selected);
-//    fDebug(DEBUG_PATHS) << "    length:" << _length;
-//    //lengthLabel->setText(QString("%1 meters").arg(length,0,'f',2));
-//    path->setLength(_length);
+
 //}
 
 //void PathGraphicsItem::removeNode(PathNode *node)
@@ -197,70 +190,7 @@ void PathGraphicsItem::paint(QPainter *, const QStyleOptionGraphicsItem *, QWidg
 
 //void PathGraphicsItem::extenderClicked(PathNode *node)
 //{
-//    QPointF p;
-//    QList<QGraphicsView*> l = scene()->views();
-//    if (l.size() > 0)
-//    {
-//        QGraphicsView *v = l.at(0);
-//        fDebug(DEBUG_PATHS) << "viewportTransform:" << v->viewportTransform();
-//        fDebug(DEBUG_PATHS) << "node->deviceTransform:" << node->deviceTransform(v->viewportTransform());
-//        fDebug(DEBUG_PATHS) << "  .map:" << node->deviceTransform(v->viewportTransform()).map(QPointF(0,0));
-//        QPointF q = node->deviceTransform(v->viewportTransform()).map(QPointF(0,0));
-//        fDebug(DEBUG_PATHS) << "  deviceTransform.map:" << deviceTransform(v->viewportTransform().inverted()).map(q);
-//        //p = deviceTransform(v->viewportTransform().inverted()).map(q);
-//        p = mapFromScene(v->viewportTransform().inverted().map(q));
-//        fDebug(DEBUG_PATHS) << "view.mapToScene:" << v->mapToScene(q.toPoint());
-//        fDebug(DEBUG_PATHS) << "this.mapFromScene(view.mapToScene):" << mapFromScene(v->mapToScene(q.toPoint()));
-//    }
-//    if (node == innerNode && innerNodeEdge)
-//    {
-//        node->setPos(p);
-//        node->setExtender(false);
-//        node->setAcceptHoverEvents(true);
-//        scene()->clearSelection();
-//        node->setSelected(true);
 
-//        PathNode *m = innerNodeEdge->inNode;
-//        PathNode *n = innerNodeEdge->outNode;
-//        if (m->outEdge == n->inEdge && (m->outEdge != 0))
-//        {
-//            _length -= m->outEdge->length();
-//            delete m->outEdge;
-//            addEdge(m,node);
-//            addEdge(node,n);
-//        }
-//        innerNode = newInnerNode();
-//        innerNodeEdge = 0;
-//        return;
-//    }
-//    node->setParentItem(this);
-//    node->setPos(p);
-//    node->setExtender(false);
-//    scene()->clearSelection();
-//    node->setSelected(true);
-
-//    if (node == tailExtenderNode)
-//    {
-//        addEdge(tail,node);
-//        tail = node;
-
-//        tailExtenderNode = newExtenderNode(&tailExtenderLine);
-
-//        tailExtenderLine.setPos(tail->pos());
-//        tailExtenderLine.setRotation(-tail->inEdge->angle2());
-//        tailExtenderLine.hide();
-//    }
-//    if (node == headExtenderNode)
-//    {
-//        addEdge(node,head);
-//        head = node;
-
-//        headExtenderNode = newExtenderNode(&headExtenderLine);
-
-//        headExtenderLine.setPos(head->pos());
-//        headExtenderLine.setRotation(180-head->outEdge->angle1());
-//        headExtenderLine.hide();
-//    }
 //}
 
 //void PathGraphicsItem::nodeReleased(PathNode *)
@@ -316,14 +246,32 @@ void PathGraphicsItem::keyPressEvent(QKeyEvent *event)
     //        event->ignore();
 }
 
-void PathGraphicsItem::updateTail(const QPointF &pos, qreal angle)
-{
-    tailExtenderLine.setPos(pos);
-    tailExtenderLine.setRotation(angle);
-}
+//void PathGraphicsItem::updateTailExtender(const QPointF &pos, qreal angle)
+//{
+//    tailExtenderLine.setPos(pos);
+//    tailExtenderLine.setRotation(angle);
+//}
 
-void PathGraphicsItem::updateHead(const QPointF &pos, qreal angle)
-{
-    headExtenderLine.setPos(pos);
-    headExtenderLine.setRotation(angle);
-}
+//void PathGraphicsItem::updateHeadExtender(const QPointF &pos, qreal angle)
+//{
+//    headExtenderLine.setPos(pos);
+//    headExtenderLine.setRotation(angle);
+//}
+
+//void PathGraphicsItem::showTailExtender(bool b)
+//{
+//    if (b) {
+//        tailExtenderLine.show();
+//    } else {
+//        tailExtenderLine.hide();
+//    }
+//}
+
+//void PathGraphicsItem::showHeadExtender(bool b)
+//{
+//    if (b) {
+//        headExtenderLine.show();
+//    } else {
+//        headExtenderLine.hide();
+//    }
+//}

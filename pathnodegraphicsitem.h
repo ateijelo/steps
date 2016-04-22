@@ -18,7 +18,7 @@ class PathNodeGraphicsItem : public QGraphicsEllipseItem
         QPainterPath shape() const;
         QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value);
 
-        void setHovered(bool h);
+        void setHovered(bool hovered);
 
         PathNode *node;
 //        PathEdge *inEdge;

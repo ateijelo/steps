@@ -13,6 +13,7 @@ class PathEdge
 {
     public:
         PathEdge(const QPointF& p1, const QPointF& p2, Path *path);
+        ~PathEdge();
 //        QRectF boundingRect() const;
 //        void paint(QPainter *, const QStyleOptionGraphicsItem *, QWidget *);
         double length() const;

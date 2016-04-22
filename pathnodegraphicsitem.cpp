@@ -37,18 +37,7 @@ void PathNodeGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 //    qDebug() << "PathNodeGraphicsItem::mousePressEvent" << event;
     QGraphicsEllipseItem::mousePressEvent(event);
 
-    if (event->button() == Qt::LeftButton && node->isExtender())
-    {
-        //path->extenderClicked(this);
-    }
-    if (event->button() == Qt::LeftButton && (event->modifiers() & Qt::ShiftModifier))
-    {
-        //path->removeNode(this);
-    }
-    if (event->button() == Qt::MiddleButton)
-    {
-        //path->removeNode(this);
-    }
+    node->clicked(event->button(), event->modifiers());
 }
 
 void PathNodeGraphicsItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
@@ -185,9 +174,11 @@ QVariant PathNodeGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange chan
             break;
         case ItemSelectedHasChanged:
             {
+                qDebug() << "ItemSelectedHasChanged(" << value.toBool() << ")";
                 if (value.toBool())
                     parentItem()->setFocus();
                 node->selectedChanged(this,value.toBool());
+                update();
                 return QVariant();
             }
             break;

@@ -25,8 +25,10 @@ class PathGraphicsItem : public QGraphicsItem
 //        void edgeHovered(PathEdge *e, const QPointF& pos);
 //        void addSibling(PathGraphicsItem *p);
 //        double length();
-        void updateTail(const QPointF& pos, qreal angle);
-        void updateHead(const QPointF& pos, qreal angle);
+//        void updateTailExtender(const QPointF& pos, qreal angle);
+//        void updateHeadExtender(const QPointF& pos, qreal angle);
+//        void showTailExtender(bool b = true);
+//        void showHeadExtender(bool b = true);
 
     signals:
 
@@ -39,8 +41,8 @@ class PathGraphicsItem : public QGraphicsItem
 //        void addNode(const QPointF& pos);
 
         Path *path;
-        QGraphicsLineItem tailExtenderLine;
-        QGraphicsLineItem headExtenderLine;
+//        QGraphicsLineItem tailExtenderLine;
+//        QGraphicsLineItem headExtenderLine;
 };
 
 #endif // PATHGRAPHICSITEM_H

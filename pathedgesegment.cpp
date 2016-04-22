@@ -21,7 +21,7 @@ PathEdgeSegment::PathEdgeSegment(PathEdge *edge)
 
 PathEdgeSegment::~PathEdgeSegment()
 {
-    for (auto& i: items) {
+    foreach (PathEdgeSegmentGraphicsItem *i, items) {
         delete i;
     }
 }
