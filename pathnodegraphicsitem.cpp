@@ -175,8 +175,8 @@ QVariant PathNodeGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange chan
         case ItemSelectedHasChanged:
             {
                 qDebug() << "ItemSelectedHasChanged(" << scenePos() << "," << value.toBool() << ")";
-                //if (value.toBool())
-                //    parentItem()->setFocus();
+                if (value.toBool())
+                    parentItem()->setFocus();
                 node->selectedChanged(this,value.toBool());
                 update();
                 return QVariant();
