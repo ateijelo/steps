@@ -36,9 +36,9 @@ PathNode::PathNode(Path *path, const QList<QGraphicsLineItem *> &parents)
 
 PathNode::~PathNode()
 {
-//    for (auto& i: items) {
-//        delete i;
-//    }
+    for (auto& i: items) {
+        delete i;
+    }
 }
 
 void PathNode::setParents(const QList<PathGraphicsItem *> &parents)
@@ -162,11 +162,11 @@ void PathNode::clicked(Qt::MouseButton button, Qt::KeyboardModifiers modifiers)
     }
     if (button == Qt::LeftButton && (modifiers & Qt::ShiftModifier))
     {
-        //path->removeNode(this);
+        path->removeNode(this);
     }
     if (button == Qt::MiddleButton)
     {
-        //path->removeNode(this);
+        path->removeNode(this);
     }
 }
 

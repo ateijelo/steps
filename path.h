@@ -30,7 +30,8 @@ public:
     void addEdge(PathNode *from, PathNode *to);
 
     void extenderClicked(PathNode *node);
-    void removeNode(PathNode *node) { /*TODO*/ }
+    void removeNode(PathNode *node);
+    void removeSelectedNodes();
     void nodeReleased(PathNode *node) { /*TODO*/ }
     void nodeMoved(PathNode *node);
     void setFocus() { /*TODO*/ }

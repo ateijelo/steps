@@ -124,6 +124,70 @@ void Path::extenderClicked(PathNode *node)
     updateExtenderLines();
 }
 
+void Path::removeNode(PathNode *node)
+{
+    if (head == tail)
+        return;
+    if (head->outNode == tail)
+        return;
+    if (tail->inNode == head)
+        return;
+    if (node == headExtenderNode)
+        return;
+    if (node == tailExtenderNode)
+        return;
+    if (node == hoverNode)
+        return;
+    if (node == head)
+    {
+        head = node->outNode;
+        head->inNode = 0;
+        head->inEdge = 0;
+        _length -= node->outEdge->length();
+        updateExtenderLines();
+        delete node->outEdge;
+        delete node;
+        return;
+    }
+    if (node == tail)
+    {
+        tail = node->inNode;
+        tail->outNode = 0;
+        tail->outEdge = 0;
+        _length -= node->inEdge->length();
+        updateExtenderLines();
+        delete node->inEdge;
+        delete node;
+        return;
+    }
+    _length -= node->inEdge->length();
+    _length -= node->outEdge->length();
+    PathNode *n = node->inNode;
+    PathNode *m = node->outNode;
+    delete node->inEdge;
+    delete node;
+    n->outEdge = m->inEdge;
+    n->outEdge->setP1(n->pos());
+    _length += n->outEdge->length();
+    n->outNode = m;
+    m->inNode = n;
+    n->outEdge->inNode = n;
+    updateExtenderLines();
+}
+
+void Path::removeSelectedNodes()
+{
+    PathNode *n = head;
+    while (n)
+    {
+        PathNode *m = n->outNode;
+        if (n->isSelected())
+            removeNode(n);
+        n = m;
+    }
+    updateExtenderLines();
+}
+
 void Path::addToScene(QGraphicsScene *scene)
 {
     auto w = GeoTools::projectionWidth();

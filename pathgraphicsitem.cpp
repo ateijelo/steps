@@ -120,56 +120,7 @@ void PathGraphicsItem::paint(QPainter *, const QStyleOptionGraphicsItem *, QWidg
 
 //void PathGraphicsItem::removeNode(PathNode *node)
 //{
-//    if (head == tail)
-//        return;
-//    if (head->outNode == tail)
-//        return;
-//    if (tail->inNode == head)
-//        return;
-//    if (node == headExtenderNode)
-//        return;
-//    if (node == tailExtenderNode)
-//        return;
-//    if (node == innerNode)
-//        return;
-//    if (node == head)
-//    {
-//        head = node->outNode;
-//        head->inNode = 0;
-//        head->inEdge = 0;
-//        _length -= node->outEdge->length();
-//        headExtenderLine.setPos(head->pos());
-//        headExtenderLine.setRotation(180-head->outEdge->angle1());
-//        delete node->outEdge;
-//        delete node;
-//        return;
-//    }
-//    if (node == tail)
-//    {
-//        tail = node->inNode;
-//        tail->outNode = 0;
-//        tail->outEdge = 0;
-//        _length -= node->inEdge->length();
-//        tailExtenderLine.setPos(tail->pos());
-//        tailExtenderLine.setRotation(-tail->inEdge->angle2());
-//        delete node->inEdge;
-//        delete node;
-//        return;
-//    }
-//    _length -= node->inEdge->length();
-//    _length -= node->outEdge->length();
-//    PathNode *n = node->inNode;
-//    PathNode *m = node->outNode;
-//    delete node->inEdge;
-//    delete node;
-//    n->outEdge = m->inEdge;
-//    n->outEdge->setP1(n->pos());
-//    _length += n->outEdge->length();
-//    n->outNode = m;
-//    m->inNode = n;
-//    n->outEdge->inNode = n;
-//    headExtenderLine.setRotation(180-head->outEdge->angle1());
-//    tailExtenderLine.setRotation(-tail->inEdge->angle2());
+
 //}
 
 //void PathGraphicsItem::setPos(const QPointF &pos)
@@ -229,21 +180,14 @@ void PathGraphicsItem::paint(QPainter *, const QStyleOptionGraphicsItem *, QWidg
 
 void PathGraphicsItem::keyPressEvent(QKeyEvent *event)
 {
-//    qDebug() << "PathGraphicsItem::keyPressEvent" << event;
-//    if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace)
-//    {
-//        PathNode *n = head;
-//        while (n)
-//        {
-//            PathNode *m = n->outNode;
-//            if (n->isSelected())
-//                removeNode(n);
-//            n = m;
-//        }
-//        updateExtenders();
-//    }
-//    else
-    //        event->ignore();
+    qDebug() << "PathGraphicsItem::keyPressEvent" << event;
+    //QGraphicsItem::keyPressEvent(event);
+    if (event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace)
+    {
+        path->removeSelectedNodes();
+    } else {
+        event->ignore();
+    }
 }
 
 //void PathGraphicsItem::updateTailExtender(const QPointF &pos, qreal angle)
