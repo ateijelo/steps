@@ -1,4 +1,4 @@
-//#include <cmath>
+#include <cmath>
 #include <QtDebug>
 #include <QCursor>
 #include <QBrush>

@@ -92,7 +92,8 @@ void PathEdge::subdivide(QLinkedList<QPointF>& points, QLinkedList<QPointF>::ite
     int subpoints = 3;
     double step = 1.0 / (subpoints + 1);
 
-    QPointF qs[subpoints + 2];
+    std::vector<QPointF> qs;
+    qs.reserve(subpoints + 2);
     bool subdiv[subpoints+1];
 
     qs[0] = *i;
