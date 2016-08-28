@@ -27,20 +27,6 @@ class MainWindow : public QMainWindow
         void closeEvent(QCloseEvent *event);
 
     private:
-        Ui::MainWindow ui;
-        QList<QAction*> recentPaths;
-        QSignalMapper recentsMapper;
-//        QSlider zoomSlider;
-//        QCheckBox showLatLonAsToolTip;
-//        QLabel latLabel;
-//        QLabel lonLabel;
-//        QComboBox cacheStyles;
-        Preferences *preferences;
-        DebugDialog *debugDialog;
-        QShortcut *debugShortcut;
-        PathsDockModel *pathsModel;
-
-    private slots:
 //        void openCacheDirectory();
 //        void updateCacheDirectory(QString path);
 //        void updateLatLonLabels(const QPointF& latLon);
@@ -51,7 +37,26 @@ class MainWindow : public QMainWindow
         void openMBTiles();
         void loadMBTilesFile(const QString& path);
 //        void updateCacheStyles();
-        void updateRecents(QString top=QString());
+        //void updateRecents(QString top=QString());
+        void loadRecents();
+        void addRecent(const QString& path);
+        void openRecentPath(int index);
+
+        Ui::MainWindow ui;
+        QStringList recentPaths;
+        QSet<QAction*> recentPathActions;
+//        QSignalMapper recentsMapper;
+//        QSlider zoomSlider;
+//        QCheckBox showLatLonAsToolTip;
+//        QLabel latLabel;
+//        QLabel lonLabel;
+//        QComboBox cacheStyles;
+        Preferences *preferences;
+        DebugDialog *debugDialog;
+        QShortcut *debugShortcut;
+        PathsDockModel *pathsModel;
+
+    private:
 };
 
 #endif

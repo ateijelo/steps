@@ -74,7 +74,6 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="openAction"/>
     <addaction name="openMBTilesAction"/>
     <addaction name="action_Preferences"/>
     <addaction name="separator"/>
@@ -280,11 +279,18 @@
    </property>
   </action>
   <action name="openMBTilesAction">
+   <property name="icon">
+    <iconset theme="file-open" resource="steps.qrc">
+     <normaloff>:/open.png</normaloff>:/open.png</iconset>
+   </property>
    <property name="text">
     <string>Open &amp;MBTiles...</string>
    </property>
    <property name="toolTip">
     <string>Open MBTiles File</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
   <action name="newPathAction">

@@ -17,6 +17,7 @@ extern const char *flagLabels[];
 #define DEBUG_TILECOORDS        0x00000080
 #define DEBUG_PATHS             0x00000100
 #define DEBUG_WORLDWINDOW       0x00000200
+#define DEBUG_DATABASE          0x00000400
 
 #define ENABLE_DEBUGGING
 

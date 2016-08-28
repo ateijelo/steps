@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
-    updateRecents();
+    loadRecents();
 
     preferences = new Preferences(this);
     debugDialog = new DebugDialog(this);
@@ -63,10 +63,9 @@ MainWindow::MainWindow(QWidget *parent)
 //    connect(ui.mapView,SIGNAL(canZoomOut(bool)),ui.zoomOutAction,SLOT(setEnabled(bool)));
 //    connect(ui.mapView,SIGNAL(zoomChanged(int)),&zoomSlider,SLOT(setValue(int)));
 //    connect(ui.mapView,&MapView::mouseMoved,this,&MainWindow::updateLatLonLabels);
-    connect(ui.aboutAction,SIGNAL(triggered()),this,SLOT(aboutDialog()));
-
+    connect(ui.aboutAction,&QAction::triggered,this,&MainWindow::aboutDialog);
     connect(ui.openMBTilesAction,&QAction::triggered, this, &MainWindow::openMBTiles);
-
+    connect(ui.mapView, &MapView::loadedMBTiles, this, &MainWindow::addRecent);
     connect(ui.newPathAction, &QAction::triggered, this, &MainWindow::newPath);
 
     ui.zoomInAction->setShortcut(QKeySequence::ZoomIn);
@@ -89,140 +88,57 @@ MainWindow::MainWindow(QWidget *parent)
     //connect(&recentsMapper, SIGNAL(mapped(QString)), this, SLOT(updateCacheDirectory(QString)));
 }
 
-void MainWindow::updateRecents(QString top)
+void MainWindow::loadRecents()
 {
     QSettings settings;
 
-    QStringList recents;
-    int amount = settings.beginReadArray(SettingsKeys::RecentPaths);
-    for (int i = 0; i < amount; i++)
-    {
-        settings.setArrayIndex(i);
-        recents.append(settings.value(SettingsKeys::path).toString());
-    }
-    settings.endArray();
+    recentPaths = settings.value(SettingsKeys::RecentPaths).toStringList();
 
-    if (top.isNull())
-    {
-        top = settings.value(SettingsKeys::CachePath, "").toString();
+    if (recentPaths.isEmpty())
+        return;
 
-        if (recents.isEmpty())
-        {
-            if (!top.isEmpty())
-            {
-                recents.append(top);
-            }
-        }
-        else
-        {
-            if (top.isEmpty())
-            {
-                top = recents[0];
-            }
-        }
+    for (QAction* a: recentPathActions) {
+        ui.menu_File->removeAction(a);
+        a->deleteLater();
     }
-    else
+    recentPathActions.clear();
+
+    QAction *action;
+    for (int i = 0; i < recentPaths.length(); i++)
     {
-        if (recents.isEmpty())
-        {
-            recents.append(top);
-        }
+        action = new QAction(
+            QString("&%1 %2").arg(i+1).arg(recentPaths[i]),
+            this->ui.menu_File
+        );
+        recentPathActions.insert(action);
+        connect(action, &QAction::triggered, [this,i](){
+            openRecentPath(i);
+        });
+        this->ui.menu_File->insertAction(this->ui.action_Exit, action);
     }
 
-    if (!recentPaths.isEmpty())
-    {
-        foreach(QAction *action, recentPaths)
-        {
-            this->ui.menu_File->removeAction(action);
-            recentsMapper.removeMappings(action);
-        }
-        recentPaths.clear();
-    }
-
-    if (!recents.isEmpty())
-    {
-        recents.insert(0, top);
-        int index = recents.indexOf(top, 1);
-        if (index != -1)
-        {
-            recents.removeAt(index);
-        }
-
-        QAction *action;
-        for (int i = 0; i < recents.length(); i++)
-        {
-            action = new QAction(QString("&%1 %2").arg(i+1).arg(recents[i]), this->ui.menu_File);
-            recentsMapper.setMapping(action, recents[i]);
-            connect(action, SIGNAL(triggered()), &recentsMapper, SLOT(map()));
-            this->ui.menu_File->insertAction(this->ui.action_Exit, action);
-            recentPaths.append(action);
-        }
-
-        action = this->ui.menu_File->insertSeparator(this->ui.action_Exit);
-        recentPaths.append(action);
-    }
-
-    settings.beginWriteArray(SettingsKeys::RecentPaths);
-    for (int i = 0; i < recents.length(); i++)
-    {
-        settings.setArrayIndex(i);
-        settings.setValue(SettingsKeys::path, recents[i]);
-    }
-    settings.endArray();
+    action = this->ui.menu_File->insertSeparator(this->ui.action_Exit);
 }
 
-//void MainWindow::updateCacheStyles()
-//{
-//    QSettings settings;
-//    QString cachePath = settings.value(SettingsKeys::CachePath, "").toString();
-//    QDir cacheDir(cachePath);
-//    QStringList cacheDirPattern("*_*");
-//    QFileInfoList list = cacheDir.entryInfoList(cacheDirPattern, QDir::Dirs | QDir::NoDotAndDotDot);
-//    QStringList styles;
-//    foreach(QFileInfo fileInfo, list)
-//    {
-//        QString style = fileInfo.fileName().section("_", 0, 0);
-//        if (!styles.contains(style))
-//        {
-//            styles.append(style);
-//        }
-//    }
-//    QString tileStyle = settings.value(SettingsKeys::MapType, "").toString();
-//    if (tileStyle == "" && styles.length() != 0)
-//    {
-//        tileStyle = styles[0];
-//    }
-//    cacheStyles.clear();
-//    foreach(QString style, styles)
-//    {
-//        cacheStyles.addItem(style);
-//        if (style == tileStyle)
-//        {
-//            cacheStyles.setCurrentIndex(cacheStyles.count()-1);
-//        }
-//    }
-//}
+void MainWindow::addRecent(const QString& path)
+{
+    QSettings settings;
 
-//void MainWindow::updateCacheDirectory(QString path)
-//{
-//    QSettings settings;
+    recentPaths.removeAll(path);
+    recentPaths.push_front(path);
 
-//    settings.setValue(SettingsKeys::CachePath,path);
-//    updateCacheStyles();
-//    updateRecents(path);
-//}
+    while (recentPaths.length() > 10)
+        recentPaths.removeLast();
 
-//void MainWindow::openCacheDirectory()
-//{
-//    QSettings settings;
-//    QString path = QFileDialog::getExistingDirectory(this,
-//                                                     "Open Cache Directory",
-//                                                     settings.value(SettingsKeys::CachePath,"").toString());
-//    if (path.compare("") != 0)
-//    {
-//        updateCacheDirectory(path);
-//    }
-//}
+    settings.setValue(SettingsKeys::RecentPaths, recentPaths);
+
+    loadRecents();
+}
+
+void MainWindow::openRecentPath(int index)
+{
+    loadMBTilesFile(recentPaths.at(index));
+}
 
 void MainWindow::openMBTiles()
 {
@@ -244,10 +160,12 @@ void MainWindow::openMBTiles()
 void MainWindow::loadMBTilesFile(const QString &path)
 {
     QSettings settings;
+    QString currentPath = settings.value(SettingsKeys::MBTilesPath, "").toString();
+    if (path == currentPath)
+        return;
+
     settings.setValue(SettingsKeys::MBTilesPath, path);
-    ui.mapView->refresh();
-    //updateCacheDirectory("");
-    qDebug() << "loading mbtiles file " << path;
+    ui.mapView->reload();
 }
 
 //void MainWindow::updateLatLonLabels(const QPointF& latLon)

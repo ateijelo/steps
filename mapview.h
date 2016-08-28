@@ -42,6 +42,7 @@ class MapView : public QGraphicsView
         int minZoomLevel();
         void centerScene();
         void refresh();
+        void reload();
         void addPath(Path *p);
 
     signals:
@@ -49,6 +50,7 @@ class MapView : public QGraphicsView
         void canZoomOut(bool);
         void zoomChanged(int);
         void mouseMoved(const QPointF& latlon);
+        void loadedMBTiles(const QString& path);
 
     public slots:
         void zoomIn();

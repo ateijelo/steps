@@ -78,6 +78,7 @@ MapView::MapView(QWidget *parent)
     connect(ui.zoomSlider, &QSlider::valueChanged, this, &MapView::setZoomLevelCentered);
     connect(this, &MapView::zoomChanged, ui.zoomSlider, &QSlider::setValue);
     connect(this, &MapView::zoomChanged, this, &MapView::setZoomSliderTooltip);
+    connect(&tileLayer, &TileLayer::loadedMBTiles, this, &MapView::loadedMBTiles);
 
     //p->lengthLabel = ui.lengthLabel;
 }
@@ -140,6 +141,12 @@ void MapView::refresh()
     tileLayer.clear();
     QPixmapCache::clear();
     updateTiles();
+}
+
+void MapView::reload()
+{
+    tileLayer.reload();
+    refresh();
 }
 
 void MapView::addPath(Path* p)

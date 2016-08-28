@@ -29,6 +29,7 @@ class MemCache : public QObject
         bool contains(const TileId& id) const;
         void insert(const QString& type, int x, int y, int zoom, const QByteArray &data);
         void insert(const TileId& id, const QByteArray &data);
+        void clear();
 
     signals:
 

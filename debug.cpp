@@ -12,5 +12,6 @@ const char *flagLabels[] = {
     "Tile Coordinates",
     "Paths",
     "World Window",
-    NULL
+    "Database",
+    nullptr
 };

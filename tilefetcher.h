@@ -28,10 +28,12 @@ class TileFetcher : public QObject
     signals:
         void tileData(const QString& type, int x, int y, int z,
                            const QByteArray& data);
+        void loadedMBTiles(const QString& path);
 
     public slots:
         void fetchTile(const QString& type, int x, int y, int zoom);
         void forgetRequest(const QString& type, int x, int y, int zoom);
+        void reload();
 
     private slots:
         void diskTaskFinished(Task* task);

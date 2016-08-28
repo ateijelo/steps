@@ -20,6 +20,8 @@ TileLayer::TileLayer(QGraphicsScene *scene)
             &fetcher,SLOT(fetchTile(QString,int,int,int)));
     connect(this,SIGNAL(forgetTile(QString,int,int,int)),
             &fetcher,SLOT(forgetRequest(QString,int,int,int)));
+    connect(this, &TileLayer::reloading, &fetcher, &TileFetcher::reload);
+    connect(&fetcher, &TileFetcher::loadedMBTiles, this, &TileLayer::loadedMBTiles);
     fetcherThread->start();
 
     tileKeyTemplate = "%1:%2:%3:%4";
@@ -278,3 +280,12 @@ void TileLayer::clear()
         emit forgetTile(tile.type,tile.x,tile.y,tile.zoom);
     }
 }
+
+void TileLayer::reload()
+{
+    emit reloading();
+    QPixmapCache::clear();
+    clear();
+}
+
+

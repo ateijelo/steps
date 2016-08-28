@@ -26,10 +26,13 @@ class TileLayer : public QObject
         TileLayer(QGraphicsScene *scene);
         void setRegion(const QRect& r, int zoom);
         void clear();
+        void reload();
 
     signals:
         void fetchTile(const QString& type, int x, int y, int z);
         void forgetTile(const QString& type, int x, int y, int z);
+        void reloading();
+        void loadedMBTiles(const QString& path);
 
     private slots:
         void tileData(const QString& type, int x, int y, int z,

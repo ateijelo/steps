@@ -168,6 +168,12 @@ void TileFetcher::networkTaskFinished(Task *task)
     wakeUp();
 }
 
+void TileFetcher::reload()
+{
+    memCache.clear();
+    db.close();
+}
+
 void TileFetcher::readMgm(const TileId& tile)
 {
     int mgm_x = tile.x >> 3;
@@ -271,43 +277,49 @@ QByteArray TileFetcher::readMBTile(const TileId &tile)
     QSettings settings;
     QString path = settings.value(SettingsKeys::MBTilesPath,"").toString();
 
-    //qDebug() << "readMBTile: " << tile;
+    fDebug(DEBUG_DATABASE) << "readMBTile: " << tile;
 
     if (path.isEmpty()) {
         return nothing;
     }
 
-    //qDebug() << "db path:" << path;
+    fDebug(DEBUG_DATABASE) << "db path:" << path;
 
-    if (!db.isValid())
+    if (!db.isOpen())
     {
         db = QSqlDatabase::addDatabase("QSQLITE");
         db.setDatabaseName(path);
         if (!db.open())
             return nothing;
+        emit loadedMBTiles(path);
+        fDebug(DEBUG_DATABASE) << "opened database:" << path;
     }
 
-    //qDebug() << "db.hostName:" << db.hostName();
+    //fDebug(DEBUG_DATABASE) << "db.hostName:" << db.hostName();
     QSqlQuery q;
-    bool b = q.exec(QString("SELECT tile_data FROM tiles WHERE "
-                            "zoom_level = %1 AND "
-                            "tile_column = %2 AND "
-                            "tile_row = %3 LIMIT 1")
-                    .arg(tile.zoom)
-                    .arg(tile.x)
-                    .arg(tile.y)
-                    );
-//    q.bindValue(":zoom", tile.zoom);
-//    q.bindValue(":col", tile.x);
-//    q.bindValue(":row", tile.y);
+    q.prepare("SELECT tile_data FROM tiles WHERE "
+                            "zoom_level = :zoom AND "
+                            "tile_column = :x AND "
+                            "tile_row = :y LIMIT 1");
+//                    .arg(tile.zoom)
+//                    .arg(tile.x)
+//                    .arg(tile.y)
+//                    );
+    q.bindValue(":zoom", tile.zoom);
+    q.bindValue(":x", tile.x);
+    q.bindValue(":y", tile.y);
+    bool b = q.exec();
+    fDebug(DEBUG_DATABASE) << "exec returned" << b;
+
+    //fDebug(DEBUG_DATABASE) << "x:" << tile.x << "y:" << tile.y << "zoom:" << tile.zoom;
 
     while (q.next())
     {
         QByteArray r = q.value(0).toByteArray();
-        //qDebug() << "query returned" << r.size() << "bytes";
+        fDebug(DEBUG_DATABASE) << "  query returned" << r.size() << "bytes";
         return r;
     }
-    //qDebug() << "readMBTiles returned nothing";
+    fDebug(DEBUG_DATABASE) << "  returned nothing";
     return nothing;
 }
 

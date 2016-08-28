@@ -53,6 +53,11 @@ void MemCache::insert(const TileId &id, const QByteArray& data)
     fDebug(DEBUG_MEMCACHE) << "MemCache.cache.totalCost:" << cache.totalCost();
 }
 
+void MemCache::clear()
+{
+    cache.clear();
+}
+
 TileWrap::TileWrap(const QByteArray& a, const TileId &id)
 {
     data = new QByteArray(a);
