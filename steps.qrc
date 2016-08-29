@@ -7,5 +7,6 @@
         <file alias="rotate-right.png">img/rotate-right.png</file>
         <file alias="icon.svg">img/icon.svg</file>
         <file>img/path.png</file>
+        <file>img/pin32.png</file>
     </qresource>
 </RCC>

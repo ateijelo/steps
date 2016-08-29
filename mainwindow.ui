@@ -108,6 +108,7 @@
    <addaction name="zoomInAction"/>
    <addaction name="separator"/>
    <addaction name="newPathAction"/>
+   <addaction name="newPinAction"/>
   </widget>
   <widget class="QDockWidget" name="pathsDock">
    <property name="windowTitle">
@@ -299,10 +300,22 @@
      <normaloff>:/img/path.png</normaloff>:/img/path.png</iconset>
    </property>
    <property name="text">
-    <string>newPath</string>
+    <string>New Path</string>
    </property>
    <property name="toolTip">
     <string>New Path</string>
+   </property>
+  </action>
+  <action name="newPinAction">
+   <property name="icon">
+    <iconset resource="steps.qrc">
+     <normaloff>:/img/pin32.png</normaloff>:/img/pin32.png</iconset>
+   </property>
+   <property name="text">
+    <string>New Pin</string>
+   </property>
+   <property name="toolTip">
+    <string>New Pin</string>
    </property>
   </action>
  </widget>
