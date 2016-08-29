@@ -194,8 +194,16 @@ void MainWindow::loadMBTilesFile(const QString &path)
 
 void MainWindow::aboutDialog()
 {
-    QMessageBox::about(this,"About Steps","Copyright (C) 2009-2015 Andy Teijelo <ateijelo@gmail.com>\n"
-                                          "Steps is distributed under the terms of the MIT License");
+    QMessageBox::about(this,"About Steps",
+                       "Copyright (C) 2009-2016 Andy Teijelo <ateijelo@gmail.com>\n"
+                       "\n"
+                       "Website: www.ateijelo.com/steps\n"
+                       "\n"
+                       "Steps is distributed under the Apache License, version 2.0\n"
+                       "You may obtain a copy at:\n"
+                       "\n"
+                       "    http://www.apache.org/licenses/LICENSE-2.0\n"
+                       );
 }
 
 void MainWindow::newPath()

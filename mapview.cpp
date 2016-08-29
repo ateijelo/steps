@@ -510,7 +510,7 @@ int MapView::zoomLevel()
 
 int MapView::maxZoomLevel()
 {
-    return 18;
+    return 19;
 }
 
 int MapView::minZoomLevel()

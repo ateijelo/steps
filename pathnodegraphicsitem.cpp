@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-//#include <cmath>
+#include <cmath>
 #include <QtDebug>
 #include <QCursor>
 #include <QBrush>
@@ -182,7 +182,7 @@ QVariant PathNodeGraphicsItem::itemChange(QGraphicsItem::GraphicsItemChange chan
                 qreal x = p.x();
                 if (x > -pw/2 && x < pw/2)
                     return value;
-                qreal m = fmod(p.x() + pw/2,pw);
+                qreal m = std::fmod(p.x() + pw/2,pw);
                 if (m < 0)
                     p.setX(pw/2 + m);
                 else
