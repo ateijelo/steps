@@ -85,6 +85,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui.openMBTilesAction,&QAction::triggered, this, &MainWindow::openMBTiles);
     connect(ui.mapView, &MapView::loadedMBTiles, this, &MainWindow::addRecent);
     connect(ui.newPathAction, &QAction::triggered, this, &MainWindow::newPath);
+    connect(ui.openKMLFile, &QAction::triggered, this, &MainWindow::openKMLFile);
 
     ui.zoomInAction->setShortcut(QKeySequence::ZoomIn);
     ui.zoomOutAction->setShortcut(QKeySequence::ZoomOut);
@@ -156,6 +157,28 @@ void MainWindow::addRecent(const QString& path)
 void MainWindow::openRecentPath(int index)
 {
     loadMBTilesFile(recentPaths.at(index));
+}
+
+void MainWindow::openKMLFile()
+{
+    QSettings settings;
+    QString dir = "";
+    QFileInfo fi(settings.value(SettingsKeys::KMLFilePath,"").toString());
+    if (fi.exists())
+        dir = fi.dir().absolutePath();
+    QString path = QFileDialog::getOpenFileName(this,
+                                                "Open KML file",
+                                                dir,
+                                                "*.kml");
+    if (!path.isEmpty())
+    {
+        loadKML(path);
+    }
+}
+
+void MainWindow::loadKML(const QString &path)
+{
+    ui.mapView->loadKML(path);
 }
 
 void MainWindow::openMBTiles()

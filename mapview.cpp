@@ -26,6 +26,9 @@
 #include <QHBoxLayout>
 #include <QSlider>
 #include <QPixmapCache>
+#include <QStringList>
+#include <QXmlStreamReader>
+
 #include <math.h>
 
 #include "mapview.h"
@@ -98,7 +101,11 @@ MapView::MapView(QWidget *parent)
     connect(this, &MapView::zoomChanged, this, &MapView::setZoomSliderTooltip);
     connect(&tileLayer, &TileLayer::loadedMBTiles, this, &MapView::loadedMBTiles);
 
-    //p->lengthLabel = ui.lengthLabel;
+    pinsLayer = new QGraphicsRectItem(QRectF());
+    pinsLayer->setZValue(4);
+    scene->addItem(pinsLayer);
+
+    pinPixmap.load(":/img/pin.png");
 }
 
 bool MapView::canZoomIn()
@@ -172,7 +179,72 @@ void MapView::addPath(Path* p)
     p->addToScene(scene);
 //    p->centerItem()->setZValue(2);
 //    p->centerItem()->setPos(QPointF(0,0));
-//    scene->addItem(p->centerItem());
+    //    scene->addItem(p->centerItem());
+}
+
+void MapView::addPin(const QString &name, double lat, double lon)
+{
+    QGraphicsPixmapItem *pin = new QGraphicsPixmapItem(pinPixmap, pinsLayer);
+    pin->setPos(GeoTools::LatLon2Meters(QPointF(lon, lat)));
+    pin->setOffset(-5,-24);
+    pin->setFlag(QGraphicsItem::ItemIsMovable);
+    pin->setFlag(QGraphicsItem::ItemIgnoresTransformations);
+    pin->setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
+    pin->setCursor(Qt::ArrowCursor);
+    pin->setZValue(-lat);
+    QGraphicsTextItem *text = new QGraphicsTextItem(name, pin);
+    text->setPos(6,-26);
+    text->setFont(QFont("sans",8));
+}
+
+void MapView::loadKML(const QString &path)
+{
+
+
+    QFile kml(path);
+    if (!kml.open(QIODevice::ReadOnly)) {
+        return;
+    }
+
+    QXmlStreamReader xml(&kml);
+    bool place = false;
+    QString name;
+    QString coords;
+    while (!xml.atEnd()) {
+        xml.readNext();
+        if (xml.isStartElement()) {
+            if (xml.name() == "Placemark") {
+                place = true;
+            }
+            if (place) {
+                if (xml.name() == "name") {
+                    name = xml.readElementText();
+                }
+                if (xml.name() == "coordinates") {
+                    coords = xml.readElementText();
+                }
+            }
+        }
+        if (xml.isEndElement()) {
+            if (xml.name() == "Placemark") {
+                place = false;
+
+                QStringList l = coords.split(",");
+                if (l.length() != 2)
+                    continue;
+
+                bool ok = false;
+                double lon = l.at(0).toDouble(&ok);
+                if (!ok) continue;
+                double lat = l.at(1).toDouble(&ok);
+                if (!ok) continue;
+
+                qDebug() << "lat:" << lat << "lon:" << lon;
+
+                addPin(name, lat, lon);
+            }
+        }
+    }
 }
 
 bool MapView::viewportEvent(QEvent *event)

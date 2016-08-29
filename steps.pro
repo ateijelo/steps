@@ -5,7 +5,7 @@ TEMPLATE = app
 TARGET = steps
 DEPENDPATH += .
 INCLUDEPATH += .
-QT += network core gui widgets sql
+QT += network core gui widgets sql xml
 LIBS += -lGeographic
 
 unix:INCLUDEPATH += /usr/local/include

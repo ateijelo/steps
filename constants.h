@@ -34,6 +34,7 @@ namespace SettingsKeys
     const QString RecentPaths = "RecentPaths";
     const QString path = "path";
     const QString MBTilesPath = "MBTilesPath";
+    const QString KMLFilePath = "KMLFilePath";
 }
 
 namespace WheelOptions

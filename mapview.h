@@ -62,6 +62,9 @@ class MapView : public QGraphicsView
         void refresh();
         void reload();
         void addPath(Path *p);
+        void loadKML(const QString& path);
+
+        void addPin(const QString& name, double lat, double lon);
 
     signals:
         void canZoomIn(bool);
@@ -101,6 +104,9 @@ class MapView : public QGraphicsView
         QString coordsTemplate;
         QTransform lastViewportTransform;
         WorldWindow *worldWindow;
+
+        QGraphicsItem *pinsLayer;
+        QPixmap pinPixmap;
 };
 
 #endif

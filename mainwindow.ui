@@ -75,6 +75,8 @@
      <string>&amp;File</string>
     </property>
     <addaction name="openMBTilesAction"/>
+    <addaction name="openKMLFile"/>
+    <addaction name="saveAction"/>
     <addaction name="action_Preferences"/>
     <addaction name="separator"/>
     <addaction name="action_Exit"/>
@@ -101,8 +103,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="rotLeftAction"/>
-   <addaction name="rotRightAction"/>
+   <addaction name="openKMLFile"/>
+   <addaction name="saveAction"/>
    <addaction name="separator"/>
    <addaction name="zoomOutAction"/>
    <addaction name="zoomInAction"/>
@@ -290,9 +292,6 @@
    <property name="toolTip">
     <string>Open MBTiles File</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+O</string>
-   </property>
   </action>
   <action name="newPathAction">
    <property name="icon">
@@ -316,6 +315,36 @@
    </property>
    <property name="toolTip">
     <string>New Pin</string>
+   </property>
+  </action>
+  <action name="openKMLFile">
+   <property name="icon">
+    <iconset resource="steps.qrc">
+     <normaloff>:/open.png</normaloff>:/open.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Open KML file...</string>
+   </property>
+   <property name="toolTip">
+    <string>Open KML file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="saveAction">
+   <property name="icon">
+    <iconset resource="steps.qrc">
+     <normaloff>:/img/floppy.png</normaloff>:/img/floppy.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Save</string>
+   </property>
+   <property name="toolTip">
+    <string>Save</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
  </widget>

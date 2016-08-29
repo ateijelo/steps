@@ -8,5 +8,7 @@
         <file alias="icon.svg">img/icon.svg</file>
         <file>img/path.png</file>
         <file>img/pin32.png</file>
+        <file>img/pin.png</file>
+        <file>img/floppy.png</file>
     </qresource>
 </RCC>
