@@ -101,7 +101,6 @@ class MapView : public QGraphicsView
         TileLayer tileLayer;
         bool showToolTip;
         Ui::ViewWidgets ui;
-        QString coordsTemplate;
         QTransform lastViewportTransform;
         WorldWindow *worldWindow;
 

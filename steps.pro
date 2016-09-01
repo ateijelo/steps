@@ -44,7 +44,8 @@ HEADERS += mainwindow.h \
     tileprovider.h \
     pathsdockmodel.h \
     pathnodegraphicsitem.h \
-    pathedgesegmentgraphicsitem.h
+    pathedgesegmentgraphicsitem.h \
+    coordslabel.h
 FORMS += mainwindow.ui \
     preferences.ui \
     debugdialog.ui \
@@ -75,5 +76,6 @@ SOURCES += main.cpp \
     tileprovider.cpp \
     pathsdockmodel.cpp \
     pathnodegraphicsitem.cpp \
-    pathedgesegmentgraphicsitem.cpp
+    pathedgesegmentgraphicsitem.cpp \
+    coordslabel.cpp
 RESOURCES += steps.qrc
