@@ -63,7 +63,7 @@ void CoordsLabel::updateCoords()
             .arg(m2,2,'f',0,'0')
             .arg(s2,5,'f',2,'0').arg(ew));
     } else {
-        setText(QString("%1 %2 %3 %4")
+        setText(QString(" %1 %2 %3 %4 ")
                 .arg(lat,0,'f',6)
                 .arg(ns)
                 .arg(lon,0,'f',6)
