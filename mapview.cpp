@@ -211,7 +211,7 @@ void MapView::loadKML(const QString &path)
                 place = false;
 
                 QStringList l = coords.split(",");
-                if (l.length() != 2)
+                if (l.length() < 2)
                     continue;
 
                 bool ok = false;
