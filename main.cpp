@@ -23,11 +23,19 @@
 
 int main(int argc, char *argv[])
 {
+    if (argc >=3 && QString(argv[argc-2]) == "--librarypath") {
+        QStringList libraryPaths;
+        libraryPaths << argv[argc-1];
+        QCoreApplication::setLibraryPaths(libraryPaths);
+        argc = argc - 2;
+    }
+
     QApplication app(argc, argv);
+
     app.setOrganizationName("ateijelo");
     app.setOrganizationDomain("ateijelo.com");
     app.setApplicationName("Steps");
-    //app.setApplicationVersion("14.02");
+    app.setApplicationVersion("16.09");
 
     if (app.arguments().size() > 1)
     {
