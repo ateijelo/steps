@@ -41,11 +41,11 @@ HEADERS += mainwindow.h \
     geocircle.h \
     worldwindow.h \
     path.h \
-    tileprovider.h \
     pathsdockmodel.h \
     pathnodegraphicsitem.h \
     pathedgesegmentgraphicsitem.h \
-    coordslabel.h
+    coordslabel.h \
+    tilesource.h
 FORMS += mainwindow.ui \
     preferences.ui \
     debugdialog.ui \
@@ -73,9 +73,9 @@ SOURCES += main.cpp \
     geocircle.cpp \
     worldwindow.cpp \
     path.cpp \
-    tileprovider.cpp \
     pathsdockmodel.cpp \
     pathnodegraphicsitem.cpp \
     pathedgesegmentgraphicsitem.cpp \
-    coordslabel.cpp
+    coordslabel.cpp \
+    tilesource.cpp
 RESOURCES += steps.qrc

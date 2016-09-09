@@ -1,5 +1,5 @@
 /*
- * tileprovider.cpp -- part of Steps, a simple maps app
+ * tilesource.cpp -- part of Steps, a simple maps app
  *
  * Copyright 2009-2016 Andy Teijelo <www.ateijelo.com>
  *
@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-#include "tileprovider.h"
+#include "tilesource.h"
 
-TileProvider::TileProvider()
+TileSource::TileSource()
 {
 
 }

@@ -1,5 +1,5 @@
 /*
- * tileprovider.h -- part of Steps, a simple maps app
+ * tilesource.h -- part of Steps, a simple maps app
  *
  * Copyright 2009-2016 Andy Teijelo <www.ateijelo.com>
  *
@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-#ifndef TILEPROVIDER_H
-#define TILEPROVIDER_H
+#ifndef TILESOURCE_H
+#define TILESOURCE_H
 
 
-class TileProvider
+class TileSource
 {
     public:
-        TileProvider();
+        TileSource();
 };
 
-#endif // TILEPROVIDER_H
+#endif // TILESOURCE_H
