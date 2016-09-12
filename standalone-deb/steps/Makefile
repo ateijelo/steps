@@ -1,7 +1,5 @@
 app:
-	@echo This is the Makefile for the Steps debian standalone package
-	@echo This default action does nothing and is in the Makefile
-	@echo to please debhelper
+	true
 
 install:
 	mkdir -p debian/steps/usr/local/
