@@ -1,0 +1,17 @@
+Source: steps
+Section: utils
+Priority: optional
+Maintainer: Andy Teijelo Pérez <ateijelo@gmail.com>
+Build-Depends: debhelper (>=9)
+Standards-Version: 3.9.8
+Homepage: http://www.ateijelo.com/steps
+#Vcs-Git: git://anonscm.debian.org/collab-maint/steps.git
+#Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/steps.git
+
+Package: steps
+Architecture: any
+#Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: A small maps app
+ Steps is a small maps app designed to be useful offline.
+ It can read mbtiles, has some very basic support for KML
+ and includes a nice path editing interface.

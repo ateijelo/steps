@@ -1,0 +1,19 @@
+[Desktop Entry]
+Comment[en_US]=
+Comment=
+Exec=/usr/bin/steps
+GenericName[en_US]=Maps
+GenericName=Mapas
+Icon=/usr/share/pixmaps/steps.png
+MimeType=application/vnd.google-earth.kml+xml;application/vnd.google-earth.kmz;application/vnd.steps.mbtiles
+Name[en_US]=Steps
+Name=Steps
+Path=
+StartupNotify=true
+Terminal=false
+TerminalOptions=
+Type=Application
+X-DBUS-ServiceName=
+X-DBUS-StartupType=
+X-KDE-SubstituteUID=false
+X-KDE-Username=
