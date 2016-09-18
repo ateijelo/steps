@@ -1,8 +1,5 @@
 # Steps
+## A Pleasant Maps App
 
-A simple maps app with nice measuring tools, meant for non-cartographers.
+A simple maps app, build with offline capabilities in mind. It includes nice measuring tools.
 
-<center>
-    <video src="http://localhost:4000/assets/video/steps.mp4" controls loop>
-    </video>
-</center>
